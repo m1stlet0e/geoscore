@@ -41,6 +41,7 @@ model User {
   subscriptions     Subscription[]
   orders            Order[]
   quotas            Quota[]
+  adminLogs         AdminLog[]
 }
 
 enum Plan {
@@ -525,4 +526,28 @@ model Alert {
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead, createdAt])
+}
+
+// ============================================
+// Admin
+// ============================================
+model AdminLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  target    String?
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+}
+
+model SystemConfig {
+  id    String @id @default(cuid())
+  key   String @unique
+  value Json
+  desc  String?
+  updatedAt DateTime @updatedAt
 }
