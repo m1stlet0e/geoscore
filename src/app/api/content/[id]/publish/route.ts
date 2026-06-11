@@ -1,5 +1,5 @@
 // ============================================
-// GET /api/publish — list publish jobs
+// POST /api/content/[id]/publish — create publish job
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -8,7 +8,12 @@ import { authOptions } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { contentEngine } from '@/lib/engines/content.engine'
 
-export async function GET(request: NextRequest) {
+const VALID_CHANNELS = ['wordpress', 'notion', 'reddit', 'github', 'zhihu', 'wechat'] as const
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.email) {
@@ -20,17 +25,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    const { searchParams } = new URL(request.url)
-    const contentId = searchParams.get('contentId') || undefined
-    const status = searchParams.get('status') || undefined
-    const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
-    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20
+    const { id } = await params
+    const body = await request.json()
+    const { channel } = body
 
-    const result = await contentEngine.getPublishJobs(user.id, contentId, status, page, limit)
+    if (!channel || !VALID_CHANNELS.includes(channel)) {
+      return NextResponse.json(
+        { error: `channel must be one of: ${VALID_CHANNELS.join(', ')}` },
+        { status: 400 }
+      )
+    }
 
-    return NextResponse.json({ success: true, data: result })
+    const publishJob = await contentEngine.createPublishJob(id, user.id, channel)
+
+    return NextResponse.json({ success: true, data: publishJob }, { status: 201 })
   } catch (error) {
-    console.error('GET /api/publish error:', error)
+    console.error('POST /api/content/[id]/publish error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

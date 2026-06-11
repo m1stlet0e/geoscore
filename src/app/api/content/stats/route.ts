@@ -1,5 +1,5 @@
 // ============================================
-// GET /api/publish — list publish jobs
+// GET /api/content/stats — content statistics
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -21,16 +21,16 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const contentId = searchParams.get('contentId') || undefined
-    const status = searchParams.get('status') || undefined
-    const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
-    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20
+    const brandId = searchParams.get('brandId')
+    if (!brandId) {
+      return NextResponse.json({ error: 'brandId is required' }, { status: 400 })
+    }
 
-    const result = await contentEngine.getPublishJobs(user.id, contentId, status, page, limit)
+    const stats = await contentEngine.getStats(brandId, user.id)
 
-    return NextResponse.json({ success: true, data: result })
+    return NextResponse.json({ success: true, data: stats })
   } catch (error) {
-    console.error('GET /api/publish error:', error)
+    console.error('GET /api/content/stats error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
