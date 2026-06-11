@@ -1,12 +1,13 @@
 // ============================================
-// GET /api/citations
-// 获取引用记录列表
+// GET /api/citations/sources
+// 获取引用来源排行
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { citationEngine } from '@/lib/engines/citation.engine'
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,50 +29,42 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const brandId = searchParams.get('brandId')
     const platform = searchParams.get('platform')
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20')
-    const sortBy = searchParams.get('sortBy') || 'createdAt'
-    const sortOrder = searchParams.get('sortOrder') || 'desc'
+    const limit = parseInt(searchParams.get('limit') || '50')
 
-    // 构建查询条件
-    const where: any = { userId: user.id }
-    if (brandId) where.brandId = brandId
-    if (platform) where.platform = platform
+    if (!brandId) {
+      return NextResponse.json(
+        { error: 'brandId is required' },
+        { status: 400 }
+      )
+    }
 
-    // 获取总数
-    const total = await prisma.citation.count({ where })
-
-    // 获取列表
-    const citations = await prisma.citation.findMany({
-      where,
-      include: {
-        brand: {
-          select: { id: true, name: true }
-        },
-        citationInfluences: {
-          orderBy: { influence: 'desc' },
-          take: 5
-        }
-      },
-      orderBy: { [sortBy]: sortOrder },
-      skip: (page - 1) * limit,
-      take: limit
+    // 验证品牌属于当前用户
+    const brand = await prisma.brand.findFirst({
+      where: {
+        id: brandId,
+        userId: user.id
+      }
     })
+
+    if (!brand) {
+      return NextResponse.json(
+        { error: 'Brand not found or access denied' },
+        { status: 404 }
+      )
+    }
+
+    // 获取来源排行
+    const sources = await citationEngine.getSourceRankings(brandId, platform || undefined, limit)
 
     return NextResponse.json({
       success: true,
       data: {
-        citations,
-        pagination: {
-          page,
-          limit,
-          total,
-          pages: Math.ceil(total / limit)
-        }
+        sources,
+        total: sources.length
       }
     })
   } catch (error) {
-    console.error('GET /api/citations error:', error)
+    console.error('GET /api/citations/sources error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

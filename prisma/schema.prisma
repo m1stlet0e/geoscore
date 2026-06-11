@@ -180,13 +180,31 @@ model Citation {
   sources     Json     // [{url, title, domain, snippet}]
   brandRank   Int?
   brandContext String? @db.Text // why was the brand mentioned?
+  aiScore     Float?   // AI 推荐概率 0-100
+  confidence  Float?   // 置信度 0-1
   createdAt   DateTime @default(now())
 
   brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  citationInfluences CitationInfluence[]
 
   @@index([brandId, platform, createdAt])
   @@index([userId, createdAt])
+  @@index([aiScore])
+}
+
+model CitationInfluence {
+  id          String   @id @default(cuid())
+  citationId  String
+  sourceUrl   String   @db.Text
+  sourceDomain String
+  influence   Float    // 0-100, 对本次引用的影响度
+  factor      String?  // github_star, reddit_upvote, blog_authority
+  createdAt   DateTime @default(now())
+
+  citation Citation @relation(fields: [citationId], references: [id], onDelete: Cascade)
+
+  @@index([citationId, influence])
 }
 
 model CitationSource {
@@ -197,8 +215,10 @@ model CitationSource {
   platform  String
   url       String   @db.Text
   title     String?
+  sourceType String?  // github, reddit, blog, news, forum, docs
   weight    Float    @default(1.0) // 0..1
   citationCount Int  @default(1)
+  sentiment String?  // positive, neutral, negative
   firstSeen DateTime @default(now())
   lastSeen  DateTime @default(now())
 

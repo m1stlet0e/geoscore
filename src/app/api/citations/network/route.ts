@@ -1,17 +1,15 @@
 // ============================================
-// GET /api/citations/[id]
-// 获取单条引用详情
+// GET /api/citations/network
+// 获取影响力网络图数据
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { citationEngine } from '@/lib/engines/citation.engine'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.email) {
@@ -26,37 +24,41 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    const { id } = params
+    const { searchParams } = new URL(request.url)
+    const brandId = searchParams.get('brandId')
+    const limit = parseInt(searchParams.get('limit') || '100')
 
-    // 获取引用详情
-    const citation = await prisma.citation.findFirst({
+    if (!brandId) {
+      return NextResponse.json(
+        { error: 'brandId is required' },
+        { status: 400 }
+      )
+    }
+
+    // 验证品牌属于当前用户
+    const brand = await prisma.brand.findFirst({
       where: {
-        id,
+        id: brandId,
         userId: user.id
-      },
-      include: {
-        brand: {
-          select: { id: true, name: true, domain: true }
-        },
-        citationInfluences: {
-          orderBy: { influence: 'desc' }
-        }
       }
     })
 
-    if (!citation) {
+    if (!brand) {
       return NextResponse.json(
-        { error: 'Citation not found' },
+        { error: 'Brand not found or access denied' },
         { status: 404 }
       )
     }
 
+    // 生成网络图
+    const graph = await citationEngine.generateNetworkGraph(brandId, limit)
+
     return NextResponse.json({
       success: true,
-      data: citation
+      data: graph
     })
   } catch (error) {
-    console.error('GET /api/citations/[id] error:', error)
+    console.error('GET /api/citations/network error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
