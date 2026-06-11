@@ -1,11 +1,103 @@
-import Link from 'next/link';
-import { ArrowRight, ChevronDown } from 'lucide-react';
-import { Logo } from '@/components/Logo';
-import { PricingTable, PricingTableCompact } from '@/components/PricingTable';
+'use client';
 
-export const metadata = {
-  title: '价格 · GeoScore',
-  description: 'GeoScore 4 档清晰定价,从个人免费到企业定制,所有方案都包含 7 大 AI 引擎监控。',
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import {
+  ArrowRight,
+  Check,
+  ChevronDown,
+  Sparkles,
+  Loader2,
+} from 'lucide-react';
+import { Logo } from '@/components/Logo';
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type Plan = 'FREE' | 'PRO' | 'GROWTH' | 'ENTERPRISE';
+
+interface PlanConfig {
+  name: string;
+  price: number;
+  quotas: Record<string, number>;
+  features: string[];
+}
+
+type PlanMap = Record<Plan, PlanConfig>;
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const TIER_ORDER: Plan[] = ['FREE', 'PRO', 'GROWTH', 'ENTERPRISE'];
+
+const TIER_META: Record<Plan, { tagline: string; highlight: boolean; cta: string; ctaLink: string }> = {
+  FREE: {
+    tagline: '个人尝鲜 / 试用',
+    highlight: false,
+    cta: '开始使用',
+    ctaLink: '/register?plan=free',
+  },
+  PRO: {
+    tagline: '小型团队 / 增长负责人',
+    highlight: true,
+    cta: '升级 PRO',
+    ctaLink: '/register?plan=pro',
+  },
+  GROWTH: {
+    tagline: '增长团队 / 代理机构',
+    highlight: false,
+    cta: '升级 GROWTH',
+    ctaLink: '/register?plan=growth',
+  },
+  ENTERPRISE: {
+    tagline: '大企业 / 定制',
+    highlight: false,
+    cta: '联系我们',
+    ctaLink: 'mailto:hello@geoscore.ai',
+  },
+};
+
+const QUOTA_LABELS: Record<string, string> = {
+  SCAN: '扫描次数/月',
+  PROMPT: 'Prompt 数量/月',
+  CITATION_ANALYSIS: '引用分析/月',
+  GAP_ANALYSIS: '缺口分析/月',
+  CONTENT_GENERATE: '内容生成/月',
+  REPORT_GENERATE: '报告生成/月',
+};
+
+const TIER_FEATURES: Record<Plan, string[]> = {
+  FREE: [
+    '基础监控',
+    '5 个品牌',
+    '每周报告',
+    '可见性评分',
+  ],
+  PRO: [
+    '完整监控',
+    '20 个品牌',
+    '每日报告',
+    'Citation 分析',
+    'Gap 分析',
+    '内容生成',
+  ],
+  GROWTH: [
+    '全部功能',
+    '50 个品牌',
+    '实时报告',
+    '内容生成 + 自动发布',
+    '3 个团队席位',
+    '影响力地图 + 预测',
+    '优先支持',
+  ],
+  ENTERPRISE: [
+    '无限额度',
+    '无限品牌',
+    '专属客服',
+    'API 接口',
+    '定制报告',
+    'SSO / SAML',
+    '私有部署',
+    '审计日志 + 合规',
+  ],
 };
 
 const FAQ_ITEMS: Array<{ q: string; a: string }> = [
@@ -39,7 +131,82 @@ const FAQ_ITEMS: Array<{ q: string; a: string }> = [
   },
 ];
 
+// ─── Helper ──────────────────────────────────────────────────────────────────
+
+function formatLimit(v: number) {
+  if (v >= 999999) return '∞';
+  return v.toLocaleString('zh-CN');
+}
+
+// ─── Skeleton ────────────────────────────────────────────────────────────────
+
+function SkeletonPulse({ className }: { className?: string }) {
+  return <div className={`animate-pulse rounded bg-slate-800 ${className}`} />;
+}
+
+function PricingCardsSkeleton() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div
+          key={i}
+          className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6"
+        >
+          <SkeletonPulse className="h-4 w-16 mb-2" />
+          <SkeletonPulse className="h-3 w-32 mb-6" />
+          <SkeletonPulse className="h-10 w-24 mb-6" />
+          <div className="space-y-2.5 mb-6">
+            {Array.from({ length: 4 }).map((_, j) => (
+              <SkeletonPulse key={j} className="h-4 w-full" />
+            ))}
+          </div>
+          <SkeletonPulse className="h-10 w-full" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Main Page Component ─────────────────────────────────────────────────────
+
 export default function PricingPage() {
+  const [plans, setPlans] = useState<PlanMap | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [userPlan, setUserPlan] = useState<Plan | null>(null);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const res = await fetch('/api/billing/plans');
+        if (!res.ok) throw new Error('Failed to fetch plans');
+        const data = await res.json();
+        setPlans(data.plans);
+      } catch (err) {
+        console.error('Error fetching plans:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
+
+  // Try to fetch current user plan (optional, for "当前套餐" badge)
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('/api/user/me');
+        if (res.ok) {
+          const data = await res.json();
+          setUserPlan(data.plan ?? null);
+        }
+      } catch {
+        // Not logged in or error - ignore
+      }
+    };
+    fetchUser();
+  }, []);
+
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       <div className="pointer-events-none fixed inset-0 -z-10 bg-radial-glow" aria-hidden="true" />
@@ -82,11 +249,7 @@ export default function PricingPage() {
           </div>
           <h1 className="mt-5 text-4xl font-bold tracking-tight sm:text-5xl">
             <span className="bg-gradient-to-br from-white to-slate-300 bg-clip-text text-transparent">
-              按规模付费,
-            </span>
-            <br />
-            <span className="bg-gradient-to-br from-indigo-300 to-violet-300 bg-clip-text text-transparent">
-              按价值交付。
+              选择适合你的套餐
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-slate-400">
@@ -95,25 +258,110 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Cards */}
+      {/* Plan Cards */}
       <section className="pb-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <PricingTable />
-        </div>
-      </section>
+          {loading ? (
+            <PricingCardsSkeleton />
+          ) : plans ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {TIER_ORDER.map((tier) => {
+                const config = plans[tier];
+                if (!config) return null;
+                const meta = TIER_META[tier];
+                const features = TIER_FEATURES[tier];
+                const isCurrentPlan = userPlan === tier;
 
-      {/* Detailed comparison table */}
-      <section className="border-t border-slate-800/60 py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 text-center">
-            <h2 className="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
-              完整功能对比
-            </h2>
-            <p className="mt-2 text-sm text-slate-400">
-              每一档都看得清清楚楚。
-            </p>
-          </div>
-          <PricingTableCompact />
+                return (
+                  <div
+                    key={tier}
+                    className={`relative flex flex-col rounded-2xl border bg-slate-900/50 p-6 backdrop-blur transition ${
+                      meta.highlight
+                        ? 'border-indigo-500/50 shadow-[0_0_0_1px_rgba(99,102,241,0.25),0_20px_60px_-20px_rgba(99,102,241,0.5)]'
+                        : 'border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    {/* 最受欢迎 badge */}
+                    {meta.highlight && (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-indigo-400/40 bg-gradient-to-r from-indigo-500 to-violet-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white shadow-lg shadow-indigo-500/30">
+                          <Sparkles className="h-3 w-3" /> 最受欢迎
+                        </span>
+                      </div>
+                    )}
+
+                    {/* 当前套餐 badge */}
+                    {isCurrentPlan && (
+                      <div className="absolute -top-3 right-4">
+                        <span className="inline-flex items-center rounded-full border border-emerald-400/40 bg-emerald-500/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-200">
+                          当前套餐
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="mb-1 text-sm font-semibold uppercase tracking-wider text-slate-300">
+                      {config.name}
+                    </div>
+                    <div className="mb-4 text-xs text-slate-500">{meta.tagline}</div>
+
+                    <div className="mb-5 flex items-baseline gap-1">
+                      <span className="text-4xl font-bold tracking-tight text-slate-50">
+                        {config.price === 0 ? '¥0' : `¥${config.price}`}
+                      </span>
+                      <span className="text-sm text-slate-500">
+                        {config.price === 0 ? '永久免费' : '/ 月'}
+                      </span>
+                    </div>
+
+                    {/* Features */}
+                    <ul className="mb-5 space-y-2.5 text-sm">
+                      {features.map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-slate-300">
+                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* Quota limits */}
+                    <div className="mb-5 rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+                      <div className="mb-2 text-[10px] uppercase tracking-wider text-slate-500">
+                        额度限制
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-[11px]">
+                        {Object.entries(config.quotas).map(([key, value]) => (
+                          <div key={key}>
+                            <div className="text-slate-500 truncate">{QUOTA_LABELS[key] ?? key}</div>
+                            <div className="font-semibold tabular-nums text-slate-100">
+                              {formatLimit(value)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* CTA */}
+                    <Link
+                      href={meta.ctaLink}
+                      className={`mt-auto inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
+                        meta.highlight
+                          ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30 hover:from-indigo-400 hover:to-violet-400'
+                          : tier === 'FREE'
+                            ? 'border border-slate-700 bg-slate-800/60 text-slate-100 hover:bg-slate-800'
+                            : 'border border-indigo-500/30 bg-indigo-500/10 text-indigo-100 hover:bg-indigo-500/20'
+                      }`}
+                    >
+                      {isCurrentPlan ? '管理订阅' : meta.cta}
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center text-sm text-slate-500 py-12">
+              加载套餐信息失败，请刷新页面重试
+            </div>
+          )}
         </div>
       </section>
 

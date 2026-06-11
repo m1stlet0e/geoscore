@@ -38,6 +38,9 @@ model User {
   trendSignals      TrendSignal[]
   forecasts         Forecast[]
   gapAnalyses       GapAnalysis[]
+  subscriptions     Subscription[]
+  orders            Order[]
+  quotas            Quota[]
 }
 
 enum Plan {
@@ -45,6 +48,133 @@ enum Plan {
   PRO
   GROWTH
   ENTERPRISE
+}
+
+enum SubStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  PAUSED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum PayStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum QuotaType {
+  SCAN
+  PROMPT
+  CITATION_ANALYSIS
+  GAP_ANALYSIS
+  CONTENT_GENERATE
+  REPORT_GENERATE
+}
+
+model Subscription {
+  id            String     @id @default(cuid())
+  userId        String
+  plan          Plan
+  status        SubStatus  @default(ACTIVE)
+  startDate     DateTime   @default(now())
+  endDate       DateTime?
+  autoRenew     Boolean    @default(true)
+  paymentMethod String?    // wechat, alipay
+  externalId    String?    // 第三方订阅 ID
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@index([userId, status])
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  userId         String
+  subscriptionId String?
+  orderNo        String      @unique
+  plan           Plan
+  amount         Decimal     @db.Decimal(10, 2)
+  currency       String      @default("CNY")
+  status         OrderStatus @default(PENDING)
+  paymentMethod  String?     // wechat, alipay
+  paymentId      String?     // 第三方支付单号
+  paidAt         DateTime?
+  expiredAt      DateTime?
+  meta           Json?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+  payments     Payment[]
+
+  @@index([userId, status])
+  @@index([orderNo])
+}
+
+model Payment {
+  id           String    @id @default(cuid())
+  orderId      String
+  method       String    // wechat, alipay
+  amount       Decimal   @db.Decimal(10, 2)
+  currency     String    @default("CNY")
+  status       PayStatus @default(PENDING)
+  externalId   String?   // 第三方支付流水号
+  callbackUrl  String?
+  callbackData Json?
+  paidAt       DateTime?
+  createdAt    DateTime  @default(now())
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+  @@index([externalId])
+}
+
+model Quota {
+  id          String    @id @default(cuid())
+  userId      String
+  type        QuotaType
+  total       Int       // 总额度
+  used        Int       @default(0) // 已用
+  remaining   Int       // 剩余 (total - used)
+  period      String    // monthly, yearly, lifetime
+  periodStart DateTime
+  periodEnd   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usages QuotaUsage[]
+
+  @@unique([userId, type, period, periodStart])
+  @@index([userId, type])
+}
+
+model QuotaUsage {
+  id          String   @id @default(cuid())
+  quotaId     String
+  amount      Int
+  description String?
+  meta        Json?    // {scanId, promptId, etc}
+  createdAt   DateTime @default(now())
+
+  quota Quota @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+
+  @@index([quotaId, createdAt])
 }
 
 model Account {
