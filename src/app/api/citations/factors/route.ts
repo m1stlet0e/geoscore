@@ -1,6 +1,6 @@
 // ============================================
-// POST /api/citations/analyze
-// 分析推荐因素 (Citation Intelligence 2.0)
+// GET /api/citations/factors
+// 获取因素分布 (Citation Intelligence 2.0)
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -9,7 +9,7 @@ import { authOptions } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { citationEngine } from '@/lib/engines/citation.engine'
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.email) {
@@ -24,20 +24,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    const body = await request.json()
-    const { brandId, platform, prompt, answer, sources } = body
+    const { searchParams } = new URL(request.url)
+    const brandId = searchParams.get('brandId')
+    const platform = searchParams.get('platform') || undefined
 
-    // 参数校验
-    if (!brandId || !platform || !prompt || !answer) {
+    if (!brandId) {
       return NextResponse.json(
-        { error: 'brandId, platform, prompt, and answer are required' },
-        { status: 400 }
-      )
-    }
-
-    if (!sources || !Array.isArray(sources) || sources.length === 0) {
-      return NextResponse.json(
-        { error: 'sources array is required and must not be empty' },
+        { error: 'brandId is required' },
         { status: 400 }
       )
     }
@@ -57,22 +50,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 分析推荐因素
-    const result = await citationEngine.analyzeRecommendationFactors(
-      brandId,
-      user.id,
-      platform,
-      prompt,
-      answer,
-      sources
-    )
+    const factors = await citationEngine.getFactorDistribution(brandId, platform)
 
     return NextResponse.json({
       success: true,
-      data: result
+      data: factors
     })
   } catch (error) {
-    console.error('POST /api/citations/analyze error:', error)
+    console.error('GET /api/citations/factors error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -42,6 +42,7 @@ model User {
   orders            Order[]
   quotas            Quota[]
   adminLogs         AdminLog[]
+  citationEvidences CitationEvidence[]
 }
 
 enum Plan {
@@ -237,6 +238,7 @@ model Brand {
   contentPieces    ContentPiece[]
   alerts           Alert[]
   gapAnalyses      GapAnalysis[]
+  citationEvidences CitationEvidence[]
 
   @@unique([userId, name])
   @@index([userId, status])
@@ -550,4 +552,31 @@ model SystemConfig {
   value Json
   desc  String?
   updatedAt DateTime @updatedAt
+}
+
+// ============================================
+// Citation Intelligence 2.0
+// 推荐因子分析 - 记录真正的推荐原因
+// ============================================
+model CitationEvidence {
+  id          String   @id @default(cuid())
+  brandId     String
+  userId      String
+  platform    String   // deepseek, kimi, doubao, yuanbao, tongyi, zhipu
+  prompt      String   @db.Text
+  answer      String   @db.Text
+  sourceUrl   String?  @db.Text
+  sourceType  String?  // github, zhihu, wechat, blog, docs, forum, news, social
+  recommendationReason String? @db.Text // 推荐原因
+  confidence  Float?   // 0-1
+  weight      Float?   // 0-1, 影响权重
+  factors     Json?    // {github_activity: 0.31, zhihu_community: 0.18, ...}
+  createdAt   DateTime @default(now())
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([brandId, platform])
+  @@index([userId, createdAt])
+  @@index([sourceType])
 }
