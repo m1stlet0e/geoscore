@@ -1,0 +1,12 @@
+node_modules
+.next
+.env
+.env.local
+*.deadlock
+*.DEAD
+.DS_Store
+*.log
+.turbo
+.vercel
+next-env.d.ts
+prisma/migrations

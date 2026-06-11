@@ -1,0 +1,335 @@
+// ============================================
+// GeoOS Prisma Schema
+// AI Search Growth Operating System
+// ============================================
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// Auth
+// ============================================
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String?
+  image         String?
+  plan          Plan      @default(FREE)
+  planExpiresAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts          Account[]
+  sessions          Session[]
+  brands            Brand[]
+  prompts           Prompt[]
+  scans             ScanRun[]
+  citations         Citation[]
+  citationSources   CitationSource[]
+  contentPieces     ContentPiece[]
+  publishJobs       PublishJob[]
+  alerts            Alert[]
+  trendSignals      TrendSignal[]
+  forecasts         Forecast[]
+}
+
+enum Plan {
+  FREE
+  PRO
+  GROWTH
+  ENTERPRISE
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// Module 1: AI Search Monitoring Center
+// ============================================
+model Brand {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  domain      String?
+  description String?
+  category    String?
+  competitors String[] // competitor brand names
+  status      String   @default("active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prompts          Prompt[]
+  scans            ScanRun[]
+  citations        Citation[]
+  citationSources  CitationSource[]
+  trendSignals     TrendSignal[]
+  forecasts        Forecast[]
+  contentPieces    ContentPiece[]
+  alerts           Alert[]
+
+  @@unique([userId, name])
+  @@index([userId, status])
+}
+
+model Prompt {
+  id           String   @id @default(cuid())
+  brandId      String
+  userId       String
+  text         String   @db.Text
+  category     String?  // informational, commercial, comparison, etc
+  intent       String?  // 推荐, 对比, 评测, 教程
+  language     String   @default("zh")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  brand Brand         @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scans PromptScan[]
+
+  @@index([brandId, isActive])
+}
+
+model ScanRun {
+  id          String   @id @default(cuid())
+  brandId     String
+  userId      String
+  status      String   // queued, running, completed, failed
+  totalPrompts Int     @default(0)
+  completedPrompts Int @default(0)
+  platforms   String[] // ['chatgpt','gemini','claude','perplexity']
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  triggeredBy String   @default("user") // user, cron
+  errorMsg    String?  @db.Text
+
+  brand      Brand        @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  promptScans PromptScan[]
+
+  @@index([brandId, startedAt])
+}
+
+model PromptScan {
+  id           String   @id @default(cuid())
+  scanRunId    String
+  promptId     String
+  platform     String   // chatgpt, gemini, claude, perplexity, google_aio, mistral, deepseek
+  responseText String?  @db.Text
+  citedSources Json?    // [{url, title, domain}]
+  brandMentioned Boolean @default(false)
+  brandRank    Int?     // 1-based position in answer
+  sentiment    String?  // positive, neutral, negative
+  latencyMs    Int?
+  createdAt    DateTime @default(now())
+
+  scanRun ScanRun @relation(fields: [scanRunId], references: [id], onDelete: Cascade)
+  prompt  Prompt  @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@index([scanRunId, platform])
+  @@index([brandMentioned, platform])
+}
+
+// ============================================
+// Module 2 + 3: Citation Analysis & Source Tracking
+// ============================================
+model Citation {
+  id          String   @id @default(cuid())
+  brandId     String
+  userId      String
+  platform    String
+  promptText  String   @db.Text
+  answerText  String   @db.Text
+  sources     Json     // [{url, title, domain, snippet}]
+  brandRank   Int?
+  brandContext String? @db.Text // why was the brand mentioned?
+  createdAt   DateTime @default(now())
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([brandId, platform, createdAt])
+  @@index([userId, createdAt])
+}
+
+model CitationSource {
+  id        String   @id @default(cuid())
+  brandId   String
+  userId    String
+  domain    String
+  platform  String
+  url       String   @db.Text
+  title     String?
+  weight    Float    @default(1.0) // 0..1
+  citationCount Int  @default(1)
+  firstSeen DateTime @default(now())
+  lastSeen  DateTime @default(now())
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, platform, url])
+  @@index([brandId, weight])
+}
+
+// ============================================
+// Module 4: Brand Influence Map (knowledge graph)
+// ============================================
+model BrandGraphNode {
+  id     String @id @default(cuid())
+  userId String
+  label  String
+  type   String // brand, category, feature, subniche
+  weight Float  @default(1.0)
+  x      Float  @default(0)
+  y      Float  @default(0)
+}
+
+model BrandGraphEdge {
+  id     String @id @default(cuid())
+  userId String
+  from   String
+  to     String
+  weight Float  @default(1.0)
+  type   String // competes_with, related_to, parent_of
+}
+
+// ============================================
+// Module 6: AI Growth Agent (content + publishing)
+// ============================================
+model ContentPiece {
+  id          String   @id @default(cuid())
+  brandId     String
+  userId      String
+  type        String   // blog, faq, schema, comparison, pr, reddit, github_readme, product_hunt
+  title       String
+  body        String   @db.Text
+  meta        Json?    // {targetKeyword, citationGap, generatedBy}
+  status      String   @default("draft") // draft, approved, published
+  quality     Int?     // 0-100 self-score
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  publishJobs PublishJob[]
+
+  @@index([brandId, type, status])
+}
+
+model PublishJob {
+  id            String   @id @default(cuid())
+  contentId     String
+  userId        String
+  channel       String   // wordpress, notion, webflow, shopify, ghost, reddit
+  status        String   @default("pending") // pending, in_progress, published, failed
+  externalUrl   String?
+  response      Json?
+  errorMsg      String?  @db.Text
+  startedAt     DateTime @default(now())
+  completedAt   DateTime?
+
+  content ContentPiece @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([contentId, status])
+}
+
+// ============================================
+// Module 7: Prompt Radar
+// ============================================
+model TrendSignal {
+  id          String   @id @default(cuid())
+  brandId     String?
+  userId      String
+  category    String   // question, topic, keyword
+  text        String
+  volume      Int      @default(0)
+  growthPct   Float    @default(0)
+  platforms   String[] // where this signal is rising
+  detectedAt  DateTime @default(now())
+
+  brand Brand? @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, growthPct])
+  @@index([category, detectedAt])
+}
+
+// ============================================
+// Module 8: Recommendation Prediction
+// ============================================
+model Forecast {
+  id           String   @id @default(cuid())
+  brandId      String
+  userId       String
+  horizonDays  Int      // 7, 30, 90
+  predictedScore Float
+  predictedRank  Float
+  confidence   Float
+  drivers      Json     // [{factor: 'reddit_growth', impact: 0.18}, ...]
+  generatedAt  DateTime @default(now())
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([brandId, generatedAt])
+}
+
+// ============================================
+// Alerts
+// ============================================
+model Alert {
+  id         String   @id @default(cuid())
+  brandId    String
+  userId     String
+  type       String   // visibility_drop, new_competitor, gap_opened, trend_rising
+  severity   String   // low, medium, high
+  title      String
+  message    String   @db.Text
+  meta       Json?
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt])
+}
