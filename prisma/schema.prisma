@@ -37,6 +37,7 @@ model User {
   alerts            Alert[]
   trendSignals      TrendSignal[]
   forecasts         Forecast[]
+  gapAnalyses       GapAnalysis[]
 }
 
 enum Plan {
@@ -104,6 +105,7 @@ model Brand {
   forecasts        Forecast[]
   contentPieces    ContentPiece[]
   alerts           Alert[]
+  gapAnalyses      GapAnalysis[]
 
   @@unique([userId, name])
   @@index([userId, status])
@@ -249,6 +251,47 @@ model BrandGraphEdge {
   to     String
   weight Float  @default(1.0)
   type   String // competes_with, related_to, parent_of
+}
+
+// ============================================
+// Module 5: GEO Gap Analysis (核心护城河 #2)
+// ============================================
+model GapAnalysis {
+  id           String   @id @default(cuid())
+  brandId      String
+  userId       String
+  competitorId String? // 可选，与谁对比
+  platform     String
+  promptText   String   @db.Text
+  score        Float    // 当前 AI 推荐分 0-100
+  benchmark    Float    // 竞对/行业基准分
+  gap          Float    // 差距值
+  status       String   @default("pending") // pending, analyzing, completed
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  brand    Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gapItems GapItem[]
+
+  @@index([brandId, createdAt])
+  @@index([userId, gap])
+}
+
+model GapItem {
+  id            String   @id @default(cuid())
+  gapAnalysisId String
+  type          String   // faq, comparison, use_case, schema, media, github, readme
+  title         String
+  description   String   @db.Text
+  impact        Float    // 对推荐概率的影响 -100 to 0
+  priority      Int      // 1 = highest
+  status        String   @default("open") // open, in_progress, resolved
+  createdAt     DateTime @default(now())
+
+  gapAnalysis GapAnalysis @relation(fields: [gapAnalysisId], references: [id], onDelete: Cascade)
+
+  @@index([gapAnalysisId, priority])
 }
 
 // ============================================
