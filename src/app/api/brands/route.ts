@@ -41,7 +41,6 @@ export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: '未登录' }, { status: 401 });
   const userId = (session.user as { id: string }).id;
-  console.log('[BRANDS POST] userId:', userId);
 
   let json: unknown;
   try {
@@ -57,9 +56,14 @@ export async function POST(req: Request) {
     );
   }
 
+  // Verify user exists in DB (defense against stale JWT)
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, plan: true } });
+  if (!user) {
+    return NextResponse.json({ error: '用户不存在，请重新登录' }, { status: 401 });
+  }
+
   // Plan limit check
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { plan: true } });
-  const plan = (user?.plan ?? 'FREE') as keyof typeof PLAN_LIMITS;
+  const plan = (user.plan ?? 'FREE') as keyof typeof PLAN_LIMITS;
   const limit = PLAN_LIMITS[plan].keywords;
   if (limit !== -1) {
     const count = await prisma.brand.count({ where: { userId } });
@@ -79,7 +83,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: '已存在同名品牌' }, { status: 400 });
   }
 
-  console.log('[BRANDS POST] Creating brand for userId:', userId, 'name:', parsed.data.name);
+  // Create brand — raw SQL fallback if Prisma ORM FK check fails (PrismaPg adapter bug)
   try {
     const brand = await prisma.brand.create({
       data: {
@@ -105,7 +109,32 @@ export async function POST(req: Request) {
     return NextResponse.json({ brand }, { status: 201 });
   } catch (err: unknown) {
     const e = err as { code?: string; message?: string };
-    console.error('[BRANDS POST] Create error:', e.code, e.message);
-    return NextResponse.json({ error: `创建失败: ${e.code} - ${e.message}` }, { status: 500 });
+    if (e.code === 'P2003') {
+      // PrismaPg driver adapter FK bug — fallback to raw SQL
+      try {
+        const id = crypto.randomUUID();
+        const now = new Date().toISOString();
+        await prisma.$executeRawUnsafe(
+          `INSERT INTO "Brand" (id, "userId", name, domain, description, category, competitors, status, "createdAt", "updatedAt")
+           VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', $8, $8)`,
+          id, userId, parsed.data.name,
+          parsed.data.domain ?? null,
+          parsed.data.description ?? null,
+          parsed.data.category ?? null,
+          parsed.data.competitors ?? [],
+          now
+        );
+        const brand = await prisma.brand.findUnique({
+          where: { id },
+          include: {
+            _count: { select: { prompts: true, scans: true, citations: true, contentPieces: true } },
+          },
+        });
+        return NextResponse.json({ brand }, { status: 201 });
+      } catch {
+        return NextResponse.json({ error: '创建失败，请重试' }, { status: 500 });
+      }
+    }
+    return NextResponse.json({ error: '创建失败' }, { status: 500 });
   }
 }
