@@ -121,7 +121,7 @@ export default function BrandsPage() {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setEditingId(brand.id)}
-                    className="rounded-md p-1.5 text-neutral-500 transition hover:bg-neutral-200 hover:text-neutral-300"
+                    className="rounded-md p-1.5 text-neutral-500 transition hover:bg-neutral-200 hover:text-neutral-500"
                     title="编辑"
                   >
                     <Pencil className="h-3.5 w-3.5" />
@@ -383,7 +383,7 @@ function BrandFormModal({
                 type="button"
                 onClick={onClose}
                 disabled={submitting}
-                className="rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 py-2 text-sm font-medium text-neutral-300 transition hover:border-neutral-400"
+                className="rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 py-2 text-sm font-medium text-neutral-500 transition hover:border-neutral-400"
               >
                 取消
               </button>

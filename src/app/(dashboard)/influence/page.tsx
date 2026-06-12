@@ -225,7 +225,7 @@ export default async function InfluencePage() {
                       </div>
                     </td>
                     <td className="px-2 py-3">
-                      <span className="inline-flex items-center rounded-full border border-neutral-300 bg-neutral-100 px-2 py-0.5 text-[10px] text-neutral-300">
+                      <span className="inline-flex items-center rounded-full border border-neutral-300 bg-neutral-100 px-2 py-0.5 text-[10px] text-neutral-500">
                         {TYPE_LABEL[m.competitor.type] ?? m.competitor.type}
                       </span>
                     </td>
@@ -237,7 +237,7 @@ export default async function InfluencePage() {
                             style={{ width: `${Math.min(100, m.weight * 100)}%` }}
                           />
                         </div>
-                        <span className="text-xs tabular-nums text-neutral-300">
+                        <span className="text-xs tabular-nums text-neutral-500">
                           {m.weight.toFixed(2)}
                         </span>
                       </div>

@@ -33,7 +33,7 @@ const STATUS_META: Record<string, { label: string; icon: React.ReactNode; cls: s
   queued: {
     label: '排队中',
     icon: <Loader2 className="h-3 w-3" />,
-    cls: 'border-neutral-300 bg-neutral-100 text-neutral-300',
+    cls: 'border-neutral-300 bg-neutral-100 text-neutral-500',
   },
   running: {
     label: '运行中',

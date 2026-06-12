@@ -108,7 +108,7 @@ export default async function AlertsPage({ searchParams }: { searchParams: Promi
                     <span className={cn('rounded-md px-2 py-0.5 text-xs', sev.text, 'bg-neutral-200/40')}>
                       {sev.label} 优先级
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-md bg-neutral-200/40 px-2 py-0.5 text-xs text-neutral-300">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-neutral-200/40 px-2 py-0.5 text-xs text-neutral-500">
                       {type.icon} {type.label}
                     </span>
                     {a.brand && (

@@ -117,14 +117,14 @@ interface ConfigItem {
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const PLAN_COLORS: Record<Plan, string> = {
-  FREE: 'bg-neutral-300 text-neutral-300',
+  FREE: 'bg-neutral-300 text-neutral-500',
   PRO: 'bg-blue-600/30 text-blue-300',
   GROWTH: 'bg-purple-600/30 text-purple-300',
   ENTERPRISE: 'bg-amber-600/30 text-amber-300',
 };
 
 const ROLE_COLORS: Record<Role, string> = {
-  USER: 'bg-neutral-300 text-neutral-300',
+  USER: 'bg-neutral-300 text-neutral-500',
   ADMIN: 'bg-indigo-600/30 text-indigo-500',
   SUPER_ADMIN: 'bg-rose-600/30 text-rose-300',
 };
@@ -133,7 +133,7 @@ const STATUS_COLORS: Record<OrderStatus, string> = {
   PENDING: 'bg-amber-600/30 text-amber-300',
   PAID: 'bg-emerald-600/30 text-emerald-300',
   FAILED: 'bg-rose-600/30 text-rose-300',
-  REFUNDED: 'bg-neutral-400/30 text-neutral-300',
+  REFUNDED: 'bg-neutral-400/30 text-neutral-500',
   CANCELLED: 'bg-neutral-300 text-neutral-500',
 };
 
@@ -264,7 +264,7 @@ function UserDetailModal({ user, onClose }: { user: User | null; onClose: () => 
         className="relative w-full max-w-lg rounded-2xl border border-neutral-300 bg-neutral-50 p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute right-4 top-4 text-neutral-500 hover:text-neutral-300 transition">
+        <button onClick={onClose} className="absolute right-4 top-4 text-neutral-500 hover:text-neutral-500 transition">
           <X className="h-5 w-5" />
         </button>
         <h3 className="text-lg font-semibold text-neutral-800">用户详情</h3>
@@ -305,7 +305,7 @@ function UserDetailModal({ user, onClose }: { user: User | null; onClose: () => 
           </div>
           {user.subscription && (
             <div className="rounded-xl border border-neutral-300 p-4">
-              <h4 className="text-sm font-medium text-neutral-300 mb-2">订阅信息</h4>
+              <h4 className="text-sm font-medium text-neutral-500 mb-2">订阅信息</h4>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <span className="text-neutral-500">计划</span>
@@ -328,7 +328,7 @@ function UserDetailModal({ user, onClose }: { user: User | null; onClose: () => 
           )}
           {user.brands && user.brands.length > 0 && (
             <div className="rounded-xl border border-neutral-300 p-4">
-              <h4 className="text-sm font-medium text-neutral-300 mb-2">品牌列表</h4>
+              <h4 className="text-sm font-medium text-neutral-500 mb-2">品牌列表</h4>
               <div className="space-y-2">
                 {user.brands.map((brand) => (
                   <div key={brand.id} className="flex items-center justify-between text-xs">
@@ -621,7 +621,7 @@ export default function AdminPage() {
       {/* Plan Distribution */}
       {stats && stats.planDistribution.length > 0 && (
         <section className="rounded-2xl border border-neutral-200 bg-white p-5">
-          <h3 className="text-sm font-medium text-neutral-300 mb-4">套餐分布</h3>
+          <h3 className="text-sm font-medium text-neutral-500 mb-4">套餐分布</h3>
           <div className="flex gap-3">
             {stats.planDistribution.map((item) => {
               const maxCount = Math.max(...stats.planDistribution.map((d) => d.count), 1);
@@ -661,7 +661,7 @@ export default function AdminPage() {
               className={`flex items-center gap-2 whitespace-nowrap px-4 py-3 text-sm font-medium transition border-b-2 ${
                 activeTab === tab.key
                   ? 'border-indigo-500 text-indigo-500'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-300 hover:border-neutral-300'
+                  : 'border-transparent text-neutral-500 hover:text-neutral-500 hover:border-neutral-300'
               }`}
             >
               {tab.icon}
@@ -727,15 +727,15 @@ export default function AdminPage() {
                     {users.map((user) => (
                       <tr key={user.id} className="hover:bg-neutral-200/30 transition">
                         <td className="py-3 text-neutral-700 max-w-[200px] truncate">{user.email}</td>
-                        <td className="py-3 text-neutral-300">{user.name || '-'}</td>
+                        <td className="py-3 text-neutral-500">{user.name || '-'}</td>
                         <td className="py-3">
                           <Badge label={user.role} className={ROLE_COLORS[user.role]} />
                         </td>
                         <td className="py-3">
                           <Badge label={user.plan} className={PLAN_COLORS[user.plan]} />
                         </td>
-                        <td className="py-3 text-right text-neutral-300">{user.brandsCount}</td>
-                        <td className="py-3 text-right text-neutral-300">{user.citationsCount}</td>
+                        <td className="py-3 text-right text-neutral-500">{user.brandsCount}</td>
+                        <td className="py-3 text-right text-neutral-500">{user.citationsCount}</td>
                         <td className="py-3 text-neutral-500 text-xs">{formatDate(user.createdAt)}</td>
                         <td className="py-3">
                           <div className="flex items-center justify-end gap-2">
@@ -759,7 +759,7 @@ export default function AdminPage() {
                                       key={p}
                                       onClick={() => updateUserPlan(user.id, p)}
                                       className={`w-full px-3 py-1.5 text-left text-xs hover:bg-neutral-200 transition ${
-                                        user.plan === p ? 'text-indigo-500 bg-indigo-600/10' : 'text-neutral-300'
+                                        user.plan === p ? 'text-indigo-500 bg-indigo-600/10' : 'text-neutral-500'
                                       }`}
                                     >
                                       {p}
@@ -824,7 +824,7 @@ export default function AdminPage() {
                   <tbody className="divide-y divide-neutral-200/50">
                     {orders.map((order) => (
                       <tr key={order.id} className="hover:bg-neutral-200/30 transition">
-                        <td className="py-3 text-neutral-300 font-mono text-xs">{order.orderNo}</td>
+                        <td className="py-3 text-neutral-500 font-mono text-xs">{order.orderNo}</td>
                         <td className="py-3 text-neutral-700 max-w-[180px] truncate">{order.userEmail}</td>
                         <td className="py-3">
                           <Badge label={order.plan} className={PLAN_COLORS[order.plan]} />
@@ -884,7 +884,7 @@ export default function AdminPage() {
                             <td className="py-3">
                               <Badge label={q.plan} className={PLAN_COLORS[q.plan]} />
                             </td>
-                            <td className="py-3 text-neutral-300">{q.quotaType}</td>
+                            <td className="py-3 text-neutral-500">{q.quotaType}</td>
                             <td className="py-3 min-w-[200px]">
                               <div className="flex items-center gap-3">
                                 <div className="flex-1 h-2 rounded-full bg-neutral-200 overflow-hidden">
@@ -953,7 +953,7 @@ export default function AdminPage() {
                         <td className="py-3">
                           <Badge label={log.action} className="bg-indigo-600/20 text-indigo-500" />
                         </td>
-                        <td className="py-3 text-neutral-300 text-xs max-w-[160px] truncate">{log.target}</td>
+                        <td className="py-3 text-neutral-500 text-xs max-w-[160px] truncate">{log.target}</td>
                         <td className="py-3 text-neutral-500 text-xs max-w-[240px] truncate font-mono">
                           {log.meta ? JSON.stringify(log.meta).slice(0, 80) : '-'}
                         </td>

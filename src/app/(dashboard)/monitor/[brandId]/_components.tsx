@@ -65,7 +65,7 @@ export function PromptRow({
         <p className="line-clamp-2 max-w-xl text-sm text-neutral-700">{prompt.text}</p>
       </td>
       <td className="px-2 py-3">
-        <span className="inline-flex items-center rounded-full border border-neutral-300 bg-neutral-100 px-2 py-0.5 text-[10px] text-neutral-300">
+        <span className="inline-flex items-center rounded-full border border-neutral-300 bg-neutral-100 px-2 py-0.5 text-[10px] text-neutral-500">
           {categoryLabel}
         </span>
       </td>
@@ -200,7 +200,7 @@ export function GeneratePromptsButton({ brandId }: { brandId: string }) {
                   type="button"
                   onClick={() => setOpen(false)}
                   disabled={busy}
-                  className="rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 py-2 text-sm font-medium text-neutral-300 transition hover:border-neutral-400"
+                  className="rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 py-2 text-sm font-medium text-neutral-500 transition hover:border-neutral-400"
                 >
                   取消
                 </button>
@@ -292,7 +292,7 @@ type ScanLite = {
 };
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
-  queued: { label: '排队中', cls: 'border-neutral-300 bg-neutral-100 text-neutral-300' },
+  queued: { label: '排队中', cls: 'border-neutral-300 bg-neutral-100 text-neutral-500' },
   running: { label: '运行中', cls: 'border-indigo-500/30 bg-indigo-50 text-indigo-600' },
   completed: { label: '已完成', cls: 'border-emerald-500/30 bg-emerald-50 text-emerald-600' },
   failed: { label: '失败', cls: 'border-rose-500/30 bg-rose-50 text-rose-600' },
@@ -346,7 +346,7 @@ export function ScanHistoryClient({ scans }: { scans: ScanLite[] }) {
                   >
                     {meta.label}
                   </span>
-                  <span className="text-xs text-neutral-300">
+                  <span className="text-xs text-neutral-500">
                     {s.completedPrompts} / {s.totalPrompts} 完成 ({progress}%)
                   </span>
                   <span className="text-xs text-neutral-500">·</span>
@@ -360,7 +360,7 @@ export function ScanHistoryClient({ scans }: { scans: ScanLite[] }) {
                     return (
                       <span
                         key={pid}
-                        className="inline-flex items-center rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-300"
+                        className="inline-flex items-center rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-500"
                         style={{ borderColor: `${pm.color}40` }}
                       >
                         {pm.name}
@@ -384,7 +384,7 @@ export function ScanHistoryClient({ scans }: { scans: ScanLite[] }) {
                           className="flex items-start gap-2 rounded-lg border border-neutral-300/40 bg-neutral-100 px-3 py-2 text-xs"
                         >
                           <span
-                            className="mt-0.5 inline-flex shrink-0 items-center rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-300"
+                            className="mt-0.5 inline-flex shrink-0 items-center rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-500"
                             style={{ borderColor: `${pm.color}40` }}
                           >
                             {pm.name}

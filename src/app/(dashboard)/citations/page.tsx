@@ -290,7 +290,7 @@ function SourceTypeBadge({ type }: { type: string }) {
   const badge = SOURCE_TYPE_BADGE[type] || {
     bg: 'bg-neutral-500/15',
     border: 'border-neutral-300',
-    text: 'text-neutral-300',
+    text: 'text-neutral-500',
   };
   return (
     <span
@@ -601,7 +601,7 @@ export default function CitationsIntelligencePage() {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-neutral-300 mb-1.5">平台</label>
+              <label className="block text-xs font-medium text-neutral-500 mb-1.5">平台</label>
               <select
                 value={analyzePlatform}
                 onChange={(e) => setAnalyzePlatform(e.target.value)}
@@ -615,7 +615,7 @@ export default function CitationsIntelligencePage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-neutral-300 mb-1.5">
+              <label className="block text-xs font-medium text-neutral-500 mb-1.5">
                 Prompt <span className="text-rose-400">*</span>
               </label>
               <input
@@ -627,7 +627,7 @@ export default function CitationsIntelligencePage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-neutral-300 mb-1.5">
+              <label className="block text-xs font-medium text-neutral-500 mb-1.5">
                 回答内容
               </label>
               <textarea
@@ -639,7 +639,7 @@ export default function CitationsIntelligencePage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-neutral-300 mb-1.5">
+              <label className="block text-xs font-medium text-neutral-500 mb-1.5">
                 引用来源 <span className="text-neutral-500">(每行一个 URL)</span>
               </label>
               <textarea
@@ -656,7 +656,7 @@ export default function CitationsIntelligencePage() {
             <button
               onClick={() => setShowAnalyzeModal(false)}
               disabled={analyzing}
-              className="rounded-lg border border-neutral-300 px-4 py-2 text-sm text-neutral-300 hover:bg-neutral-100 transition disabled:opacity-50"
+              className="rounded-lg border border-neutral-300 px-4 py-2 text-sm text-neutral-500 hover:bg-neutral-100 transition disabled:opacity-50"
             >
               取消
             </button>
@@ -791,7 +791,7 @@ export default function CitationsIntelligencePage() {
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                     isActive
                       ? 'border-indigo-500/50 bg-indigo-500/20 text-indigo-600 shadow-sm shadow-indigo-500/10'
-                      : 'border-neutral-300 bg-neutral-200/40 text-neutral-500 hover:border-neutral-400/60 hover:text-neutral-300'
+                      : 'border-neutral-300 bg-neutral-200/40 text-neutral-500 hover:border-neutral-400/60 hover:text-neutral-500'
                   }`}
                 >
                   <span>{p.emoji}</span>
@@ -817,7 +817,7 @@ export default function CitationsIntelligencePage() {
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                     isActive
                       ? 'border-indigo-500/50 bg-indigo-500/20 text-indigo-600 shadow-sm shadow-indigo-500/10'
-                      : 'border-neutral-300 bg-neutral-200/40 text-neutral-500 hover:border-neutral-400/60 hover:text-neutral-300'
+                      : 'border-neutral-300 bg-neutral-200/40 text-neutral-500 hover:border-neutral-400/60 hover:text-neutral-500'
                   }`}
                 >
                   <span>{p.emoji}</span>
@@ -997,8 +997,8 @@ export default function CitationsIntelligencePage() {
                       {isExpanded && (
                         <div className="mt-3 rounded-lg border border-neutral-200 bg-neutral-200/30 p-3 text-xs leading-relaxed text-neutral-500">
                           <p>
-                            <strong className="text-neutral-300">{f.label}</strong> 因子在分析中出现了{' '}
-                            <strong className="text-neutral-300">{f.count}</strong> 次，占总权重的{' '}
+                            <strong className="text-neutral-500">{f.label}</strong> 因子在分析中出现了{' '}
+                            <strong className="text-neutral-500">{f.count}</strong> 次，占总权重的{' '}
                             <strong className="text-indigo-500">{f.percentage.toFixed(1)}%</strong>
                             。平均权重为 {f.avgWeight.toFixed(2)}。
                           </p>
@@ -1117,7 +1117,7 @@ export default function CitationsIntelligencePage() {
                             <td className="px-3 py-3">
                               <SourceTypeBadge type={s.type} />
                             </td>
-                            <td className="px-3 py-3 text-center font-mono text-xs text-neutral-300">
+                            <td className="px-3 py-3 text-center font-mono text-xs text-neutral-500">
                               {s.weight.toFixed(1)}
                             </td>
                             <td className="px-3 py-3 text-center font-mono text-xs text-indigo-500">

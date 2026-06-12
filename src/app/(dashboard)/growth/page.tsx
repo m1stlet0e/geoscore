@@ -10,7 +10,7 @@ import { cn, formatDate } from '@/lib/utils';
 export const dynamic = 'force-dynamic';
 
 const STATUS_STYLES: Record<string, { label: string; cls: string; icon: React.ReactNode }> = {
-  draft: { label: '草稿', cls: 'border-neutral-300 bg-neutral-100 text-neutral-300', icon: <Clock className="h-3 w-3" /> },
+  draft: { label: '草稿', cls: 'border-neutral-300 bg-neutral-100 text-neutral-500', icon: <Clock className="h-3 w-3" /> },
   approved: { label: '已审核', cls: 'border-indigo-500/30 bg-indigo-50 text-indigo-600', icon: <CheckCircle2 className="h-3 w-3" /> },
   published: { label: '已发布', cls: 'border-emerald-500/30 bg-emerald-50 text-emerald-600', icon: <Send className="h-3 w-3" /> },
 };
@@ -52,7 +52,7 @@ export default async function GrowthPage({ searchParams }: { searchParams: Promi
         </div>
         <div className="rounded-2xl border border-neutral-200 bg-neutral-100 p-5">
           <div className="text-xs text-neutral-500">草稿待审</div>
-          <div className="mt-1 text-2xl font-semibold text-neutral-300">{draftCount}</div>
+          <div className="mt-1 text-2xl font-semibold text-neutral-500">{draftCount}</div>
         </div>
       </div>
 
@@ -124,7 +124,7 @@ export default async function GrowthPage({ searchParams }: { searchParams: Promi
                       <span className={cn('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs', st.cls)}>
                         {st.icon} {st.label}
                       </span>
-                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-300">
+                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500">
                         {meta?.label || p.type}
                       </span>
                       <span className="text-xs text-neutral-500">{p.brand.name}</span>

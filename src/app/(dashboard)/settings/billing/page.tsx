@@ -496,7 +496,7 @@ export default function BillingPage() {
 
                       return (
                         <tr key={order.id} className="hover:bg-neutral-100 transition">
-                          <td className="px-5 py-3 font-mono text-xs text-neutral-300">
+                          <td className="px-5 py-3 font-mono text-xs text-neutral-500">
                             {order.orderNo}
                           </td>
                           <td className="px-5 py-3">
@@ -535,7 +535,7 @@ export default function BillingPage() {
                     <button
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage <= 1}
-                      className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-300 transition hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-500 transition hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="h-3.5 w-3.5" />
                       上一页
@@ -543,7 +543,7 @@ export default function BillingPage() {
                     <button
                       onClick={() => setCurrentPage((p) => Math.min(pagination.pages, p + 1))}
                       disabled={currentPage >= pagination.pages}
-                      className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-300 transition hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-500 transition hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       下一页
                       <ChevronRight className="h-3.5 w-3.5" />
@@ -575,7 +575,7 @@ export default function BillingPage() {
               <button
                 onClick={() => setShowCancelModal(false)}
                 disabled={cancelling}
-                className="rounded-lg border border-neutral-300 bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-300 transition hover:bg-neutral-200 disabled:opacity-50"
+                className="rounded-lg border border-neutral-300 bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-500 transition hover:bg-neutral-200 disabled:opacity-50"
               >
                 再想想
               </button>

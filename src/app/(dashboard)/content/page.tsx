@@ -88,7 +88,7 @@ const CONTENT_TYPES = [
 ];
 
 const STATUS_BADGES: Record<ContentStatus, { bg: string; text: string; label: string }> = {
-  draft: { bg: 'bg-neutral-500/15 border-neutral-300', text: 'text-neutral-300', label: '草稿' },
+  draft: { bg: 'bg-neutral-500/15 border-neutral-300', text: 'text-neutral-500', label: '草稿' },
   review: { bg: 'bg-amber-500/15 border-amber-500/30', text: 'text-amber-300', label: '审核中' },
   approved: { bg: 'bg-blue-500/15 border-blue-500/30', text: 'text-blue-300', label: '已批准' },
   published: { bg: 'bg-emerald-500/15 border-emerald-500/30', text: 'text-emerald-300', label: '已发布' },
@@ -96,7 +96,7 @@ const STATUS_BADGES: Record<ContentStatus, { bg: string; text: string; label: st
 };
 
 const PUBLISH_STATUS_BADGES: Record<PublishStatus, { bg: string; text: string; label: string }> = {
-  pending: { bg: 'bg-neutral-500/15 border-neutral-300', text: 'text-neutral-300', label: '待处理' },
+  pending: { bg: 'bg-neutral-500/15 border-neutral-300', text: 'text-neutral-500', label: '待处理' },
   in_progress: { bg: 'bg-amber-500/15 border-amber-500/30', text: 'text-amber-300', label: '进行中' },
   published: { bg: 'bg-emerald-500/15 border-emerald-500/30', text: 'text-emerald-300', label: '已发布' },
   failed: { bg: 'bg-rose-500/15 border-rose-500/30', text: 'text-rose-300', label: '失败' },
@@ -582,7 +582,7 @@ export default function ContentPage() {
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="bg-transparent text-sm text-neutral-300 outline-none"
+            className="bg-transparent text-sm text-neutral-500 outline-none"
           >
             <option value="">全部类型</option>
             {CONTENT_TYPES.map((t) => (
@@ -596,7 +596,7 @@ export default function ContentPage() {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-transparent text-sm text-neutral-300 outline-none"
+            className="bg-transparent text-sm text-neutral-500 outline-none"
           >
             <option value="">全部状态</option>
             <option value="draft">草稿</option>
@@ -613,12 +613,12 @@ export default function ContentPage() {
             placeholder="搜索内容..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-neutral-300 outline-none placeholder:text-neutral-500"
+            className="flex-1 bg-transparent text-sm text-neutral-500 outline-none placeholder:text-neutral-500"
           />
         </div>
         <button
           onClick={() => fetchContents()}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-neutral-200/40 px-3 py-2 text-sm text-neutral-300 transition hover:bg-neutral-300/40"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-neutral-200/40 px-3 py-2 text-sm text-neutral-500 transition hover:bg-neutral-300/40"
         >
           <RefreshCw className="h-3.5 w-3.5" /> 刷新
         </button>
@@ -696,7 +696,7 @@ export default function ContentPage() {
                     <div className="mb-3">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs text-neutral-500">质量评分</span>
-                        <span className="text-xs font-medium text-neutral-300">{item.qualityScore}</span>
+                        <span className="text-xs font-medium text-neutral-500">{item.qualityScore}</span>
                       </div>
                       <div className="h-1.5 w-full rounded-full bg-neutral-200">
                         <div
@@ -750,7 +750,7 @@ export default function ContentPage() {
               <button
                 disabled={pagination.page <= 1}
                 onClick={() => fetchContents(pagination.page - 1)}
-                className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 bg-neutral-200/40 px-3 py-1.5 text-sm text-neutral-300 transition hover:bg-neutral-300/40 disabled:opacity-40"
+                className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 bg-neutral-200/40 px-3 py-1.5 text-sm text-neutral-500 transition hover:bg-neutral-300/40 disabled:opacity-40"
               >
                 <ChevronLeft className="h-4 w-4" /> 上一页
               </button>
@@ -760,7 +760,7 @@ export default function ContentPage() {
               <button
                 disabled={pagination.page >= pagination.totalPages}
                 onClick={() => fetchContents(pagination.page + 1)}
-                className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 bg-neutral-200/40 px-3 py-1.5 text-sm text-neutral-300 transition hover:bg-neutral-300/40 disabled:opacity-40"
+                className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 bg-neutral-200/40 px-3 py-1.5 text-sm text-neutral-500 transition hover:bg-neutral-300/40 disabled:opacity-40"
               >
                 下一页 <ChevronRight className="h-4 w-4" />
               </button>
@@ -825,7 +825,7 @@ export default function ContentPage() {
                         <td className="px-5 py-3 text-neutral-700">
                           {parentContent?.title ?? '-'}
                         </td>
-                        <td className="px-5 py-3 text-neutral-300 capitalize">
+                        <td className="px-5 py-3 text-neutral-500 capitalize">
                           {job.channel}
                         </td>
                         <td className="px-5 py-3">
@@ -942,7 +942,7 @@ export default function ContentPage() {
               ) : (
                 <>
                   <h2 className="text-lg font-semibold text-neutral-800">{selectedContent.title}</h2>
-                  <div className="text-sm text-neutral-300 leading-relaxed whitespace-pre-wrap">
+                  <div className="text-sm text-neutral-500 leading-relaxed whitespace-pre-wrap">
                     {selectedContent.body}
                   </div>
                 </>
@@ -952,7 +952,7 @@ export default function ContentPage() {
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-xs text-neutral-500">质量评分</span>
-                  <span className="text-xs font-medium text-neutral-300">{selectedContent.qualityScore}</span>
+                  <span className="text-xs font-medium text-neutral-500">{selectedContent.qualityScore}</span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-neutral-200">
                   <div
@@ -990,7 +990,7 @@ export default function ContentPage() {
               <div className="flex items-center justify-between">
                 <button
                   onClick={() => setEditing(!editing)}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs text-neutral-300 transition hover:bg-neutral-200/40"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs text-neutral-500 transition hover:bg-neutral-200/40"
                 >
                   {editing ? '取消编辑' : '编辑内容'}
                 </button>
@@ -999,7 +999,7 @@ export default function ContentPage() {
                   <select
                     value={publishChannel}
                     onChange={(e) => setPublishChannel(e.target.value as PublishChannel)}
-                    className="rounded-lg border border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs text-neutral-300 outline-none"
+                    className="rounded-lg border border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs text-neutral-500 outline-none"
                   >
                     {PUBLISH_CHANNELS.map((ch) => (
                       <option key={ch.key} value={ch.key}>
@@ -1181,7 +1181,7 @@ function GenerateModal({
           <button
             onClick={onClose}
             disabled={generating}
-            className="rounded-lg border border-neutral-300 px-4 py-2 text-sm text-neutral-300 transition hover:bg-neutral-200/40 disabled:opacity-50"
+            className="rounded-lg border border-neutral-300 px-4 py-2 text-sm text-neutral-500 transition hover:bg-neutral-200/40 disabled:opacity-50"
           >
             取消
           </button>

@@ -28,7 +28,7 @@ const STATUS_META: Record<string, { label: string; icon: React.ReactNode; cls: s
   queued: {
     label: '排队中',
     icon: <Loader2 className="h-3 w-3" />,
-    cls: 'border-neutral-300 bg-neutral-100 text-neutral-300',
+    cls: 'border-neutral-300 bg-neutral-100 text-neutral-500',
   },
   running: {
     label: '运行中',
@@ -216,7 +216,7 @@ export default async function MonitorPage() {
                             ? 'text-emerald-300'
                             : scoreValue >= 10
                               ? 'text-indigo-500'
-                              : 'text-neutral-300'
+                              : 'text-neutral-500'
                         )}
                       >
                         {scoreValue}%
@@ -313,7 +313,7 @@ export default async function MonitorPage() {
                               return (
                                 <span
                                   key={pid}
-                                  className="inline-flex items-center rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-300"
+                                  className="inline-flex items-center rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-500"
                                   style={{ borderColor: `${pm.color}40` }}
                                 >
                                   {pm.name}

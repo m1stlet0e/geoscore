@@ -97,7 +97,7 @@ const PLATFORM_COLORS: Record<string, { bg: string; text: string; border: string
 };
 
 const STATUS_STYLES: Record<AnalysisStatus, { bg: string; text: string; label: string }> = {
-  pending: { bg: 'bg-neutral-500/15', text: 'text-neutral-300', label: '待处理' },
+  pending: { bg: 'bg-neutral-500/15', text: 'text-neutral-500', label: '待处理' },
   analyzing: { bg: 'bg-amber-500/15', text: 'text-amber-300', label: '分析中' },
   completed: { bg: 'bg-emerald-500/15', text: 'text-emerald-300', label: '已完成' },
 };
@@ -108,7 +108,7 @@ const GAP_TYPE_COLORS: Record<string, { bg: string; text: string; border: string
   use_case: { bg: 'bg-emerald-500/15', text: 'text-emerald-300', border: 'border-emerald-500/30' },
   schema: { bg: 'bg-indigo-50', text: 'text-indigo-500', border: 'border-indigo-500/30' },
   media: { bg: 'bg-pink-500/15', text: 'text-pink-300', border: 'border-pink-500/30' },
-  github: { bg: 'bg-neutral-500/15', text: 'text-neutral-300', border: 'border-neutral-300' },
+  github: { bg: 'bg-neutral-500/15', text: 'text-neutral-500', border: 'border-neutral-300' },
   readme: { bg: 'bg-orange-500/15', text: 'text-orange-300', border: 'border-orange-500/30' },
   blog: { bg: 'bg-teal-500/15', text: 'text-teal-300', border: 'border-teal-500/30' },
   reddit: { bg: 'bg-red-500/15', text: 'text-red-300', border: 'border-red-500/30' },
@@ -497,7 +497,7 @@ export default function GapsPage() {
 
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-neutral-300">AI 平台</label>
+              <label className="mb-1.5 block text-sm font-medium text-neutral-500">AI 平台</label>
               <div className="flex flex-wrap gap-2">
                 {PLATFORMS.map((p) => {
                   const meta = PLATFORM_COLORS[p];
@@ -520,7 +520,7 @@ export default function GapsPage() {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-neutral-300">Prompt 文本</label>
+              <label className="mb-1.5 block text-sm font-medium text-neutral-500">Prompt 文本</label>
               <textarea
                 value={newPromptText}
                 onChange={(e) => setNewPromptText(e.target.value)}
@@ -539,7 +539,7 @@ export default function GapsPage() {
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={() => { setShowModal(false); setSubmitError(null); }}
-                className="rounded-lg border border-neutral-300 bg-neutral-200/40 px-4 py-2 text-sm font-medium text-neutral-300 hover:bg-neutral-300/40 transition"
+                className="rounded-lg border border-neutral-300 bg-neutral-200/40 px-4 py-2 text-sm font-medium text-neutral-500 hover:bg-neutral-300/40 transition"
               >
                 取消
               </button>
@@ -666,7 +666,7 @@ export default function GapsPage() {
           <select
             value={platformFilter}
             onChange={(e) => setPlatformFilter(e.target.value)}
-            className="appearance-none rounded-lg border border-neutral-300 bg-neutral-200/40 px-4 py-2 pr-8 text-sm text-neutral-300 outline-none transition focus:border-indigo-500/50"
+            className="appearance-none rounded-lg border border-neutral-300 bg-neutral-200/40 px-4 py-2 pr-8 text-sm text-neutral-500 outline-none transition focus:border-indigo-500/50"
           >
             <option value="">全部平台</option>
             {PLATFORMS.map((p) => (
@@ -708,12 +708,12 @@ export default function GapsPage() {
           ) : analyses.length === 0 ? (
             <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
               <Search className="mx-auto mb-3 h-8 w-8 text-neutral-500" />
-              <h3 className="text-base font-medium text-neutral-300">暂无分析记录</h3>
+              <h3 className="text-base font-medium text-neutral-500">暂无分析记录</h3>
               <p className="mt-1.5 text-sm text-neutral-500">点击「新建分析」开始第一次 GEO 差距分析</p>
             </div>
           ) : (
             analyses.map((a) => {
-              const plat = PLATFORM_COLORS[a.platform] ?? { bg: 'bg-neutral-500/15', text: 'text-neutral-300', border: 'border-neutral-300', label: a.platform };
+              const plat = PLATFORM_COLORS[a.platform] ?? { bg: 'bg-neutral-500/15', text: 'text-neutral-500', border: 'border-neutral-300', label: a.platform };
               const status = STATUS_STYLES[a.status] ?? STATUS_STYLES.pending;
               return (
                 <div
@@ -747,7 +747,7 @@ export default function GapsPage() {
                         </div>
                         <div className="flex items-center gap-1.5">
                           <span className="text-neutral-500">基准</span>
-                          <span className="font-mono text-neutral-300">{a.benchmarkScore.toFixed(0)}</span>
+                          <span className="font-mono text-neutral-500">{a.benchmarkScore.toFixed(0)}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <span className="text-neutral-500">差距</span>
@@ -811,7 +811,7 @@ export default function GapsPage() {
           {!selectedAnalysis ? (
             <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
               <Search className="mx-auto mb-3 h-8 w-8 text-neutral-500" />
-              <h3 className="text-base font-medium text-neutral-300">请选择一个分析</h3>
+              <h3 className="text-base font-medium text-neutral-500">请选择一个分析</h3>
               <p className="mt-1.5 text-sm text-neutral-500">在「分析列表」中点击「查看详情」查看差距详情</p>
               <button
                 onClick={() => setActiveTab('list')}
@@ -922,7 +922,7 @@ export default function GapsPage() {
                           .sort((a, b) => a.priority - b.priority)
                           .map((item) => {
                             const prio = getPriorityStyle(item.priority);
-                            const typeStyle = GAP_TYPE_COLORS[item.type] ?? { bg: 'bg-neutral-500/15', text: 'text-neutral-300', border: 'border-neutral-300' };
+                            const typeStyle = GAP_TYPE_COLORS[item.type] ?? { bg: 'bg-neutral-500/15', text: 'text-neutral-500', border: 'border-neutral-300' };
                             const isExpanded = expandedDescriptions.has(item.id);
                             const desc = item.description || '';
                             const shortDesc = desc.length > 60 ? desc.slice(0, 60) + '...' : desc;
@@ -992,7 +992,7 @@ export default function GapsPage() {
                                         console.error('Error updating status:', err);
                                       }
                                     }}
-                                    className="rounded-md border border-neutral-300 bg-neutral-100 px-2 py-1 text-[11px] text-neutral-300 outline-none"
+                                    className="rounded-md border border-neutral-300 bg-neutral-100 px-2 py-1 text-[11px] text-neutral-500 outline-none"
                                   >
                                     {GAP_STATUS_OPTIONS.map((opt) => (
                                       <option key={opt.value} value={opt.value}>
@@ -1162,7 +1162,7 @@ export default function GapsPage() {
           {!selectedAnalysis && analyses.length === 0 && (
             <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
               <BarChart3 className="mx-auto mb-3 h-8 w-8 text-neutral-500" />
-              <h3 className="text-base font-medium text-neutral-300">暂无改进跟踪数据</h3>
+              <h3 className="text-base font-medium text-neutral-500">暂无改进跟踪数据</h3>
               <p className="mt-1.5 text-sm text-neutral-500">
                 创建差距分析后，这里会展示改进进度和类型分布
               </p>

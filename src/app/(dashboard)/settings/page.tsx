@@ -46,7 +46,7 @@ export default async function SettingsPage() {
       {/* Basic info */}
       <section className="rounded-2xl border border-neutral-200 bg-neutral-100 p-6">
         <div className="mb-4 flex items-center gap-2">
-          <UserIcon className="h-4 w-4 text-neutral-300" />
+          <UserIcon className="h-4 w-4 text-neutral-500" />
           <h2 className="text-sm font-medium">基本信息</h2>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -59,7 +59,7 @@ export default async function SettingsPage() {
       {/* Plan */}
       <section className="rounded-2xl border border-neutral-200 bg-neutral-100 p-6">
         <div className="mb-4 flex items-center gap-2">
-          <CreditCard className="h-4 w-4 text-neutral-300" />
+          <CreditCard className="h-4 w-4 text-neutral-500" />
           <h2 className="text-sm font-medium">当前计划</h2>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -89,7 +89,7 @@ export default async function SettingsPage() {
       {/* API */}
       <section className="rounded-2xl border border-neutral-200 bg-neutral-100 p-6">
         <div className="mb-4 flex items-center gap-2">
-          <Key className="h-4 w-4 text-neutral-300" />
+          <Key className="h-4 w-4 text-neutral-500" />
           <h2 className="text-sm font-medium">AI 引擎</h2>
         </div>
         <p className="text-sm text-neutral-500">
@@ -100,7 +100,7 @@ export default async function SettingsPage() {
       {/* Team (placeholder) */}
       <section className="rounded-2xl border border-neutral-200 bg-neutral-100 p-6">
         <div className="mb-4 flex items-center gap-2">
-          <Users className="h-4 w-4 text-neutral-300" />
+          <Users className="h-4 w-4 text-neutral-500" />
           <h2 className="text-sm font-medium">团队</h2>
         </div>
         <p className="text-sm text-neutral-500">
@@ -146,7 +146,7 @@ function UsageBar({ label, used, pct }: { label: string; used: string; pct: numb
     <div>
       <div className="mb-1 flex items-center justify-between text-xs">
         <span className="text-neutral-500">{label}</span>
-        <span className="text-neutral-300">{used}</span>
+        <span className="text-neutral-500">{used}</span>
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-neutral-200">
         <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-400" style={{ width: `${pct}%` }} />

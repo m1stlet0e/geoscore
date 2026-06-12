@@ -95,7 +95,7 @@ export default async function RadarPage({ searchParams }: { searchParams: Promis
               className="group rounded-2xl border border-neutral-200 bg-neutral-100 p-4 transition hover:border-cyan-500/30"
             >
               <div className="flex items-center gap-2">
-                <span className="rounded-md bg-neutral-100 px-2 py-0.5 text-xs text-neutral-300">
+                <span className="rounded-md bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500">
                   {CATEGORY_LABEL[s.category] || s.category}
                 </span>
                 <span className="ml-auto inline-flex items-center gap-0.5 rounded-md bg-emerald-50 px-2 py-0.5 text-xs text-emerald-600">

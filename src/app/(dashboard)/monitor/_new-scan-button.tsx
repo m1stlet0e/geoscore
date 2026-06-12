@@ -175,7 +175,7 @@ export function NewScanButton({
                   type="button"
                   onClick={() => setOpen(false)}
                   disabled={submitting}
-                  className="rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 py-2 text-sm font-medium text-neutral-300 transition hover:border-neutral-400"
+                  className="rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 py-2 text-sm font-medium text-neutral-500 transition hover:border-neutral-400"
                 >
                   取消
                 </button>

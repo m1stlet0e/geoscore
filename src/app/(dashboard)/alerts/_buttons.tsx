@@ -16,7 +16,7 @@ export function MarkAllReadButton({ hasUnread }: { hasUnread: boolean }) {
         router.refresh();
         setBusy(false);
       }}
-      className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm text-neutral-300 transition hover:border-neutral-300 hover:text-neutral-800 disabled:opacity-50"
+      className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm text-neutral-500 transition hover:border-neutral-300 hover:text-neutral-800 disabled:opacity-50"
     >
       <CheckCircle2 className="h-3.5 w-3.5" /> 全部标记已读
     </button>

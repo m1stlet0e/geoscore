@@ -24,7 +24,7 @@ type SearchParams = Promise<{ brandId?: string }>;
 // 5-step heat color scale
 const HEAT_LEVELS = [
   'bg-neutral-200/40 text-neutral-500',
-  'bg-neutral-200 text-neutral-300',
+  'bg-neutral-200 text-neutral-500',
   'bg-indigo-500/30 text-indigo-100',
   'bg-indigo-500/55 text-white',
   'bg-indigo-400 text-slate-950',
@@ -149,12 +149,12 @@ export default async function SourcesPage({
             <span className="text-4xl font-semibold tabular-nums text-neutral-900">
               {allSources.length}
             </span>
-            <span className="text-sm text-neutral-300">个权威引用源</span>
+            <span className="text-sm text-neutral-500">个权威引用源</span>
             <span className="text-neutral-500">·</span>
             <span className="text-4xl font-semibold tabular-nums text-neutral-900">
               {platformSet.size}
             </span>
-            <span className="text-sm text-neutral-300">个平台</span>
+            <span className="text-sm text-neutral-500">个平台</span>
           </div>
           <p className="mt-3 text-sm text-neutral-500">
             覆盖 {AI_PLATFORMS.length} 大 AI 引擎中 {platformSet.size} 个,共被引用 {formatNumber(citationAgg._count._all)} 次。
@@ -179,7 +179,7 @@ export default async function SourcesPage({
               const widthPct = maxWeight > 0 ? (s.weight / maxWeight) * 100 : 0;
               return (
                 <div key={s.id} className="group flex items-center gap-3">
-                  <div className="w-44 shrink-0 truncate text-right text-xs font-medium text-neutral-300">
+                  <div className="w-44 shrink-0 truncate text-right text-xs font-medium text-neutral-500">
                     {s.domain}
                   </div>
                   <div className="relative h-7 flex-1 overflow-hidden rounded-md bg-neutral-200/40">
@@ -283,7 +283,7 @@ export default async function SourcesPage({
               >
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent opacity-0 transition group-hover:opacity-100" />
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-neutral-300 bg-neutral-100 text-neutral-300">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-neutral-300 bg-neutral-100 text-neutral-500">
                     <Icon className="h-5 w-5" />
                   </div>
                   <span className={cn('rounded-full border px-2 py-0.5 text-[10px] font-medium', t.color)}>
@@ -300,7 +300,7 @@ export default async function SourcesPage({
                     href={`https://${t.domain}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-neutral-300 transition hover:text-indigo-500"
+                    className="inline-flex items-center gap-1 text-xs text-neutral-500 transition hover:text-indigo-500"
                   >
                     访问 <ArrowUpRight className="h-3 w-3" />
                   </Link>

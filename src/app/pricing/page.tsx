@@ -217,7 +217,7 @@ export default function PricingPage() {
           <Link href="/" className="flex items-center gap-2.5">
             <Logo size="md" />
           </Link>
-          <nav className="hidden items-center gap-7 text-sm text-neutral-300 md:flex">
+          <nav className="hidden items-center gap-7 text-sm text-neutral-600 md:flex">
             <Link href="/#modules" className="transition hover:text-neutral-900">功能</Link>
             <Link href="/#how" className="transition hover:text-neutral-900">原理</Link>
             <Link href="/#platforms" className="transition hover:text-neutral-900">AI 引擎</Link>
@@ -226,7 +226,7 @@ export default function PricingPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="hidden rounded-lg px-3 py-1.5 text-sm text-neutral-300 transition hover:text-neutral-900 sm:inline-flex"
+              className="hidden rounded-lg px-3 py-1.5 text-sm text-neutral-600 transition hover:text-neutral-900 sm:inline-flex"
             >
               登录
             </Link>
@@ -251,7 +251,7 @@ export default function PricingPage() {
               选择适合你的套餐
             </span>
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-neutral-500">
+          <p className="mx-auto mt-4 max-w-2xl text-base text-neutral-700">
             所有方案均包含 7 大 AI 引擎监控、可见性评分、引用分析、来源追踪。升级后解锁自动内容生成、影响力地图、推荐预测。
           </p>
         </div>
@@ -298,16 +298,16 @@ export default function PricingPage() {
                       </div>
                     )}
 
-                    <div className="mb-1 text-sm font-semibold uppercase tracking-wider text-neutral-300">
+                    <div className="mb-1 text-sm font-semibold uppercase tracking-wider text-neutral-600">
                       {config.name}
                     </div>
-                    <div className="mb-4 text-xs text-neutral-500">{meta.tagline}</div>
+                    <div className="mb-4 text-xs text-neutral-700">{meta.tagline}</div>
 
                     <div className="mb-5 flex items-baseline gap-1">
                       <span className="text-4xl font-bold tracking-tight text-neutral-900">
                         {config.price === 0 ? '¥0' : `¥${config.price}`}
                       </span>
-                      <span className="text-sm text-neutral-500">
+                      <span className="text-sm text-neutral-700">
                         {config.price === 0 ? '永久免费' : '/ 月'}
                       </span>
                     </div>
@@ -315,7 +315,7 @@ export default function PricingPage() {
                     {/* Features */}
                     <ul className="mb-5 space-y-2.5 text-sm">
                       {features.map((f) => (
-                        <li key={f} className="flex items-start gap-2 text-neutral-300">
+                        <li key={f} className="flex items-start gap-2 text-neutral-600">
                           <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
                           <span>{f}</span>
                         </li>
@@ -324,13 +324,13 @@ export default function PricingPage() {
 
                     {/* Quota limits */}
                     <div className="mb-5 rounded-lg border border-neutral-300 bg-white/50 p-3">
-                      <div className="mb-2 text-[10px] uppercase tracking-wider text-neutral-500">
+                      <div className="mb-2 text-[10px] uppercase tracking-wider text-neutral-700">
                         额度限制
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-[11px]">
                         {Object.entries(config.quotas).map(([key, value]) => (
                           <div key={key}>
-                            <div className="text-neutral-500 truncate">{QUOTA_LABELS[key] ?? key}</div>
+                            <div className="text-neutral-700 truncate">{QUOTA_LABELS[key] ?? key}</div>
                             <div className="font-semibold tabular-nums text-neutral-800">
                               {formatLimit(value)}
                             </div>
@@ -357,7 +357,7 @@ export default function PricingPage() {
               })}
             </div>
           ) : (
-            <div className="text-center text-sm text-neutral-500 py-12">
+            <div className="text-center text-sm text-neutral-700 py-12">
               加载套餐信息失败，请刷新页面重试
             </div>
           )}
@@ -384,9 +384,9 @@ export default function PricingPage() {
               >
                 <summary className="flex cursor-pointer items-center justify-between gap-3 px-5 py-4 text-left text-sm font-medium text-neutral-800 marker:hidden [&::-webkit-details-marker]:hidden">
                   <span>{item.q}</span>
-                  <ChevronDown className="h-4 w-4 shrink-0 text-neutral-500 transition group-open:rotate-180 group-open:text-indigo-500" />
+                  <ChevronDown className="h-4 w-4 shrink-0 text-neutral-700 transition group-open:rotate-180 group-open:text-indigo-500" />
                 </summary>
-                <div className="border-t border-neutral-200 px-5 py-4 text-sm leading-relaxed text-neutral-500">
+                <div className="border-t border-neutral-200 px-5 py-4 text-sm leading-relaxed text-neutral-700">
                   {item.a}
                 </div>
               </details>
@@ -397,13 +397,13 @@ export default function PricingPage() {
 
       {/* Footer */}
       <footer className="border-t border-neutral-200 py-10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 text-sm text-neutral-500 sm:flex-row sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 text-sm text-neutral-700 sm:flex-row sm:px-6 lg:px-8">
           <Logo size="sm" />
           <div>© {new Date().getFullYear()} GeoScore. All rights reserved.</div>
           <div className="flex gap-5">
-            <Link href="/login" className="hover:text-neutral-300">登录</Link>
-            <Link href="/register" className="hover:text-neutral-300">注册</Link>
-            <a href="mailto:hello@geoscore.ai" className="hover:text-neutral-300">联系</a>
+            <Link href="/login" className="hover:text-neutral-600">登录</Link>
+            <Link href="/register" className="hover:text-neutral-600">注册</Link>
+            <a href="mailto:hello@geoscore.ai" className="hover:text-neutral-600">联系</a>
           </div>
         </div>
       </footer>

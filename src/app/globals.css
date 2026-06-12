@@ -393,26 +393,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
 }
 
-/* ============================================
-   Dark sidebar styles
-   ============================================ */
-.sidebar-dark {
-  background: #0c0a09;
-  border-right: 1px solid #292524;
-}
-
-.sidebar-dark .nav-item {
-  transition: all 0.15s ease;
-}
-
-.sidebar-dark .nav-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.sidebar-dark .nav-item.active {
-  background: rgba(99, 102, 241, 0.1);
-  color: #a5b4fc;
-}
+/* Sidebar is now light-themed — no dark overrides needed */
 
 /* ============================================
    Card hover effects

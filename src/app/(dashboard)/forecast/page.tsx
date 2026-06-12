@@ -135,7 +135,7 @@ export default async function ForecastPage({ searchParams }: { searchParams: Pro
                   style={{ width: `${Math.min(100, d.impact * 400)}%` }}
                 />
               </div>
-              <span className="w-12 text-right text-xs text-neutral-300">+{(d.impact * 100).toFixed(1)}%</span>
+              <span className="w-12 text-right text-xs text-neutral-500">+{(d.impact * 100).toFixed(1)}%</span>
             </div>
           ))}
         </div>
