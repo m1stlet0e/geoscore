@@ -76,19 +76,19 @@ export default function HomePage() {
           <Link href="/" className="flex items-center gap-2.5">
             <Logo size="md" />
           </Link>
-          <nav className="hidden items-center gap-8 text-[13px] font-medium text-neutral-500 md:flex">
+          <nav className="hidden items-center gap-8 text-sm font-medium text-neutral-600 md:flex">
             <a href="#features" className="transition hover:text-neutral-900">功能</a>
             <a href="#how" className="transition hover:text-neutral-900">原理</a>
             <a href="#platforms" className="transition hover:text-neutral-900">AI 引擎</a>
             <Link href="/pricing" className="transition hover:text-neutral-900">价格</Link>
           </nav>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="hidden text-[13px] font-medium text-neutral-600 transition hover:text-neutral-900 sm:inline-flex">
+            <Link href="/login" className="hidden text-sm font-medium text-neutral-700 transition hover:text-neutral-900 sm:inline-flex">
               登录
             </Link>
             <Link
               href="/register"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-[13px] font-medium text-white shadow-sm transition hover:bg-indigo-700"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
             >
               免费开始 <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -107,7 +107,7 @@ export default function HomePage() {
 
         <div className="mx-auto max-w-4xl px-5 text-center sm:px-6">
           {/* Eyebrow */}
-          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3.5 py-1 text-xs font-medium text-indigo-600">
+          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-sm font-medium text-indigo-600">
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-60" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-indigo-500" />
@@ -116,15 +116,15 @@ export default function HomePage() {
           </div>
 
           {/* Headline — Stripe-style light weight */}
-          <h1 className="mt-8 text-5xl font-light leading-[1.08] tracking-tight text-neutral-900 sm:text-6xl lg:text-7xl" style={{ letterSpacing: '-0.02em' }}>
+          <h1 className="mt-8 text-5xl font-bold leading-[1.05] tracking-tight text-neutral-900 sm:text-6xl lg:text-[5.5rem]" style={{ letterSpacing: '-0.02em' }}>
             Rank In AI,
             <br />
-            <span className="bg-gradient-to-r from-indigo-600 via-violet-500 to-indigo-500 bg-clip-text font-normal text-transparent">
+            <span className="bg-gradient-to-r from-indigo-600 via-violet-500 to-indigo-500 bg-clip-text font-bold text-transparent">
               Not Just Google.
             </span>
           </h1>
 
-          <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-neutral-500">
+          <p className="mx-auto mt-7 max-w-2xl text-xl leading-relaxed text-neutral-500">
             GeoScore 是面向 AI 时代的<strong className="font-medium text-neutral-700">生成式引擎优化 (GEO)</strong> 操作系统。监控你的品牌在 ChatGPT、Perplexity、Gemini 等 7 大 AI 引擎中的可见性、引用与排名，并自动生产可发布的内容。
           </p>
 
@@ -132,14 +132,14 @@ export default function HomePage() {
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/register"
-              className="group inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-7 py-3.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/25 transition hover:bg-indigo-700 hover:shadow-indigo-500/30"
+              className="group inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:bg-indigo-700 hover:shadow-indigo-500/30"
             >
               Start Free
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
             </Link>
             <a
               href="#how"
-              className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-7 py-3.5 text-sm font-medium text-neutral-700 shadow-sm transition hover:border-neutral-400 hover:bg-neutral-50"
+              className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-8 py-4 text-base font-medium text-neutral-700 shadow-sm transition hover:border-neutral-400 hover:bg-neutral-50"
             >
               <PlayCircle className="h-4 w-4 text-indigo-500" />
               Watch Demo
@@ -156,8 +156,8 @@ export default function HomePage() {
           <div className="grid grid-cols-2 gap-px rounded-2xl border border-neutral-200 bg-neutral-200 sm:grid-cols-4">
             {STATS.map((s) => (
               <div key={s.label} className="flex flex-col items-center gap-1 bg-white px-6 py-5">
-                <div className="text-2xl font-semibold tracking-tight text-neutral-900">{s.value}</div>
-                <div className="text-xs text-neutral-500">{s.label}</div>
+                <div className="text-3xl font-bold tracking-tight text-neutral-900">{s.value}</div>
+                <div className="text-sm text-neutral-500">{s.label}</div>
               </div>
             ))}
           </div>
@@ -187,8 +187,8 @@ export default function HomePage() {
                   >
                     <Icon className="h-5 w-5" />
                   </div>
-                  <h3 className="text-[15px] font-semibold text-neutral-900">{m.title}</h3>
-                  <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">{m.desc}</p>
+                  <h3 className="text-base font-semibold text-neutral-900">{m.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-500">{m.desc}</p>
                   <div className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-indigo-600 opacity-0 transition group-hover:opacity-100">
                     了解更多 <ChevronRight className="h-3 w-3" />
                   </div>
@@ -220,7 +220,7 @@ export default function HomePage() {
                 >
                   {p.icon}
                 </div>
-                <div className="text-[13px] font-medium text-neutral-800">{p.name}</div>
+                <div className="text-sm font-medium text-neutral-800">{p.name}</div>
                 <div className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-600">
                   <span className="h-1 w-1 rounded-full bg-emerald-500" />
                   verified
@@ -250,10 +250,10 @@ export default function HomePage() {
                       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
                         <Icon className="h-5 w-5" />
                       </div>
-                      <span className="text-4xl font-light tracking-tight text-neutral-200">{s.n}</span>
+                      <span className="text-5xl font-bold tracking-tight text-neutral-200">{s.n}</span>
                     </div>
-                    <h3 className="text-lg font-semibold text-neutral-900">{s.title}</h3>
-                    <p className="mt-3 text-sm leading-relaxed text-neutral-500">{s.desc}</p>
+                    <h3 className="text-xl font-semibold text-neutral-900">{s.title}</h3>
+                    <p className="mt-3 text-base leading-relaxed text-neutral-500">{s.desc}</p>
                   </div>
                   {i < STEPS.length - 1 && (
                     <div className="absolute -right-3 top-1/2 hidden -translate-y-1/2 text-neutral-300 md:block">
@@ -280,7 +280,7 @@ export default function HomePage() {
             <PricingTable />
           </div>
 
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-neutral-500">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-base text-neutral-500">
             <span className="flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-emerald-500" /> 30 天无理由退款
             </span>
@@ -309,11 +309,11 @@ export default function HomePage() {
           <div className="mt-12 space-y-0 divide-y divide-neutral-200 rounded-2xl border border-neutral-200 bg-white">
             {FAQ_ITEMS.map((faq, i) => (
               <details key={i} className="group">
-                <summary className="flex cursor-pointer items-center justify-between gap-4 px-6 py-5 text-[15px] font-medium text-neutral-800 marker:hidden [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer items-center justify-between gap-4 px-6 py-5 text-base font-semibold text-neutral-800 marker:hidden [&::-webkit-details-marker]:hidden">
                   {faq.q}
                   <ChevronRight className="h-4 w-4 shrink-0 text-neutral-400 transition group-open:rotate-90" />
                 </summary>
-                <div className="px-6 pb-5 text-sm leading-relaxed text-neutral-500">
+                <div className="px-6 pb-5 text-base leading-relaxed text-neutral-500">
                   {faq.a}
                 </div>
               </details>
@@ -331,23 +331,23 @@ export default function HomePage() {
             <div className="pointer-events-none absolute -bottom-16 -right-16 h-48 w-48 rounded-full bg-white/[0.06] blur-2xl" />
 
             <div className="relative">
-              <h2 className="text-3xl font-light tracking-tight text-white sm:text-4xl" style={{ letterSpacing: '-0.015em' }}>
+              <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl" style={{ letterSpacing: '-0.015em' }}>
                 让 AI 主动提起你
               </h2>
-              <p className="mx-auto mt-4 max-w-xl text-base text-indigo-100">
+              <p className="mx-auto mt-4 max-w-xl text-lg text-indigo-100">
                 注册 30 秒拿到你品牌的 AI 可见性快照。免费版永久可用，不需要信用卡。
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
                   href="/register"
-                  className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-medium text-indigo-700 shadow-sm transition hover:bg-indigo-50"
+                  className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-base font-semibold text-indigo-700 shadow-sm transition hover:bg-indigo-50"
                 >
                   Start Free
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/pricing"
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/30 px-7 py-3.5 text-sm font-medium text-white transition hover:bg-white/10"
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/30 px-8 py-4 text-base font-medium text-white transition hover:bg-white/10"
                 >
                   查看价格
                 </Link>
@@ -400,9 +400,9 @@ export default function HomePage() {
 function SectionHeader({ eyebrow, title, subtitle }: { eyebrow: string; title: string; subtitle: string }) {
   return (
     <div className="mx-auto max-w-2xl text-center">
-      <div className="text-xs font-semibold uppercase tracking-[0.15em] text-indigo-600">{eyebrow}</div>
+      <div className="text-sm font-semibold uppercase tracking-[0.12em] text-indigo-600">{eyebrow}</div>
       <h2
-        className="mt-4 text-3xl font-light tracking-tight text-neutral-900 sm:text-4xl"
+        className="mt-4 text-3xl font-bold tracking-tight text-neutral-900 sm:text-[2.75rem]"
         style={{ letterSpacing: '-0.02em' }}
       >
         {title}
