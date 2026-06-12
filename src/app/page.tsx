@@ -36,7 +36,7 @@ const MODULES: Array<{
     title: 'AI 监控中心',
     desc: '7 个 AI 引擎统一扫描,逐日追踪品牌可见性、排名、情感倾向。',
     icon: Radar,
-    accent: 'from-indigo-500/20 to-violet-500/10 text-indigo-300',
+    accent: 'bg-indigo-500/15 text-indigo-500',
   },
   {
     id: 'citations',
@@ -57,7 +57,7 @@ const MODULES: Array<{
     title: '影响力地图',
     desc: '品牌 × 竞品 × 品类 × 子赛道 的知识图谱,一眼看清心智位置。',
     icon: MapIcon,
-    accent: 'from-violet-500/20 to-fuchsia-500/10 text-violet-300',
+    accent: 'from-violet-500/20 to-fuchsia-500/10 text-violet-500',
   },
   {
     id: 'gaps',
@@ -137,32 +137,31 @@ export default function HomePage() {
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       {/* Decorative background */}
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-radial-glow" aria-hidden="true" />
       <div className="pointer-events-none fixed inset-0 -z-10 bg-grid opacity-40" aria-hidden="true" />
       <div className="pointer-events-none fixed -top-40 left-1/2 -z-10 h-[500px] w-[1100px] -translate-x-1/2 rounded-full bg-indigo-600/20 blur-3xl" aria-hidden="true" />
 
       {/* ===================== Nav ===================== */}
-      <header className="sticky top-0 z-30 border-b border-slate-800/60 bg-slate-950/70 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white/70 ">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-2.5">
             <Logo size="md" />
           </Link>
-          <nav className="hidden items-center gap-7 text-sm text-slate-300 md:flex">
-            <a href="#modules" className="transition hover:text-slate-50">功能</a>
-            <a href="#how" className="transition hover:text-slate-50">原理</a>
-            <a href="#platforms" className="transition hover:text-slate-50">AI 引擎</a>
-            <Link href="/pricing" className="transition hover:text-slate-50">价格</Link>
+          <nav className="hidden items-center gap-7 text-sm text-neutral-300 md:flex">
+            <a href="#modules" className="transition hover:text-neutral-900">功能</a>
+            <a href="#how" className="transition hover:text-neutral-900">原理</a>
+            <a href="#platforms" className="transition hover:text-neutral-900">AI 引擎</a>
+            <Link href="/pricing" className="transition hover:text-neutral-900">价格</Link>
           </nav>
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="hidden rounded-lg px-3 py-1.5 text-sm text-slate-300 transition hover:text-slate-50 sm:inline-flex"
+              className="hidden rounded-lg px-3 py-1.5 text-sm text-neutral-300 transition hover:text-neutral-900 sm:inline-flex"
             >
               登录
             </Link>
             <Link
               href="/register"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-3.5 py-1.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500 px-3.5 py-1.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400"
             >
               免费开始 <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -173,7 +172,7 @@ export default function HomePage() {
       {/* ===================== Hero ===================== */}
       <section className="relative pt-16 pb-20 sm:pt-24 sm:pb-28">
         <div className="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
-          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs text-indigo-200 animate-fade-up">
+          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-50 px-3 py-1 text-xs text-indigo-600 animate-fade-up">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-60" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-indigo-400" />
@@ -182,18 +181,18 @@ export default function HomePage() {
           </div>
 
           <h1 className="mt-6 text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl animate-fade-up">
-            <span className="bg-gradient-to-br from-white via-slate-100 to-indigo-300 bg-clip-text text-transparent">
+            <span className="text-white">
               Rank In AI,
             </span>
             <br className="hidden sm:block" />
-            <span className="bg-gradient-to-br from-indigo-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent">
+            <span className="text-indigo-500">
               Not Just Google.
             </span>
           </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-400 sm:text-lg animate-fade-up">
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-neutral-500 sm:text-lg animate-fade-up">
             GeoScore 是面向 AI 时代的{' '}
-            <span className="font-semibold text-slate-200">生成式引擎优化 (GEO)</span>{' '}
+            <span className="font-semibold text-neutral-700">生成式引擎优化 (GEO)</span>{' '}
             操作系统。监控你的品牌在 ChatGPT、Perplexity、Gemini、Claude 等
             7 大 AI 引擎中的可见性、引用与排名,并自动生产可发布的内容。
           </p>
@@ -201,44 +200,44 @@ export default function HomePage() {
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row animate-fade-up">
             <Link
               href="/register"
-              className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:shadow-indigo-400/40 hover:from-indigo-400 hover:to-violet-400"
+              className="group inline-flex items-center gap-2 rounded-xl bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:shadow-indigo-400/40 hover:from-indigo-400 hover:to-violet-400"
             >
               Start Free
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
             </Link>
             <a
               href="#how"
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/60 px-6 py-3 text-sm font-medium text-slate-200 transition hover:border-slate-600 hover:bg-slate-900"
+              className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-neutral-50 px-6 py-3 text-sm font-medium text-neutral-700 transition hover:border-neutral-400 hover:bg-neutral-50"
             >
-              <PlayCircle className="h-4 w-4 text-indigo-300" />
+              <PlayCircle className="h-4 w-4 text-indigo-500" />
               Watch Demo
             </a>
           </div>
 
-          <p className="mt-6 text-xs text-slate-500 animate-fade-up">
+          <p className="mt-6 text-xs text-neutral-500 animate-fade-up">
             免信用卡 · 1 分钟接入 · 永久免费版可用
           </p>
         </div>
 
         {/* Social proof */}
         <div className="mx-auto mt-14 max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-800/80 bg-slate-900/40 px-6 py-5 text-center backdrop-blur">
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+          <div className="rounded-2xl border border-neutral-300/80 bg-neutral-100 px-6 py-5 text-center backdrop-blur">
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
               Social Proof
             </div>
-            <div className="mt-2 text-base text-slate-200 sm:text-lg">
-              <span className="bg-gradient-to-r from-indigo-300 to-violet-300 bg-clip-text text-xl font-semibold text-transparent sm:text-2xl">
+            <div className="mt-2 text-base text-neutral-700 sm:text-lg">
+              <span className="text-xl font-semibold text-indigo-500 sm:text-2xl">
                 1,200+
               </span>{' '}
               品牌正在使用 GeoScore 追踪 AI 可见性 · 覆盖 SaaS / DTC / 金融科技 / B2B 服务
             </div>
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-xs text-slate-500">
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-xs text-neutral-500">
               <span>Notion-style workflow</span>
-              <span className="text-slate-700">·</span>
+              <span className="text-neutral-300">·</span>
               <span>SOC2-ready</span>
-              <span className="text-slate-700">·</span>
+              <span className="text-neutral-300">·</span>
               <span>中文 / English</span>
-              <span className="text-slate-700">·</span>
+              <span className="text-neutral-300">·</span>
               <span>GDPR / 数据本地化</span>
             </div>
           </div>
@@ -260,7 +259,7 @@ export default function HomePage() {
               return (
                 <div
                   key={m.id}
-                  className="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/40 p-6 backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-indigo-500/50 hover:shadow-[0_20px_60px_-30px_rgba(99,102,241,0.6)]"
+                  className="group relative overflow-hidden rounded-2xl border border-neutral-300 bg-neutral-100 p-6 backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-indigo-500/50 hover:shadow-[0_20px_60px_-30px_rgba(99,102,241,0.6)]"
                 >
                   <div
                     className={`absolute -right-12 -top-12 h-40 w-40 rounded-full bg-gradient-to-br ${m.accent} opacity-40 blur-2xl transition group-hover:opacity-70`}
@@ -268,13 +267,13 @@ export default function HomePage() {
                   />
                   <div className="relative">
                     <div
-                      className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-700/80 bg-gradient-to-br ${m.accent}`}
+                      className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-neutral-300/80 bg-gradient-to-br ${m.accent}`}
                     >
                       <Icon className="h-5 w-5" />
                     </div>
-                    <h3 className="text-base font-semibold text-slate-50">{m.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-400">{m.desc}</p>
-                    <div className="mt-5 inline-flex items-center gap-1 text-xs font-medium text-indigo-300 opacity-0 transition group-hover:opacity-100">
+                    <h3 className="text-base font-semibold text-neutral-900">{m.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-neutral-500">{m.desc}</p>
+                    <div className="mt-5 inline-flex items-center gap-1 text-xs font-medium text-indigo-500 opacity-0 transition group-hover:opacity-100">
                       了解更多 <ChevronRight className="h-3.5 w-3.5" />
                     </div>
                   </div>
@@ -298,7 +297,7 @@ export default function HomePage() {
             {AI_PLATFORMS.map((p) => (
               <div
                 key={p.id}
-                className="group flex flex-col items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/40 px-3 py-5 text-center transition hover:border-slate-700 hover:bg-slate-900/70"
+                className="group flex flex-col items-center gap-2 rounded-2xl border border-neutral-300 bg-neutral-100 px-3 py-5 text-center transition hover:border-neutral-300 hover:bg-neutral-50/70"
               >
                 <div
                   className="flex h-10 w-10 items-center justify-center rounded-xl text-lg"
@@ -306,8 +305,8 @@ export default function HomePage() {
                 >
                   {p.icon}
                 </div>
-                <div className="text-sm font-medium text-slate-100">{p.name}</div>
-                <div className="text-[10px] uppercase tracking-wider text-slate-500">API verified</div>
+                <div className="text-sm font-medium text-neutral-800">{p.name}</div>
+                <div className="text-[10px] uppercase tracking-wider text-neutral-500">API verified</div>
               </div>
             ))}
           </div>
@@ -329,20 +328,20 @@ export default function HomePage() {
               return (
                 <div
                   key={s.n}
-                  className="relative overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900/60 to-slate-950/40 p-7"
+                  className="relative overflow-hidden rounded-2xl border border-neutral-300 bg-gradient-to-b from-surface-200/60 to-surface-100/40 p-7"
                 >
                   <div className="absolute -right-4 -top-4 text-7xl font-bold text-slate-800/40 select-none">
                     {s.n}
                   </div>
                   <div className="relative">
-                    <div className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-300">
+                    <div className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-indigo-500/30 bg-indigo-50 text-indigo-500">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-50">{s.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-400">{s.desc}</p>
+                    <h3 className="text-lg font-semibold text-neutral-900">{s.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-neutral-500">{s.desc}</p>
                   </div>
                   {i < STEPS.length - 1 ? (
-                    <div className="absolute -right-3 top-1/2 hidden -translate-y-1/2 text-slate-700 md:block">
+                    <div className="absolute -right-3 top-1/2 hidden -translate-y-1/2 text-neutral-300 md:block">
                       <ChevronRight className="h-6 w-6" />
                     </div>
                   ) : null}
@@ -366,7 +365,7 @@ export default function HomePage() {
             <PricingTable />
           </div>
 
-          <div className="mt-8 grid grid-cols-1 gap-3 text-xs text-slate-500 sm:grid-cols-3">
+          <div className="mt-8 grid grid-cols-1 gap-3 text-xs text-neutral-500 sm:grid-cols-3">
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-emerald-400" /> 30 天无理由退款
             </div>
@@ -378,9 +377,9 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="mt-6 text-center text-sm text-slate-400">
+          <div className="mt-6 text-center text-sm text-neutral-500">
             想看完整对比?查看{' '}
-            <Link href="/pricing" className="text-indigo-300 hover:text-indigo-200">
+            <Link href="/pricing" className="text-indigo-500 hover:text-indigo-600">
               价格详情 →
             </Link>
           </div>
@@ -390,26 +389,25 @@ export default function HomePage() {
       {/* ===================== Final CTA ===================== */}
       <section className="relative py-20 sm:py-28">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-10 text-center shadow-[0_30px_120px_-30px_rgba(99,102,241,0.45)] sm:p-16">
-            <div className="pointer-events-none absolute inset-0 -z-0 bg-radial-glow opacity-80" aria-hidden="true" />
+          <div className="relative overflow-hidden rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-surface-200 via-surface-100 to-surface-200 p-10 text-center shadow-[0_30px_120px_-30px_rgba(29,179,146,0.3)] sm:p-16">
             <div className="relative">
-              <h2 className="text-3xl font-bold tracking-tight text-slate-50 sm:text-4xl">
+              <h2 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
                 让 AI 主动提起你
               </h2>
-              <p className="mx-auto mt-4 max-w-2xl text-base text-slate-400">
+              <p className="mx-auto mt-4 max-w-2xl text-base text-neutral-500">
                 注册 30 秒拿到你品牌的 AI 可见性快照。免费版永久可用,不需要信用卡。
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
                   href="/register"
-                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:from-indigo-400 hover:to-violet-400"
+                  className="inline-flex items-center gap-2 rounded-xl bg-indigo-500 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:from-indigo-400 hover:to-violet-400"
                 >
                   Start Free
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/pricing"
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/60 px-7 py-3 text-sm font-medium text-slate-200 transition hover:border-slate-600 hover:bg-slate-900"
+                  className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-neutral-50 px-7 py-3 text-sm font-medium text-neutral-700 transition hover:border-neutral-400 hover:bg-neutral-50"
                 >
                   查看价格
                 </Link>
@@ -420,15 +418,15 @@ export default function HomePage() {
       </section>
 
       {/* ===================== Footer ===================== */}
-      <footer className="border-t border-slate-800/60 py-12">
+      <footer className="border-t border-neutral-200 py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-8 md:grid-cols-4">
             <div className="md:col-span-2">
               <Logo size="md" />
-              <p className="mt-3 max-w-md text-sm text-slate-400">
+              <p className="mt-3 max-w-md text-sm text-neutral-500">
                 AI 时代的品牌可观测性 · 监控、归因、补位、增长,一套操作系统。
               </p>
-              <div className="mt-4 text-xs text-slate-500">
+              <div className="mt-4 text-xs text-neutral-500">
                 © {new Date().getFullYear()} GeoScore. All rights reserved.
               </div>
             </div>
@@ -468,18 +466,18 @@ function SectionHeader({
 }) {
   return (
     <div className="mx-auto max-w-3xl text-center">
-      <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs text-indigo-200">
+      <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-50 px-3 py-1 text-xs text-indigo-600">
         {eyebrow}
       </div>
-      <h2 className="mt-5 text-3xl font-bold tracking-tight text-slate-50 sm:text-4xl">{title}</h2>
-      <p className="mt-4 text-base text-slate-400">{subtitle}</p>
+      <h2 className="mt-5 text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">{title}</h2>
+      <p className="mt-4 text-base text-neutral-500">{subtitle}</p>
     </div>
   );
 }
 
 function Gradient({ children }: { children: React.ReactNode }) {
   return (
-    <span className="bg-gradient-to-r from-indigo-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent">
+    <span className="text-indigo-500">
       {children}
     </span>
   );
@@ -488,11 +486,11 @@ function Gradient({ children }: { children: React.ReactNode }) {
 function FooterCol({ title, links }: { title: string; links: Array<{ label: string; href: string }> }) {
   return (
     <div>
-      <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">{title}</div>
+      <div className="text-xs font-semibold uppercase tracking-wider text-neutral-500">{title}</div>
       <ul className="mt-4 space-y-2.5 text-sm">
         {links.map((l) => (
           <li key={l.label}>
-            <Link href={l.href} className="text-slate-400 transition hover:text-slate-100">
+            <Link href={l.href} className="text-neutral-500 transition hover:text-neutral-800">
               {l.label}
             </Link>
           </li>

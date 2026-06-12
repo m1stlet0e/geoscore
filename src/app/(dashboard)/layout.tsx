@@ -14,10 +14,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const userName = session.user.name ?? null;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      {/* Ambient background glow */}
-      <div className="pointer-events-none fixed inset-0 bg-radial-glow opacity-50" aria-hidden="true" />
-      <div className="pointer-events-none fixed inset-0 bg-grid opacity-30" aria-hidden="true" />
+    <div className="min-h-screen bg-white text-neutral-800">
+      {/* Subtle grid — only on large screens */}
+      <div className="pointer-events-none fixed inset-0 hidden bg-grid opacity-30 lg:block" aria-hidden="true" />
 
       <Sidebar plan={plan} userEmail={userEmail} userName={userName} />
 

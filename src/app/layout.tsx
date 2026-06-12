@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { DM_Sans } from 'next/font/google';
 import { Providers } from './providers';
 import { Toaster } from '@/components/ui/Toaster';
 import './globals.css';
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-dm-sans',
 });
 
 export const metadata: Metadata = {
@@ -39,8 +39,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-CN" className={inter.variable}>
-      <body className="min-h-screen bg-slate-950 font-sans text-slate-100 antialiased">
+    <html lang="zh-CN" className={dmSans.variable}>
+      <body className="min-h-screen bg-white font-sans text-neutral-800 antialiased">
         <Providers>
           {children}
           <Toaster />

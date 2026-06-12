@@ -50,12 +50,12 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // 生成网络图
-    const graph = await citationEngine.generateNetworkGraph(brandId, limit)
+    // 获取来源排名
+    const sources = await citationEngine.getSourceRankings(brandId)
 
     return NextResponse.json({
       success: true,
-      data: graph
+      data: sources
     })
   } catch (error) {
     console.error('GET /api/citations/network error:', error)

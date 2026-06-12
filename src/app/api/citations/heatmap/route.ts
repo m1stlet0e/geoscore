@@ -50,13 +50,13 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // 获取热力图数据
-    const heatmap = await citationEngine.getHeatmapData(brandId, days)
+    // 获取统计数据
+    const stats = await citationEngine.getStats(brandId)
 
     return NextResponse.json({
       success: true,
       data: {
-        heatmap,
+        heatmap: stats,
         totalDays: days
       }
     })

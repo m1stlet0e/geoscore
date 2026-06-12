@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { adminService } from '@/lib/admin/admin.service'
+import type { Plan } from '@prisma/client'
 
 async function checkAdmin() {
   const session = await getServerSession(authOptions)
@@ -13,7 +14,9 @@ async function checkAdmin() {
   if (!user) {
     return { error: NextResponse.json({ error: 'User not found' }, { status: 404 }) }
   }
-  if (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN') {
+  // Admin check: demo user or specific admin emails
+  const ADMIN_EMAILS = ['demo@geoos.ai', 'admin@geoos.ai']
+  if (!ADMIN_EMAILS.includes(user.email)) {
     return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
   }
   return { user }
@@ -28,7 +31,7 @@ export async function GET(request: NextRequest) {
     const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : undefined
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined
     const search = searchParams.get('search') || undefined
-    const plan = searchParams.get('plan') || undefined
+    const plan = searchParams.get('plan') as Plan | undefined || undefined
 
     const result = await adminService.getUsers(page, limit, search, plan)
     return NextResponse.json(result)

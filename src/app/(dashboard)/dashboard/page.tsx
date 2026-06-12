@@ -24,31 +24,31 @@ import { CitationTrendChart, PlatformDistributionChart } from './_charts';
 export const dynamic = 'force-dynamic';
 
 const SEVERITY_STYLES: Record<string, { ring: string; dot: string; text: string; label: string }> = {
-  high: { ring: 'border-rose-500/40', dot: 'bg-rose-400', text: 'text-rose-200', label: '高' },
-  medium: { ring: 'border-amber-500/40', dot: 'bg-amber-400', text: 'text-amber-200', label: '中' },
-  low: { ring: 'border-slate-500/40', dot: 'bg-slate-400', text: 'text-slate-200', label: '低' },
+  high: { ring: 'border-rose-500/40', dot: 'bg-rose-400', text: 'text-rose-600', label: '高' },
+  medium: { ring: 'border-amber-500/40', dot: 'bg-amber-400', text: 'text-amber-600', label: '中' },
+  low: { ring: 'border-neutral-400/40', dot: 'bg-neutral-500', text: 'text-neutral-700', label: '低' },
 };
 
 const STATUS_META: Record<string, { label: string; icon: React.ReactNode; cls: string }> = {
   queued: {
     label: '排队中',
     icon: <Loader2 className="h-3 w-3" />,
-    cls: 'border-slate-500/30 bg-slate-500/10 text-slate-300',
+    cls: 'border-neutral-300 bg-neutral-100 text-neutral-300',
   },
   running: {
     label: '运行中',
     icon: <Activity className="h-3 w-3 animate-pulse" />,
-    cls: 'border-indigo-500/30 bg-indigo-500/10 text-indigo-200',
+    cls: 'border-indigo-500/30 bg-indigo-50 text-indigo-600',
   },
   completed: {
     label: '已完成',
     icon: <CheckCircle2 className="h-3 w-3" />,
-    cls: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200',
+    cls: 'border-emerald-500/30 bg-emerald-50 text-emerald-600',
   },
   failed: {
     label: '失败',
     icon: <XCircle className="h-3 w-3" />,
-    cls: 'border-rose-500/30 bg-rose-500/10 text-rose-200',
+    cls: 'border-rose-500/30 bg-rose-50 text-rose-600',
   },
 };
 
@@ -161,13 +161,13 @@ export default async function DashboardPage() {
           <>
             <Link
               href="/monitor"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900/60 px-3.5 py-2 text-sm font-medium text-slate-200 transition hover:border-slate-600 hover:bg-slate-900"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 py-2 text-sm font-medium text-neutral-700 transition hover:border-neutral-400 hover:bg-neutral-50"
             >
-              <Activity className="h-4 w-4 text-indigo-300" /> 查看监控
+              <Activity className="h-4 w-4 text-indigo-500" /> 查看监控
             </Link>
             <Link
               href="/alerts"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-3.5 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500 px-3.5 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400"
             >
               <Sparkles className="h-4 w-4" /> 智能预警
             </Link>
@@ -207,15 +207,15 @@ export default async function DashboardPage() {
 
       {/* Charts row */}
       <section className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5 lg:col-span-2">
+        <div className="rounded-2xl border border-neutral-200 bg-white p-5 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-base font-semibold text-slate-100">AI 引用趋势</h2>
-              <p className="mt-0.5 text-xs text-slate-400">近 30 天每日提及次数</p>
+              <h2 className="text-base font-semibold text-neutral-800">AI 引用趋势</h2>
+              <p className="mt-0.5 text-xs text-neutral-500">近 30 天每日提及次数</p>
             </div>
             <Link
               href="/citations"
-              className="inline-flex items-center gap-1 text-xs text-indigo-300 hover:text-indigo-200"
+              className="inline-flex items-center gap-1 text-xs text-indigo-500 hover:text-indigo-600"
             >
               查看详情 <ArrowRight className="h-3 w-3" />
             </Link>
@@ -223,15 +223,15 @@ export default async function DashboardPage() {
           <CitationTrendChart data={trendData} />
         </div>
 
-        <div className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5">
+        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-base font-semibold text-slate-100">7 大 AI 平台曝光分布</h2>
-              <p className="mt-0.5 text-xs text-slate-400">近 30 天扫描分布</p>
+              <h2 className="text-base font-semibold text-neutral-800">7 大 AI 平台曝光分布</h2>
+              <p className="mt-0.5 text-xs text-neutral-500">近 30 天扫描分布</p>
             </div>
           </div>
           {platformData.length === 0 ? (
-            <div className="flex h-[280px] items-center justify-center text-sm text-slate-500">
+            <div className="flex h-[280px] items-center justify-center text-sm text-neutral-500">
               暂无扫描数据
             </div>
           ) : (
@@ -243,20 +243,20 @@ export default async function DashboardPage() {
       {/* Recent activity row */}
       <section className="grid gap-4 lg:grid-cols-2">
         {/* Recent scans */}
-        <div className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5">
+        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-slate-100">最近扫描</h2>
+            <h2 className="text-base font-semibold text-neutral-800">最近扫描</h2>
             <Link
               href="/monitor"
-              className="text-xs text-indigo-300 hover:text-indigo-200"
+              className="text-xs text-indigo-500 hover:text-indigo-600"
             >
               查看全部 →
             </Link>
           </div>
           {recentScans.length === 0 ? (
-            <div className="py-10 text-center text-sm text-slate-500">暂无扫描记录</div>
+            <div className="py-10 text-center text-sm text-neutral-500">暂无扫描记录</div>
           ) : (
-            <ul className="divide-y divide-slate-800/60">
+            <ul className="divide-y divide-neutral-200">
               {recentScans.map((s) => {
                 const meta = STATUS_META[s.status] ?? STATUS_META.queued;
                 const progress = s.totalPrompts
@@ -269,7 +269,7 @@ export default async function DashboardPage() {
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="truncate text-sm font-medium text-slate-100">
+                        <span className="truncate text-sm font-medium text-neutral-800">
                           {s.brand?.name ?? '未知品牌'}
                         </span>
                         <span
@@ -282,13 +282,13 @@ export default async function DashboardPage() {
                           {meta.label}
                         </span>
                       </div>
-                      <div className="mt-1 flex items-center gap-3 text-xs text-slate-500">
+                      <div className="mt-1 flex items-center gap-3 text-xs text-neutral-500">
                         <span>{s.completedPrompts} / {s.totalPrompts} 完成</span>
                         <span>·</span>
                         <span>{formatDate(s.startedAt)}</span>
                       </div>
                     </div>
-                    <div className="text-xs tabular-nums text-slate-400">{progress}%</div>
+                    <div className="text-xs tabular-nums text-neutral-500">{progress}%</div>
                   </li>
                 );
               })}
@@ -297,18 +297,18 @@ export default async function DashboardPage() {
         </div>
 
         {/* Recent alerts */}
-        <div className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5">
+        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-slate-100">最新警报</h2>
+            <h2 className="text-base font-semibold text-neutral-800">最新警报</h2>
             <Link
               href="/alerts"
-              className="text-xs text-indigo-300 hover:text-indigo-200"
+              className="text-xs text-indigo-500 hover:text-indigo-600"
             >
               查看全部 →
             </Link>
           </div>
           {recentAlerts.length === 0 ? (
-            <div className="py-10 text-center text-sm text-slate-500">暂无警报</div>
+            <div className="py-10 text-center text-sm text-neutral-500">暂无警报</div>
           ) : (
             <ul className="space-y-2">
               {recentAlerts.map((a) => {
@@ -317,7 +317,7 @@ export default async function DashboardPage() {
                   <li
                     key={a.id}
                     className={cn(
-                      'group relative overflow-hidden rounded-xl border border-slate-800/70 bg-slate-900/40 p-3 transition hover:border-slate-700',
+                      'group relative overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100 p-3 transition hover:border-neutral-300',
                       !a.isRead && 'ring-1 ring-indigo-500/20'
                     )}
                   >
@@ -332,13 +332,13 @@ export default async function DashboardPage() {
                             <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
                           ) : null}
                         </div>
-                        <p className="mt-0.5 truncate text-sm font-medium text-slate-100">
+                        <p className="mt-0.5 truncate text-sm font-medium text-neutral-800">
                           {a.title}
                         </p>
-                        <p className="mt-0.5 line-clamp-1 text-xs text-slate-400">{a.message}</p>
+                        <p className="mt-0.5 line-clamp-1 text-xs text-neutral-500">{a.message}</p>
                       </div>
                       <div className="shrink-0 text-right">
-                        <p className="text-[10px] text-slate-500">{relativeTime(a.createdAt)}</p>
+                        <p className="text-[10px] text-neutral-500">{relativeTime(a.createdAt)}</p>
                       </div>
                     </div>
                   </li>

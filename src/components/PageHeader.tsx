@@ -12,18 +12,18 @@ type PageHeaderProps = {
 
 export function PageHeader({ title, subtitle, eyebrow, actions, children, className }: PageHeaderProps) {
   return (
-    <header className={cn('flex flex-col gap-4 border-b border-slate-800/60 pb-6 sm:flex-row sm:items-end sm:justify-between', className)}>
+    <header className={cn('flex flex-col gap-4 border-b border-neutral-200 pb-6 sm:flex-row sm:items-end sm:justify-between', className)}>
       <div className="min-w-0">
         {eyebrow ? (
-          <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider text-indigo-200">
+          <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-50 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider text-indigo-600">
             {eyebrow}
           </div>
         ) : null}
-        <h1 className="truncate text-2xl font-semibold tracking-tight text-slate-50 sm:text-3xl">
+        <h1 className="truncate text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl">
           {title}
         </h1>
         {subtitle ? (
-          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-slate-400">{subtitle}</p>
+          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-neutral-500">{subtitle}</p>
         ) : null}
         {children ? <div className="mt-4">{children}</div> : null}
       </div>

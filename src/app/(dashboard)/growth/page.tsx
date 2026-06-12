@@ -10,9 +10,9 @@ import { cn, formatDate } from '@/lib/utils';
 export const dynamic = 'force-dynamic';
 
 const STATUS_STYLES: Record<string, { label: string; cls: string; icon: React.ReactNode }> = {
-  draft: { label: '草稿', cls: 'border-slate-500/30 bg-slate-500/10 text-slate-300', icon: <Clock className="h-3 w-3" /> },
-  approved: { label: '已审核', cls: 'border-indigo-500/30 bg-indigo-500/10 text-indigo-200', icon: <CheckCircle2 className="h-3 w-3" /> },
-  published: { label: '已发布', cls: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200', icon: <Send className="h-3 w-3" /> },
+  draft: { label: '草稿', cls: 'border-neutral-300 bg-neutral-100 text-neutral-300', icon: <Clock className="h-3 w-3" /> },
+  approved: { label: '已审核', cls: 'border-indigo-500/30 bg-indigo-50 text-indigo-600', icon: <CheckCircle2 className="h-3 w-3" /> },
+  published: { label: '已发布', cls: 'border-emerald-500/30 bg-emerald-50 text-emerald-600', icon: <Send className="h-3 w-3" /> },
 };
 
 export default async function GrowthPage({ searchParams }: { searchParams: Promise<{ brandId?: string; prompt?: string }> }) {
@@ -42,23 +42,23 @@ export default async function GrowthPage({ searchParams }: { searchParams: Promi
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-slate-800/60 bg-slate-900/40 p-5">
-          <div className="text-xs text-slate-400">已生成内容</div>
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-100 p-5">
+          <div className="text-xs text-neutral-500">已生成内容</div>
           <div className="mt-1 text-2xl font-semibold">{pieces.length}</div>
         </div>
-        <div className="rounded-2xl border border-slate-800/60 bg-slate-900/40 p-5">
-          <div className="text-xs text-slate-400">已发布</div>
-          <div className="mt-1 text-2xl font-semibold text-emerald-200">{publishedCount}</div>
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-100 p-5">
+          <div className="text-xs text-neutral-500">已发布</div>
+          <div className="mt-1 text-2xl font-semibold text-emerald-600">{publishedCount}</div>
         </div>
-        <div className="rounded-2xl border border-slate-800/60 bg-slate-900/40 p-5">
-          <div className="text-xs text-slate-400">草稿待审</div>
-          <div className="mt-1 text-2xl font-semibold text-slate-300">{draftCount}</div>
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-100 p-5">
+          <div className="text-xs text-neutral-500">草稿待审</div>
+          <div className="mt-1 text-2xl font-semibold text-neutral-300">{draftCount}</div>
         </div>
       </div>
 
       {/* Content type quick generate */}
       {activeBrand && (
-        <div className="rounded-2xl border border-slate-800/60 bg-slate-900/40 p-5">
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-100 p-5">
           <div className="mb-4 flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-fuchsia-300" />
             <h3 className="text-sm font-medium">为「{activeBrand.name}」生成内容</h3>
@@ -71,10 +71,10 @@ export default async function GrowthPage({ searchParams }: { searchParams: Promi
                 <button
                   type="submit"
                   formAction={`/growth?brandId=${activeBrand.id}`}
-                  className="rounded-xl border border-slate-800/60 bg-slate-950/40 p-3 text-left transition hover:border-fuchsia-500/40 hover:bg-fuchsia-500/5"
+                  className="rounded-xl border border-neutral-200 bg-white/40 p-3 text-left transition hover:border-fuchsia-500/40 hover:bg-fuchsia-500/5"
                 >
-                  <div className="text-sm font-medium text-slate-100">{t.label}</div>
-                  <div className="mt-1 text-xs text-slate-500">{t.desc}</div>
+                  <div className="text-sm font-medium text-neutral-800">{t.label}</div>
+                  <div className="mt-1 text-xs text-neutral-500">{t.desc}</div>
                 </button>
               </form>
             ))}
@@ -91,8 +91,8 @@ export default async function GrowthPage({ searchParams }: { searchParams: Promi
             className={cn(
               'rounded-full border px-3 py-1.5 text-sm transition',
               b.id === activeBrand?.id
-                ? 'border-indigo-500/40 bg-indigo-500/10 text-indigo-200'
-                : 'border-slate-800/60 bg-slate-900/40 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                ? 'border-indigo-500/40 bg-indigo-50 text-indigo-600'
+                : 'border-neutral-200 bg-neutral-100 text-neutral-500 hover:border-neutral-300 hover:text-neutral-700'
             )}
           >
             {b.name}
@@ -103,10 +103,10 @@ export default async function GrowthPage({ searchParams }: { searchParams: Promi
       {/* Pieces list */}
       <div className="space-y-3">
         {pieces.length === 0 ? (
-          <div className="rounded-2xl border border-slate-800/60 bg-slate-900/40 p-12 text-center">
+          <div className="rounded-2xl border border-neutral-200 bg-neutral-100 p-12 text-center">
             <Sparkles className="mx-auto h-8 w-8 text-fuchsia-400" />
             <h3 className="mt-4 text-lg font-medium">还没有内容</h3>
-            <p className="mt-2 text-sm text-slate-400">点击上方的内容类型卡片,让 AI 帮你写第一篇博客/FAQ/Reddit 帖子</p>
+            <p className="mt-2 text-sm text-neutral-500">点击上方的内容类型卡片,让 AI 帮你写第一篇博客/FAQ/Reddit 帖子</p>
           </div>
         ) : (
           pieces.map((p) => {
@@ -116,7 +116,7 @@ export default async function GrowthPage({ searchParams }: { searchParams: Promi
               <Link
                 key={p.id}
                 href={`/growth/${p.id}`}
-                className="block rounded-2xl border border-slate-800/60 bg-slate-900/40 p-5 transition hover:border-slate-700"
+                className="block rounded-2xl border border-neutral-200 bg-neutral-100 p-5 transition hover:border-neutral-300"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex-1 space-y-1.5">
@@ -124,17 +124,17 @@ export default async function GrowthPage({ searchParams }: { searchParams: Promi
                       <span className={cn('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs', st.cls)}>
                         {st.icon} {st.label}
                       </span>
-                      <span className="rounded-full bg-slate-800/60 px-2 py-0.5 text-xs text-slate-300">
+                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-300">
                         {meta?.label || p.type}
                       </span>
-                      <span className="text-xs text-slate-500">{p.brand.name}</span>
+                      <span className="text-xs text-neutral-500">{p.brand.name}</span>
                     </div>
-                    <h3 className="text-base font-medium text-slate-100">{p.title}</h3>
-                    <p className="line-clamp-2 text-sm text-slate-500">{p.body.slice(0, 200)}</p>
+                    <h3 className="text-base font-medium text-neutral-800">{p.title}</h3>
+                    <p className="line-clamp-2 text-sm text-neutral-500">{p.body.slice(0, 200)}</p>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-slate-500" />
+                  <ArrowRight className="h-4 w-4 text-neutral-500" />
                 </div>
-                <div className="mt-2 text-xs text-slate-500">{formatDate(p.createdAt)}</div>
+                <div className="mt-2 text-xs text-neutral-500">{formatDate(p.createdAt)}</div>
               </Link>
             );
           })

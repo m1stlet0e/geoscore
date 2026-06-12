@@ -22,7 +22,7 @@ export default async function ForecastPage({ searchParams }: { searchParams: Pro
     return (
       <div className="space-y-6">
         <PageHeader title="AI 推荐预测" subtitle="基于历史数据预测未来 30 天品牌曝光与排名" />
-        <div className="rounded-2xl border border-slate-800/60 bg-slate-900/40 p-12 text-center">
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-100 p-12 text-center">
           <LineChart className="mx-auto h-8 w-8 text-cyan-400" />
           <h3 className="mt-4 text-lg font-medium">先创建品牌</h3>
           <Link href="/monitor" className="mt-4 inline-block rounded-lg bg-indigo-500 px-4 py-2 text-sm text-white">
@@ -64,7 +64,7 @@ export default async function ForecastPage({ searchParams }: { searchParams: Pro
 
   // scenarios
   const scenarios = [
-    { name: '保守', score: Math.max(0, currentScore - 3), cls: 'border-slate-500/30' },
+    { name: '保守', score: Math.max(0, currentScore - 3), cls: 'border-neutral-300' },
     { name: '基准', score: currentScore, cls: 'border-indigo-500/30' },
     { name: '乐观', score: Math.min(100, currentScore + 18), cls: 'border-emerald-500/30' },
   ];
@@ -82,8 +82,8 @@ export default async function ForecastPage({ searchParams }: { searchParams: Pro
             className={cn(
               'rounded-full border px-3 py-1.5 text-sm transition',
               b.id === activeBrand.id
-                ? 'border-indigo-500/40 bg-indigo-500/10 text-indigo-200'
-                : 'border-slate-800/60 bg-slate-900/40 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                ? 'border-indigo-500/40 bg-indigo-50 text-indigo-600'
+                : 'border-neutral-200 bg-neutral-100 text-neutral-500 hover:border-neutral-300 hover:text-neutral-700'
             )}
           >
             {b.name}
@@ -103,39 +103,39 @@ export default async function ForecastPage({ searchParams }: { searchParams: Pro
       </div>
 
       {/* Big predicted card */}
-      <div className="rounded-2xl border border-slate-800/60 bg-gradient-to-br from-indigo-500/10 via-slate-900/40 to-slate-900/40 p-6">
+      <div className="rounded-2xl border border-neutral-200 bg-gradient-to-br from-indigo-500/10 via-slate-900/40 to-slate-900/40 p-6">
         <div className="flex items-baseline gap-4">
-          <Activity className="h-5 w-5 text-indigo-300" />
+          <Activity className="h-5 w-5 text-indigo-500" />
           <div>
-            <div className="text-xs text-slate-400">未来 30 天预测</div>
+            <div className="text-xs text-neutral-500">未来 30 天预测</div>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-5xl font-semibold text-indigo-200">{predictedScore.toFixed(0)}</span>
-              <span className="text-sm text-slate-400">分</span>
+              <span className="text-5xl font-semibold text-indigo-600">{predictedScore.toFixed(0)}</span>
+              <span className="text-sm text-neutral-500">分</span>
               <span className={cn('text-sm font-medium', delta > 0 ? 'text-emerald-300' : 'text-rose-300')}>
                 {delta > 0 ? '↑' : '↓'} {Math.abs(delta).toFixed(1)}%
               </span>
             </div>
             {latestForecast && (
-              <div className="mt-2 text-xs text-slate-500">生成时间: {formatDate(latestForecast.generatedAt)}</div>
+              <div className="mt-2 text-xs text-neutral-500">生成时间: {formatDate(latestForecast.generatedAt)}</div>
             )}
           </div>
         </div>
       </div>
 
       {/* Drivers */}
-      <div className="rounded-2xl border border-slate-800/60 bg-slate-900/40 p-6">
+      <div className="rounded-2xl border border-neutral-200 bg-neutral-100 p-6">
         <h3 className="mb-4 text-sm font-medium">驱动因素</h3>
         <div className="space-y-2">
           {drivers.map((d, i) => (
             <div key={i} className="flex items-center gap-3">
-              <span className="w-40 truncate text-xs text-slate-400">{d.factor}</span>
-              <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-800">
+              <span className="w-40 truncate text-xs text-neutral-500">{d.factor}</span>
+              <div className="h-2 flex-1 overflow-hidden rounded-full bg-neutral-200">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-400"
                   style={{ width: `${Math.min(100, d.impact * 400)}%` }}
                 />
               </div>
-              <span className="w-12 text-right text-xs text-slate-300">+{(d.impact * 100).toFixed(1)}%</span>
+              <span className="w-12 text-right text-xs text-neutral-300">+{(d.impact * 100).toFixed(1)}%</span>
             </div>
           ))}
         </div>
@@ -146,8 +146,8 @@ export default async function ForecastPage({ searchParams }: { searchParams: Pro
         <h3 className="mb-3 text-sm font-medium">假设情景</h3>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {scenarios.map((s) => (
-            <div key={s.name} className={cn('rounded-2xl border bg-slate-900/40 p-5', s.cls)}>
-              <div className="text-xs text-slate-400">{s.name}情景</div>
+            <div key={s.name} className={cn('rounded-2xl border bg-neutral-100 p-5', s.cls)}>
+              <div className="text-xs text-neutral-500">{s.name}情景</div>
               <div className="mt-1 text-3xl font-semibold">{s.score.toFixed(0)}%</div>
             </div>
           ))}

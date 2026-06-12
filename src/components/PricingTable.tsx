@@ -67,44 +67,44 @@ export function PricingTable() {
           <div
             key={tier}
             className={cn(
-              'relative flex flex-col rounded-2xl border bg-slate-900/50 p-6 backdrop-blur transition',
+              'relative flex flex-col rounded-2xl border bg-neutral-50 p-6 backdrop-blur transition',
               meta.highlight
                 ? 'border-indigo-500/50 shadow-[0_0_0_1px_rgba(99,102,241,0.25),0_20px_60px_-20px_rgba(99,102,241,0.5)]'
-                : 'border-slate-800 hover:border-slate-700'
+                : 'border-neutral-300 hover:border-neutral-300'
             )}
           >
             {meta.highlight ? (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="inline-flex items-center gap-1 rounded-full border border-indigo-400/40 bg-gradient-to-r from-indigo-500 to-violet-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white shadow-lg shadow-indigo-500/30">
+                <span className="inline-flex items-center gap-1 rounded-full border border-indigo-400/40 bg-indigo-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white shadow-lg shadow-indigo-500/30">
                   <Sparkles className="h-3 w-3" /> 最受欢迎
                 </span>
               </div>
             ) : null}
 
-            <div className="mb-1 text-sm font-semibold uppercase tracking-wider text-slate-300">
+            <div className="mb-1 text-sm font-semibold uppercase tracking-wider text-neutral-300">
               {tier}
             </div>
-            <div className="mb-4 text-xs text-slate-500">{meta.tagline}</div>
+            <div className="mb-4 text-xs text-neutral-500">{meta.tagline}</div>
 
             <div className="mb-5 flex items-baseline gap-1">
-              <span className="text-4xl font-bold tracking-tight text-slate-50">
+              <span className="text-4xl font-bold tracking-tight text-neutral-900">
                 {limits.price === 0 ? '¥0' : `¥${limits.price}`}
               </span>
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-neutral-500">
                 {limits.price === 0 ? '永久免费' : '/ 月'}
               </span>
             </div>
 
             <ul className="mb-6 space-y-2.5 text-sm">
               {features.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-slate-300">
+                <li key={f} className="flex items-start gap-2 text-neutral-300">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
                   <span>{f}</span>
                 </li>
               ))}
             </ul>
 
-            <div className="mb-5 grid grid-cols-2 gap-2 rounded-lg border border-slate-800 bg-slate-950/50 p-3 text-[11px]">
+            <div className="mb-5 grid grid-cols-2 gap-2 rounded-lg border border-neutral-300 bg-white/50 p-3 text-[11px]">
               <Stat label="关键词" value={formatLimit(limits.keywords)} />
               <Stat label="Prompts/月" value={formatLimit(limits.prompts)} />
               <Stat label="每日扫描" value={formatLimit(limits.scansPerDay)} />
@@ -116,10 +116,10 @@ export function PricingTable() {
               className={cn(
                 'mt-auto inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition',
                 meta.highlight
-                  ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30 hover:from-indigo-400 hover:to-violet-400'
+                  ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 hover:from-indigo-400 hover:to-violet-400'
                   : tier === 'FREE'
-                    ? 'border border-slate-700 bg-slate-800/60 text-slate-100 hover:bg-slate-800'
-                    : 'border border-indigo-500/30 bg-indigo-500/10 text-indigo-100 hover:bg-indigo-500/20'
+                    ? 'border border-neutral-300 bg-neutral-100 text-neutral-800 hover:bg-neutral-200'
+                    : 'border border-indigo-500/30 bg-indigo-50 text-indigo-100 hover:bg-indigo-500/20'
               )}
             >
               {meta.cta}
@@ -134,17 +134,17 @@ export function PricingTable() {
 function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-wider text-slate-500">{label}</div>
-      <div className="mt-0.5 text-sm font-semibold tabular-nums text-slate-100">{value}</div>
+      <div className="text-[10px] uppercase tracking-wider text-neutral-500">{label}</div>
+      <div className="mt-0.5 text-sm font-semibold tabular-nums text-neutral-800">{value}</div>
     </div>
   );
 }
 
 export function PricingTableCompact() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/40">
+    <div className="overflow-hidden rounded-2xl border border-neutral-300 bg-neutral-100">
       <table className="w-full text-left text-sm">
-        <thead className="bg-slate-900/70 text-xs uppercase tracking-wider text-slate-400">
+        <thead className="bg-neutral-50/70 text-xs uppercase tracking-wider text-neutral-500">
           <tr>
             <th className="px-4 py-3">能力</th>
             {TIER_ORDER.map((t) => (
@@ -152,7 +152,7 @@ export function PricingTableCompact() {
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-800/70 text-slate-300">
+        <tbody className="divide-y divide-neutral-200/70 text-neutral-300">
           <Row label="品牌数" get={(t) => t === 'ENTERPRISE' ? '∞' : (t === 'FREE' ? '1' : t === 'PRO' ? '5' : '25')} />
           <Row label="关键词" get={(t) => formatLimit(PLAN_LIMITS[t].keywords)} />
           <Row label="Prompts / 月" get={(t) => formatLimit(PLAN_LIMITS[t].prompts)} />
@@ -173,10 +173,10 @@ export function PricingTableCompact() {
 
 function Row({ label, get }: { label: string; get: (t: Tier) => React.ReactNode }) {
   return (
-    <tr className="hover:bg-slate-900/40">
-      <td className="px-4 py-2.5 text-slate-300">{label}</td>
+    <tr className="hover:bg-neutral-100">
+      <td className="px-4 py-2.5 text-neutral-300">{label}</td>
       {TIER_ORDER.map((t) => (
-        <td key={t} className="px-4 py-2.5 text-center text-slate-200">{get(t)}</td>
+        <td key={t} className="px-4 py-2.5 text-center text-neutral-700">{get(t)}</td>
       ))}
     </tr>
   );
@@ -186,5 +186,5 @@ function CheckIcon() {
   return <Check className="mx-auto h-4 w-4 text-emerald-400" />;
 }
 function Cross() {
-  return <X className="mx-auto h-4 w-4 text-slate-600" />;
+  return <X className="mx-auto h-4 w-4 text-neutral-500" />;
 }

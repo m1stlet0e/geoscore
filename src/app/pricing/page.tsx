@@ -141,7 +141,7 @@ function formatLimit(v: number) {
 // ─── Skeleton ────────────────────────────────────────────────────────────────
 
 function SkeletonPulse({ className }: { className?: string }) {
-  return <div className={`animate-pulse rounded bg-slate-800 ${className}`} />;
+  return <div className={`animate-pulse rounded bg-neutral-200 ${className}`} />;
 }
 
 function PricingCardsSkeleton() {
@@ -150,7 +150,7 @@ function PricingCardsSkeleton() {
       {Array.from({ length: 4 }).map((_, i) => (
         <div
           key={i}
-          className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6"
+          className="rounded-2xl border border-neutral-300 bg-neutral-50 p-6"
         >
           <SkeletonPulse className="h-4 w-16 mb-2" />
           <SkeletonPulse className="h-3 w-32 mb-6" />
@@ -209,31 +209,30 @@ export default function PricingPage() {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-radial-glow" aria-hidden="true" />
       <div className="pointer-events-none fixed inset-0 -z-10 bg-grid opacity-30" aria-hidden="true" />
 
       {/* Nav (lightweight, public) */}
-      <header className="sticky top-0 z-30 border-b border-slate-800/60 bg-slate-950/70 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white/70 ">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-2.5">
             <Logo size="md" />
           </Link>
-          <nav className="hidden items-center gap-7 text-sm text-slate-300 md:flex">
-            <Link href="/#modules" className="transition hover:text-slate-50">功能</Link>
-            <Link href="/#how" className="transition hover:text-slate-50">原理</Link>
-            <Link href="/#platforms" className="transition hover:text-slate-50">AI 引擎</Link>
-            <Link href="/pricing" className="text-slate-50">价格</Link>
+          <nav className="hidden items-center gap-7 text-sm text-neutral-300 md:flex">
+            <Link href="/#modules" className="transition hover:text-neutral-900">功能</Link>
+            <Link href="/#how" className="transition hover:text-neutral-900">原理</Link>
+            <Link href="/#platforms" className="transition hover:text-neutral-900">AI 引擎</Link>
+            <Link href="/pricing" className="text-neutral-900">价格</Link>
           </nav>
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="hidden rounded-lg px-3 py-1.5 text-sm text-slate-300 transition hover:text-slate-50 sm:inline-flex"
+              className="hidden rounded-lg px-3 py-1.5 text-sm text-neutral-300 transition hover:text-neutral-900 sm:inline-flex"
             >
               登录
             </Link>
             <Link
               href="/register"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-3.5 py-1.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500 px-3.5 py-1.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400"
             >
               免费开始 <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -244,7 +243,7 @@ export default function PricingPage() {
       {/* Hero */}
       <section className="pt-16 pb-10 sm:pt-24">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs text-indigo-200">
+          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-50 px-3 py-1 text-xs text-indigo-600">
             定价 · 4 档清晰 · 永久免费版
           </div>
           <h1 className="mt-5 text-4xl font-bold tracking-tight sm:text-5xl">
@@ -252,7 +251,7 @@ export default function PricingPage() {
               选择适合你的套餐
             </span>
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-slate-400">
+          <p className="mx-auto mt-4 max-w-2xl text-base text-neutral-500">
             所有方案均包含 7 大 AI 引擎监控、可见性评分、引用分析、来源追踪。升级后解锁自动内容生成、影响力地图、推荐预测。
           </p>
         </div>
@@ -275,16 +274,16 @@ export default function PricingPage() {
                 return (
                   <div
                     key={tier}
-                    className={`relative flex flex-col rounded-2xl border bg-slate-900/50 p-6 backdrop-blur transition ${
+                    className={`relative flex flex-col rounded-2xl border bg-neutral-50 p-6 backdrop-blur transition ${
                       meta.highlight
                         ? 'border-indigo-500/50 shadow-[0_0_0_1px_rgba(99,102,241,0.25),0_20px_60px_-20px_rgba(99,102,241,0.5)]'
-                        : 'border-slate-800 hover:border-slate-700'
+                        : 'border-neutral-300 hover:border-neutral-300'
                     }`}
                   >
                     {/* 最受欢迎 badge */}
                     {meta.highlight && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                        <span className="inline-flex items-center gap-1 rounded-full border border-indigo-400/40 bg-gradient-to-r from-indigo-500 to-violet-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white shadow-lg shadow-indigo-500/30">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-indigo-400/40 bg-indigo-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white shadow-lg shadow-indigo-500/30">
                           <Sparkles className="h-3 w-3" /> 最受欢迎
                         </span>
                       </div>
@@ -293,22 +292,22 @@ export default function PricingPage() {
                     {/* 当前套餐 badge */}
                     {isCurrentPlan && (
                       <div className="absolute -top-3 right-4">
-                        <span className="inline-flex items-center rounded-full border border-emerald-400/40 bg-emerald-500/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-200">
+                        <span className="inline-flex items-center rounded-full border border-emerald-400/40 bg-emerald-500/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-600">
                           当前套餐
                         </span>
                       </div>
                     )}
 
-                    <div className="mb-1 text-sm font-semibold uppercase tracking-wider text-slate-300">
+                    <div className="mb-1 text-sm font-semibold uppercase tracking-wider text-neutral-300">
                       {config.name}
                     </div>
-                    <div className="mb-4 text-xs text-slate-500">{meta.tagline}</div>
+                    <div className="mb-4 text-xs text-neutral-500">{meta.tagline}</div>
 
                     <div className="mb-5 flex items-baseline gap-1">
-                      <span className="text-4xl font-bold tracking-tight text-slate-50">
+                      <span className="text-4xl font-bold tracking-tight text-neutral-900">
                         {config.price === 0 ? '¥0' : `¥${config.price}`}
                       </span>
-                      <span className="text-sm text-slate-500">
+                      <span className="text-sm text-neutral-500">
                         {config.price === 0 ? '永久免费' : '/ 月'}
                       </span>
                     </div>
@@ -316,7 +315,7 @@ export default function PricingPage() {
                     {/* Features */}
                     <ul className="mb-5 space-y-2.5 text-sm">
                       {features.map((f) => (
-                        <li key={f} className="flex items-start gap-2 text-slate-300">
+                        <li key={f} className="flex items-start gap-2 text-neutral-300">
                           <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
                           <span>{f}</span>
                         </li>
@@ -324,15 +323,15 @@ export default function PricingPage() {
                     </ul>
 
                     {/* Quota limits */}
-                    <div className="mb-5 rounded-lg border border-slate-800 bg-slate-950/50 p-3">
-                      <div className="mb-2 text-[10px] uppercase tracking-wider text-slate-500">
+                    <div className="mb-5 rounded-lg border border-neutral-300 bg-white/50 p-3">
+                      <div className="mb-2 text-[10px] uppercase tracking-wider text-neutral-500">
                         额度限制
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-[11px]">
                         {Object.entries(config.quotas).map(([key, value]) => (
                           <div key={key}>
-                            <div className="text-slate-500 truncate">{QUOTA_LABELS[key] ?? key}</div>
-                            <div className="font-semibold tabular-nums text-slate-100">
+                            <div className="text-neutral-500 truncate">{QUOTA_LABELS[key] ?? key}</div>
+                            <div className="font-semibold tabular-nums text-neutral-800">
                               {formatLimit(value)}
                             </div>
                           </div>
@@ -345,10 +344,10 @@ export default function PricingPage() {
                       href={meta.ctaLink}
                       className={`mt-auto inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
                         meta.highlight
-                          ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30 hover:from-indigo-400 hover:to-violet-400'
+                          ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 hover:from-indigo-400 hover:to-violet-400'
                           : tier === 'FREE'
-                            ? 'border border-slate-700 bg-slate-800/60 text-slate-100 hover:bg-slate-800'
-                            : 'border border-indigo-500/30 bg-indigo-500/10 text-indigo-100 hover:bg-indigo-500/20'
+                            ? 'border border-neutral-300 bg-neutral-100 text-neutral-800 hover:bg-neutral-200'
+                            : 'border border-indigo-500/30 bg-indigo-50 text-indigo-100 hover:bg-indigo-500/20'
                       }`}
                     >
                       {isCurrentPlan ? '管理订阅' : meta.cta}
@@ -358,7 +357,7 @@ export default function PricingPage() {
               })}
             </div>
           ) : (
-            <div className="text-center text-sm text-slate-500 py-12">
+            <div className="text-center text-sm text-neutral-500 py-12">
               加载套餐信息失败，请刷新页面重试
             </div>
           )}
@@ -366,13 +365,13 @@ export default function PricingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="border-t border-slate-800/60 py-20">
+      <section className="border-t border-neutral-200 py-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs text-indigo-200">
+            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-50 px-3 py-1 text-xs text-indigo-600">
               FAQ · 常见问题
             </div>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-slate-50">
+            <h2 className="mt-4 text-3xl font-bold tracking-tight text-neutral-900">
               你可能想问的
             </h2>
           </div>
@@ -381,13 +380,13 @@ export default function PricingPage() {
             {FAQ_ITEMS.map((item) => (
               <details
                 key={item.q}
-                className="group overflow-hidden rounded-xl border border-slate-800 bg-slate-900/40 backdrop-blur transition open:border-indigo-500/40 open:bg-slate-900/70"
+                className="group overflow-hidden rounded-xl border border-neutral-300 bg-neutral-100 backdrop-blur transition open:border-indigo-500/40 open:bg-neutral-50/70"
               >
-                <summary className="flex cursor-pointer items-center justify-between gap-3 px-5 py-4 text-left text-sm font-medium text-slate-100 marker:hidden [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer items-center justify-between gap-3 px-5 py-4 text-left text-sm font-medium text-neutral-800 marker:hidden [&::-webkit-details-marker]:hidden">
                   <span>{item.q}</span>
-                  <ChevronDown className="h-4 w-4 shrink-0 text-slate-500 transition group-open:rotate-180 group-open:text-indigo-300" />
+                  <ChevronDown className="h-4 w-4 shrink-0 text-neutral-500 transition group-open:rotate-180 group-open:text-indigo-500" />
                 </summary>
-                <div className="border-t border-slate-800/70 px-5 py-4 text-sm leading-relaxed text-slate-400">
+                <div className="border-t border-neutral-200 px-5 py-4 text-sm leading-relaxed text-neutral-500">
                   {item.a}
                 </div>
               </details>
@@ -397,14 +396,14 @@ export default function PricingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/60 py-10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 text-sm text-slate-500 sm:flex-row sm:px-6 lg:px-8">
+      <footer className="border-t border-neutral-200 py-10">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 text-sm text-neutral-500 sm:flex-row sm:px-6 lg:px-8">
           <Logo size="sm" />
           <div>© {new Date().getFullYear()} GeoScore. All rights reserved.</div>
           <div className="flex gap-5">
-            <Link href="/login" className="hover:text-slate-300">登录</Link>
-            <Link href="/register" className="hover:text-slate-300">注册</Link>
-            <a href="mailto:hello@geoscore.ai" className="hover:text-slate-300">联系</a>
+            <Link href="/login" className="hover:text-neutral-300">登录</Link>
+            <Link href="/register" className="hover:text-neutral-300">注册</Link>
+            <a href="mailto:hello@geoscore.ai" className="hover:text-neutral-300">联系</a>
           </div>
         </div>
       </footer>

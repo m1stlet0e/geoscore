@@ -117,15 +117,15 @@ interface ConfigItem {
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const PLAN_COLORS: Record<Plan, string> = {
-  FREE: 'bg-slate-700 text-slate-300',
+  FREE: 'bg-neutral-300 text-neutral-300',
   PRO: 'bg-blue-600/30 text-blue-300',
   GROWTH: 'bg-purple-600/30 text-purple-300',
   ENTERPRISE: 'bg-amber-600/30 text-amber-300',
 };
 
 const ROLE_COLORS: Record<Role, string> = {
-  USER: 'bg-slate-700 text-slate-300',
-  ADMIN: 'bg-indigo-600/30 text-indigo-300',
+  USER: 'bg-neutral-300 text-neutral-300',
+  ADMIN: 'bg-indigo-600/30 text-indigo-500',
   SUPER_ADMIN: 'bg-rose-600/30 text-rose-300',
 };
 
@@ -133,8 +133,8 @@ const STATUS_COLORS: Record<OrderStatus, string> = {
   PENDING: 'bg-amber-600/30 text-amber-300',
   PAID: 'bg-emerald-600/30 text-emerald-300',
   FAILED: 'bg-rose-600/30 text-rose-300',
-  REFUNDED: 'bg-slate-600/30 text-slate-300',
-  CANCELLED: 'bg-slate-700 text-slate-400',
+  REFUNDED: 'bg-neutral-400/30 text-neutral-300',
+  CANCELLED: 'bg-neutral-300 text-neutral-500',
 };
 
 const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
@@ -166,14 +166,14 @@ function formatCurrency(amount: number) {
 // ─── Skeleton Components ─────────────────────────────────────────────────────
 
 function SkeletonPulse({ className }: { className?: string }) {
-  return <div className={`animate-pulse rounded bg-slate-800 ${className}`} />;
+  return <div className={`animate-pulse rounded bg-neutral-200 ${className}`} />;
 }
 
 function StatCardsSkeleton() {
   return (
     <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5">
+        <div key={i} className="rounded-2xl border border-neutral-200 bg-white p-5">
           <SkeletonPulse className="h-3 w-20 mb-3" />
           <SkeletonPulse className="h-8 w-24 mb-3" />
           <SkeletonPulse className="h-3 w-32" />
@@ -186,7 +186,7 @@ function StatCardsSkeleton() {
 function TableSkeleton({ rows = 5, cols = 6 }: { rows?: number; cols?: number }) {
   return (
     <div className="space-y-3">
-      <div className="flex gap-4 pb-2 border-b border-slate-800">
+      <div className="flex gap-4 pb-2 border-b border-neutral-300">
         {Array.from({ length: cols }).map((_, i) => (
           <SkeletonPulse key={i} className="h-3 flex-1" />
         ))}
@@ -206,10 +206,10 @@ function TableSkeleton({ rows = 5, cols = 6 }: { rows?: number; cols?: number })
 
 function EmptyState({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-slate-500">
-      <div className="mb-4 text-slate-600">{icon}</div>
-      <p className="text-sm font-medium text-slate-400">{title}</p>
-      <p className="mt-1 text-xs text-slate-500">{description}</p>
+    <div className="flex flex-col items-center justify-center py-16 text-neutral-500">
+      <div className="mb-4 text-neutral-500">{icon}</div>
+      <p className="text-sm font-medium text-neutral-500">{title}</p>
+      <p className="mt-1 text-xs text-neutral-500">{description}</p>
     </div>
   );
 }
@@ -219,23 +219,23 @@ function EmptyState({ icon, title, description }: { icon: React.ReactNode; title
 function PaginationBar({ pagination, onPageChange }: { pagination: Pagination; onPageChange: (page: number) => void }) {
   const { page, totalPages, total } = pagination;
   return (
-    <div className="flex items-center justify-between border-t border-slate-800 pt-4">
-      <span className="text-xs text-slate-500">共 {total} 条记录</span>
+    <div className="flex items-center justify-between border-t border-neutral-300 pt-4">
+      <span className="text-xs text-neutral-500">共 {total} 条记录</span>
       <div className="flex items-center gap-2">
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          className="rounded-lg border border-slate-700 p-1.5 text-slate-400 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition"
+          className="rounded-lg border border-neutral-300 p-1.5 text-neutral-500 hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed transition"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <span className="text-xs text-slate-400">
+        <span className="text-xs text-neutral-500">
           第 {page} / {totalPages} 页
         </span>
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          className="rounded-lg border border-slate-700 p-1.5 text-slate-400 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition"
+          className="rounded-lg border border-neutral-300 p-1.5 text-neutral-500 hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed transition"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -261,79 +261,79 @@ function UserDetailModal({ user, onClose }: { user: User | null; onClose: () => 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="relative w-full max-w-lg rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl"
+        className="relative w-full max-w-lg rounded-2xl border border-neutral-300 bg-neutral-50 p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute right-4 top-4 text-slate-500 hover:text-slate-300 transition">
+        <button onClick={onClose} className="absolute right-4 top-4 text-neutral-500 hover:text-neutral-300 transition">
           <X className="h-5 w-5" />
         </button>
-        <h3 className="text-lg font-semibold text-slate-100">用户详情</h3>
+        <h3 className="text-lg font-semibold text-neutral-800">用户详情</h3>
         <div className="mt-4 space-y-4">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-slate-500">邮箱</span>
-              <p className="mt-1 text-slate-200">{user.email}</p>
+              <span className="text-neutral-500">邮箱</span>
+              <p className="mt-1 text-neutral-700">{user.email}</p>
             </div>
             <div>
-              <span className="text-slate-500">姓名</span>
-              <p className="mt-1 text-slate-200">{user.name || '-'}</p>
+              <span className="text-neutral-500">姓名</span>
+              <p className="mt-1 text-neutral-700">{user.name || '-'}</p>
             </div>
             <div>
-              <span className="text-slate-500">角色</span>
+              <span className="text-neutral-500">角色</span>
               <div className="mt-1">
                 <Badge label={user.role} className={ROLE_COLORS[user.role]} />
               </div>
             </div>
             <div>
-              <span className="text-slate-500">套餐</span>
+              <span className="text-neutral-500">套餐</span>
               <div className="mt-1">
                 <Badge label={user.plan} className={PLAN_COLORS[user.plan]} />
               </div>
             </div>
             <div>
-              <span className="text-slate-500">品牌数</span>
-              <p className="mt-1 text-slate-200">{user.brandsCount}</p>
+              <span className="text-neutral-500">品牌数</span>
+              <p className="mt-1 text-neutral-700">{user.brandsCount}</p>
             </div>
             <div>
-              <span className="text-slate-500">引用数</span>
-              <p className="mt-1 text-slate-200">{user.citationsCount}</p>
+              <span className="text-neutral-500">引用数</span>
+              <p className="mt-1 text-neutral-700">{user.citationsCount}</p>
             </div>
             <div className="col-span-2">
-              <span className="text-slate-500">注册时间</span>
-              <p className="mt-1 text-slate-200">{formatDate(user.createdAt)}</p>
+              <span className="text-neutral-500">注册时间</span>
+              <p className="mt-1 text-neutral-700">{formatDate(user.createdAt)}</p>
             </div>
           </div>
           {user.subscription && (
-            <div className="rounded-xl border border-slate-800 p-4">
-              <h4 className="text-sm font-medium text-slate-300 mb-2">订阅信息</h4>
+            <div className="rounded-xl border border-neutral-300 p-4">
+              <h4 className="text-sm font-medium text-neutral-300 mb-2">订阅信息</h4>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
-                  <span className="text-slate-500">计划</span>
-                  <p className="text-slate-200">{user.subscription.plan}</p>
+                  <span className="text-neutral-500">计划</span>
+                  <p className="text-neutral-700">{user.subscription.plan}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">状态</span>
-                  <p className="text-slate-200">{user.subscription.status}</p>
+                  <span className="text-neutral-500">状态</span>
+                  <p className="text-neutral-700">{user.subscription.status}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">开始日期</span>
-                  <p className="text-slate-200">{formatDate(user.subscription.startDate)}</p>
+                  <span className="text-neutral-500">开始日期</span>
+                  <p className="text-neutral-700">{formatDate(user.subscription.startDate)}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">结束日期</span>
-                  <p className="text-slate-200">{user.subscription.endDate ? formatDate(user.subscription.endDate) : '无期限'}</p>
+                  <span className="text-neutral-500">结束日期</span>
+                  <p className="text-neutral-700">{user.subscription.endDate ? formatDate(user.subscription.endDate) : '无期限'}</p>
                 </div>
               </div>
             </div>
           )}
           {user.brands && user.brands.length > 0 && (
-            <div className="rounded-xl border border-slate-800 p-4">
-              <h4 className="text-sm font-medium text-slate-300 mb-2">品牌列表</h4>
+            <div className="rounded-xl border border-neutral-300 p-4">
+              <h4 className="text-sm font-medium text-neutral-300 mb-2">品牌列表</h4>
               <div className="space-y-2">
                 {user.brands.map((brand) => (
                   <div key={brand.id} className="flex items-center justify-between text-xs">
-                    <span className="text-slate-200">{brand.name}</span>
-                    <span className="text-slate-500">{brand.domain}</span>
+                    <span className="text-neutral-700">{brand.name}</span>
+                    <span className="text-neutral-500">{brand.domain}</span>
                   </div>
                 ))}
               </div>
@@ -620,14 +620,14 @@ export default function AdminPage() {
 
       {/* Plan Distribution */}
       {stats && stats.planDistribution.length > 0 && (
-        <section className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5">
-          <h3 className="text-sm font-medium text-slate-300 mb-4">套餐分布</h3>
+        <section className="rounded-2xl border border-neutral-200 bg-white p-5">
+          <h3 className="text-sm font-medium text-neutral-300 mb-4">套餐分布</h3>
           <div className="flex gap-3">
             {stats.planDistribution.map((item) => {
               const maxCount = Math.max(...stats.planDistribution.map((d) => d.count), 1);
               const pct = (item.count / maxCount) * 100;
               const barColors: Record<Plan, string> = {
-                FREE: 'bg-slate-500',
+                FREE: 'bg-neutral-500',
                 PRO: 'bg-blue-500',
                 GROWTH: 'bg-purple-500',
                 ENTERPRISE: 'bg-amber-500',
@@ -636,9 +636,9 @@ export default function AdminPage() {
                 <div key={item.plan} className="flex-1">
                   <div className="flex items-center justify-between text-xs mb-2">
                     <Badge label={item.plan} className={PLAN_COLORS[item.plan]} />
-                    <span className="text-slate-400 font-medium">{item.count}</span>
+                    <span className="text-neutral-500 font-medium">{item.count}</span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
+                  <div className="h-2 w-full rounded-full bg-neutral-200 overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${barColors[item.plan]}`}
                       style={{ width: `${pct}%` }}
@@ -652,7 +652,7 @@ export default function AdminPage() {
       )}
 
       {/* Tab Navigation */}
-      <div className="border-b border-slate-800/70">
+      <div className="border-b border-neutral-200">
         <nav className="flex gap-1 overflow-x-auto">
           {visibleTabs.map((tab) => (
             <button
@@ -660,8 +660,8 @@ export default function AdminPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`flex items-center gap-2 whitespace-nowrap px-4 py-3 text-sm font-medium transition border-b-2 ${
                 activeTab === tab.key
-                  ? 'border-indigo-500 text-indigo-300'
-                  : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-slate-700'
+                  ? 'border-indigo-500 text-indigo-500'
+                  : 'border-transparent text-neutral-500 hover:text-neutral-300 hover:border-neutral-300'
               }`}
             >
               {tab.icon}
@@ -672,28 +672,28 @@ export default function AdminPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5">
+      <div className="rounded-2xl border border-neutral-200 bg-white p-5">
         {/* ─── 用户管理 ────────────────────────────────────────────────── */}
         {activeTab === 'users' && (
           <div className="space-y-4">
             {/* Filters */}
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative flex-1 min-w-[200px] max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
                 <input
                   type="text"
                   placeholder="搜索邮箱或姓名..."
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800/50 py-2 pl-10 pr-4 text-sm text-slate-200 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition"
+                  className="w-full rounded-xl border border-neutral-300 bg-neutral-200/50 py-2 pl-10 pr-4 text-sm text-neutral-700 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition"
                 />
               </div>
               <div className="relative">
-                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
                 <select
                   value={userPlanFilter}
                   onChange={(e) => setUserPlanFilter(e.target.value as Plan | '')}
-                  className="rounded-xl border border-slate-700 bg-slate-800/50 py-2 pl-10 pr-8 text-sm text-slate-200 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition appearance-none cursor-pointer"
+                  className="rounded-xl border border-neutral-300 bg-neutral-200/50 py-2 pl-10 pr-8 text-sm text-neutral-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition appearance-none cursor-pointer"
                 >
                   <option value="">全部套餐</option>
                   {PLAN_OPTIONS.map((p) => (
@@ -712,54 +712,54 @@ export default function AdminPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-slate-800">
-                      <th className="pb-3 text-left font-medium text-slate-500">邮箱</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">姓名</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">角色</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">套餐</th>
-                      <th className="pb-3 text-right font-medium text-slate-500">品牌</th>
-                      <th className="pb-3 text-right font-medium text-slate-500">引用</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">注册时间</th>
-                      <th className="pb-3 text-right font-medium text-slate-500">操作</th>
+                    <tr className="border-b border-neutral-300">
+                      <th className="pb-3 text-left font-medium text-neutral-500">邮箱</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">姓名</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">角色</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">套餐</th>
+                      <th className="pb-3 text-right font-medium text-neutral-500">品牌</th>
+                      <th className="pb-3 text-right font-medium text-neutral-500">引用</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">注册时间</th>
+                      <th className="pb-3 text-right font-medium text-neutral-500">操作</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/50">
+                  <tbody className="divide-y divide-neutral-200/50">
                     {users.map((user) => (
-                      <tr key={user.id} className="hover:bg-slate-800/30 transition">
-                        <td className="py-3 text-slate-200 max-w-[200px] truncate">{user.email}</td>
-                        <td className="py-3 text-slate-300">{user.name || '-'}</td>
+                      <tr key={user.id} className="hover:bg-neutral-200/30 transition">
+                        <td className="py-3 text-neutral-700 max-w-[200px] truncate">{user.email}</td>
+                        <td className="py-3 text-neutral-300">{user.name || '-'}</td>
                         <td className="py-3">
                           <Badge label={user.role} className={ROLE_COLORS[user.role]} />
                         </td>
                         <td className="py-3">
                           <Badge label={user.plan} className={PLAN_COLORS[user.plan]} />
                         </td>
-                        <td className="py-3 text-right text-slate-300">{user.brandsCount}</td>
-                        <td className="py-3 text-right text-slate-300">{user.citationsCount}</td>
-                        <td className="py-3 text-slate-500 text-xs">{formatDate(user.createdAt)}</td>
+                        <td className="py-3 text-right text-neutral-300">{user.brandsCount}</td>
+                        <td className="py-3 text-right text-neutral-300">{user.citationsCount}</td>
+                        <td className="py-3 text-neutral-500 text-xs">{formatDate(user.createdAt)}</td>
                         <td className="py-3">
                           <div className="flex items-center justify-end gap-2">
                             <button
                               onClick={() => setSelectedUser(user)}
-                              className="rounded-lg border border-slate-700 px-2.5 py-1 text-xs text-slate-400 hover:bg-slate-700 hover:text-slate-200 transition"
+                              className="rounded-lg border border-neutral-300 px-2.5 py-1 text-xs text-neutral-500 hover:bg-neutral-300 hover:text-neutral-700 transition"
                             >
                               查看详情
                             </button>
                             <div className="relative">
                               <button
                                 onClick={() => setEditingPlanUserId(editingPlanUserId === user.id ? null : user.id)}
-                                className="rounded-lg border border-indigo-600/40 bg-indigo-600/10 px-2.5 py-1 text-xs text-indigo-300 hover:bg-indigo-600/20 transition"
+                                className="rounded-lg border border-indigo-600/40 bg-indigo-600/10 px-2.5 py-1 text-xs text-indigo-500 hover:bg-indigo-600/20 transition"
                               >
                                 修改套餐
                               </button>
                               {editingPlanUserId === user.id && (
-                                <div className="absolute right-0 top-full mt-1 z-20 w-40 rounded-xl border border-slate-700 bg-slate-900 shadow-xl py-1">
+                                <div className="absolute right-0 top-full mt-1 z-20 w-40 rounded-xl border border-neutral-300 bg-neutral-50 shadow-xl py-1">
                                   {PLAN_OPTIONS.map((p) => (
                                     <button
                                       key={p}
                                       onClick={() => updateUserPlan(user.id, p)}
-                                      className={`w-full px-3 py-1.5 text-left text-xs hover:bg-slate-800 transition ${
-                                        user.plan === p ? 'text-indigo-300 bg-indigo-600/10' : 'text-slate-300'
+                                      className={`w-full px-3 py-1.5 text-left text-xs hover:bg-neutral-200 transition ${
+                                        user.plan === p ? 'text-indigo-500 bg-indigo-600/10' : 'text-neutral-300'
                                       }`}
                                     >
                                       {p}
@@ -789,11 +789,11 @@ export default function AdminPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
                 <select
                   value={orderStatusFilter}
                   onChange={(e) => setOrderStatusFilter(e.target.value as OrderStatus | '')}
-                  className="rounded-xl border border-slate-700 bg-slate-800/50 py-2 pl-10 pr-8 text-sm text-slate-200 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition appearance-none cursor-pointer"
+                  className="rounded-xl border border-neutral-300 bg-neutral-200/50 py-2 pl-10 pr-8 text-sm text-neutral-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition appearance-none cursor-pointer"
                 >
                   <option value="">全部状态</option>
                   {ORDER_STATUS_OPTIONS.map((s) => (
@@ -811,30 +811,30 @@ export default function AdminPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-slate-800">
-                      <th className="pb-3 text-left font-medium text-slate-500">订单号</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">用户邮箱</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">套餐</th>
-                      <th className="pb-3 text-right font-medium text-slate-500">金额</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">状态</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">支付方式</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">日期</th>
+                    <tr className="border-b border-neutral-300">
+                      <th className="pb-3 text-left font-medium text-neutral-500">订单号</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">用户邮箱</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">套餐</th>
+                      <th className="pb-3 text-right font-medium text-neutral-500">金额</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">状态</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">支付方式</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">日期</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/50">
+                  <tbody className="divide-y divide-neutral-200/50">
                     {orders.map((order) => (
-                      <tr key={order.id} className="hover:bg-slate-800/30 transition">
-                        <td className="py-3 text-slate-300 font-mono text-xs">{order.orderNo}</td>
-                        <td className="py-3 text-slate-200 max-w-[180px] truncate">{order.userEmail}</td>
+                      <tr key={order.id} className="hover:bg-neutral-200/30 transition">
+                        <td className="py-3 text-neutral-300 font-mono text-xs">{order.orderNo}</td>
+                        <td className="py-3 text-neutral-700 max-w-[180px] truncate">{order.userEmail}</td>
                         <td className="py-3">
                           <Badge label={order.plan} className={PLAN_COLORS[order.plan]} />
                         </td>
-                        <td className="py-3 text-right text-slate-200 font-medium">{formatCurrency(order.amount)}</td>
+                        <td className="py-3 text-right text-neutral-700 font-medium">{formatCurrency(order.amount)}</td>
                         <td className="py-3">
                           <Badge label={order.status} className={STATUS_COLORS[order.status]} />
                         </td>
-                        <td className="py-3 text-slate-400 text-xs">{order.paymentMethod}</td>
-                        <td className="py-3 text-slate-500 text-xs">{formatDate(order.createdAt)}</td>
+                        <td className="py-3 text-neutral-500 text-xs">{order.paymentMethod}</td>
+                        <td className="py-3 text-neutral-500 text-xs">{formatDate(order.createdAt)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -859,15 +859,15 @@ export default function AdminPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-slate-800">
-                      <th className="pb-3 text-left font-medium text-slate-500">用户邮箱</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">套餐</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">额度类型</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">使用情况</th>
-                      <th className="pb-3 text-right font-medium text-slate-500">剩余</th>
+                    <tr className="border-b border-neutral-300">
+                      <th className="pb-3 text-left font-medium text-neutral-500">用户邮箱</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">套餐</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">额度类型</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">使用情况</th>
+                      <th className="pb-3 text-right font-medium text-neutral-500">剩余</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/50">
+                  <tbody className="divide-y divide-neutral-200/50">
                     {quotas
                       .sort((a, b) => {
                         const aPct = a.total > 0 ? a.used / a.total : 0;
@@ -879,15 +879,15 @@ export default function AdminPage() {
                         const barColor = pct > 80 ? 'bg-rose-500' : pct > 50 ? 'bg-amber-500' : 'bg-emerald-500';
                         const textColor = pct > 80 ? 'text-rose-300' : pct > 50 ? 'text-amber-300' : 'text-emerald-300';
                         return (
-                          <tr key={`${q.userId}-${q.quotaType}-${i}`} className="hover:bg-slate-800/30 transition">
-                            <td className="py-3 text-slate-200 max-w-[180px] truncate">{q.userEmail}</td>
+                          <tr key={`${q.userId}-${q.quotaType}-${i}`} className="hover:bg-neutral-200/30 transition">
+                            <td className="py-3 text-neutral-700 max-w-[180px] truncate">{q.userEmail}</td>
                             <td className="py-3">
                               <Badge label={q.plan} className={PLAN_COLORS[q.plan]} />
                             </td>
-                            <td className="py-3 text-slate-300">{q.quotaType}</td>
+                            <td className="py-3 text-neutral-300">{q.quotaType}</td>
                             <td className="py-3 min-w-[200px]">
                               <div className="flex items-center gap-3">
-                                <div className="flex-1 h-2 rounded-full bg-slate-800 overflow-hidden">
+                                <div className="flex-1 h-2 rounded-full bg-neutral-200 overflow-hidden">
                                   <div
                                     className={`h-full rounded-full transition-all duration-500 ${barColor}`}
                                     style={{ width: `${Math.min(pct, 100)}%` }}
@@ -916,11 +916,11 @@ export default function AdminPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
                 <select
                   value={logActionFilter}
                   onChange={(e) => setLogActionFilter(e.target.value)}
-                  className="rounded-xl border border-slate-700 bg-slate-800/50 py-2 pl-10 pr-8 text-sm text-slate-200 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition appearance-none cursor-pointer"
+                  className="rounded-xl border border-neutral-300 bg-neutral-200/50 py-2 pl-10 pr-8 text-sm text-neutral-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition appearance-none cursor-pointer"
                 >
                   <option value="">全部操作</option>
                   {ACTION_OPTIONS.map((a) => (
@@ -938,26 +938,26 @@ export default function AdminPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-slate-800">
-                      <th className="pb-3 text-left font-medium text-slate-500">管理员</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">操作</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">目标</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">详情</th>
-                      <th className="pb-3 text-left font-medium text-slate-500">时间</th>
+                    <tr className="border-b border-neutral-300">
+                      <th className="pb-3 text-left font-medium text-neutral-500">管理员</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">操作</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">目标</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">详情</th>
+                      <th className="pb-3 text-left font-medium text-neutral-500">时间</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/50">
+                  <tbody className="divide-y divide-neutral-200/50">
                     {logs.map((log) => (
-                      <tr key={log.id} className="hover:bg-slate-800/30 transition">
-                        <td className="py-3 text-slate-200 max-w-[160px] truncate">{log.adminEmail}</td>
+                      <tr key={log.id} className="hover:bg-neutral-200/30 transition">
+                        <td className="py-3 text-neutral-700 max-w-[160px] truncate">{log.adminEmail}</td>
                         <td className="py-3">
-                          <Badge label={log.action} className="bg-indigo-600/20 text-indigo-300" />
+                          <Badge label={log.action} className="bg-indigo-600/20 text-indigo-500" />
                         </td>
-                        <td className="py-3 text-slate-300 text-xs max-w-[160px] truncate">{log.target}</td>
-                        <td className="py-3 text-slate-500 text-xs max-w-[240px] truncate font-mono">
+                        <td className="py-3 text-neutral-300 text-xs max-w-[160px] truncate">{log.target}</td>
+                        <td className="py-3 text-neutral-500 text-xs max-w-[240px] truncate font-mono">
                           {log.meta ? JSON.stringify(log.meta).slice(0, 80) : '-'}
                         </td>
-                        <td className="py-3 text-slate-500 text-xs whitespace-nowrap">{formatDate(log.createdAt)}</td>
+                        <td className="py-3 text-neutral-500 text-xs whitespace-nowrap">{formatDate(log.createdAt)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -983,13 +983,13 @@ export default function AdminPage() {
                 {configs.map((config) => (
                   <div
                     key={config.key}
-                    className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-slate-800 p-4 hover:border-slate-700 transition"
+                    className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-neutral-300 p-4 hover:border-neutral-300 transition"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <code className="text-xs font-mono text-indigo-300 bg-indigo-600/10 px-2 py-0.5 rounded">{config.key}</code>
+                        <code className="text-xs font-mono text-indigo-500 bg-indigo-600/10 px-2 py-0.5 rounded">{config.key}</code>
                       </div>
-                      <p className="mt-1 text-xs text-slate-500">{config.description}</p>
+                      <p className="mt-1 text-xs text-neutral-500">{config.description}</p>
                     </div>
                     <div className="flex items-center gap-2 sm:min-w-[300px]">
                       <input
@@ -1005,7 +1005,7 @@ export default function AdminPage() {
                             prev.map((c) => (c.key === config.key ? { ...c, editValue: e.target.value } : c))
                           );
                         }}
-                        className="flex-1 rounded-lg border border-slate-700 bg-slate-800/50 py-1.5 px-3 text-sm text-slate-200 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition"
+                        className="flex-1 rounded-lg border border-neutral-300 bg-neutral-200/50 py-1.5 px-3 text-sm text-neutral-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition"
                       />
                       <button
                         onClick={() => saveConfig(config.key, config.editValue ?? config.value)}

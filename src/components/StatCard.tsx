@@ -14,10 +14,10 @@ type StatCardProps = {
 };
 
 const toneStyles: Record<NonNullable<StatCardProps['tone']>, string> = {
-  default: 'text-slate-200',
-  positive: 'text-emerald-300',
-  warning: 'text-amber-300',
-  critical: 'text-rose-300',
+  default: 'text-neutral-800',
+  positive: 'text-emerald-600',
+  warning: 'text-amber-600',
+  critical: 'text-rose-600',
 };
 
 export function StatCard({
@@ -34,37 +34,37 @@ export function StatCard({
   const DeltaIcon = !hasDelta ? Minus : delta! > 0 ? ArrowUp : delta! < 0 ? ArrowDown : Minus;
   const deltaTone =
     !hasDelta
-      ? 'text-slate-400'
+      ? 'text-neutral-500'
       : delta! > 0
-        ? 'text-emerald-300 bg-emerald-500/10 border-emerald-500/20'
+        ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
         : delta! < 0
-          ? 'text-rose-300 bg-rose-500/10 border-rose-500/20'
-          : 'text-slate-400 bg-slate-500/10 border-slate-500/20';
+          ? 'text-rose-700 bg-rose-50 border-rose-200'
+          : 'text-neutral-500 bg-neutral-100 border-neutral-200';
 
   return (
     <div
       className={cn(
-        'group relative overflow-hidden rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5 transition hover:border-indigo-500/40 hover:shadow-[0_0_0_1px_rgba(99,102,241,0.15)]',
+        'group relative overflow-hidden rounded-2xl border border-neutral-200 bg-white p-5 transition hover:border-indigo-500/40 hover:shadow-[0_0_0_1px_rgba(99,102,241,0.15)]',
         className
       )}
     >
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent opacity-0 transition group-hover:opacity-100" />
       <div className="flex items-start justify-between gap-3">
-        <div className="text-xs font-medium uppercase tracking-wider text-slate-400">{label}</div>
-        {icon ? <div className="text-indigo-300/80">{icon}</div> : null}
+        <div className="text-xs font-medium uppercase tracking-wider text-neutral-500">{label}</div>
+        {icon ? <div className="text-indigo-500/80">{icon}</div> : null}
       </div>
       <div className={cn('mt-3 text-3xl font-semibold tracking-tight tabular-nums', toneStyles[tone])}>
         {value}
       </div>
-      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-neutral-500">
         {hasDelta ? (
           <span className={cn('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-medium', deltaTone)}>
             <DeltaIcon className="h-3 w-3" />
             {Math.abs(delta!).toFixed(1)}%
-            {deltaLabel ? <span className="text-slate-400">{deltaLabel}</span> : null}
+            {deltaLabel ? <span className="text-neutral-500">{deltaLabel}</span> : null}
           </span>
         ) : null}
-        {subline ? <span className="text-slate-500">{subline}</span> : null}
+        {subline ? <span className="text-neutral-500">{subline}</span> : null}
       </div>
     </div>
   );

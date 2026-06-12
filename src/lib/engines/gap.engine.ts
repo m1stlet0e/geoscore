@@ -58,7 +58,7 @@ export class GapEngine {
     // 获取品牌信息
     const brand = await prisma.brand.findUnique({
       where: { id: brandId },
-      include: { competitors: true }
+      include: { prompts: true }
     })
 
     if (!brand) throw new Error('Brand not found')

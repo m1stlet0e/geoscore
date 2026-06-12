@@ -4,7 +4,7 @@
 // ============================================
 
 import { prisma } from '@/lib/prisma'
-import { chat, jsonChat } from '@/lib/deepseek'
+import { chat, jsonChat, chatCompletion } from '@/lib/deepseek'
 import { billingService } from '@/lib/billing/billing.service'
 
 // ============================================
@@ -187,7 +187,7 @@ export class ContentEngine {
       gapContext
     )
 
-    const response = await chat([
+    const response = await chatCompletion([
       {
         role: 'system',
         content: this.getSystemPrompt(request.type),

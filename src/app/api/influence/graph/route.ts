@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { chat } from '@/lib/deepseek';
+import { chat, chatCompletion } from '@/lib/deepseek';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -118,7 +118,7 @@ export async function GET(req: Request) {
 
   // Optional: a small LLM-driven touch to enrich (non-blocking on failure)
   try {
-    const txt = await chat(
+    const txt = await chatCompletion(
       [
         {
           role: 'system',

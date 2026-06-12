@@ -76,10 +76,10 @@ export function Toaster() {
           const Icon = t.kind === 'success' ? CheckCircle2 : t.kind === 'error' ? AlertCircle : Info;
           const tone =
             t.kind === 'success'
-              ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-100'
+              ? 'border-emerald-500/30 bg-emerald-50 text-emerald-100'
               : t.kind === 'error'
-                ? 'border-rose-500/30 bg-rose-500/10 text-rose-100'
-                : 'border-indigo-500/30 bg-indigo-500/10 text-indigo-100';
+                ? 'border-rose-500/30 bg-rose-50 text-rose-100'
+                : 'border-indigo-500/30 bg-indigo-50 text-indigo-100';
           return (
             <div
               key={t.id}
@@ -90,14 +90,14 @@ export function Toaster() {
             >
               <Icon className="mt-0.5 h-5 w-5 shrink-0" />
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-semibold text-slate-50">{t.title}</div>
+                <div className="text-sm font-semibold text-neutral-900">{t.title}</div>
                 {t.description ? (
-                  <div className="mt-0.5 text-xs text-slate-300/90">{t.description}</div>
+                  <div className="mt-0.5 text-xs text-neutral-300/90">{t.description}</div>
                 ) : null}
               </div>
               <button
                 onClick={() => dismiss(t.id)}
-                className="rounded-md p-1 text-slate-400 hover:bg-slate-800/50 hover:text-slate-100"
+                className="rounded-md p-1 text-neutral-500 hover:bg-neutral-200/50 hover:text-neutral-800"
                 aria-label="关闭"
               >
                 <X className="h-4 w-4" />

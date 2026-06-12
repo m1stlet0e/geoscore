@@ -18,7 +18,7 @@ export function UpgradeButton({ plan, label }: { plan: string; label: string }) 
         router.refresh();
         setBusy(false);
       }}
-      className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-sm font-medium text-indigo-200 transition hover:bg-indigo-500/20 disabled:opacity-50"
+      className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-500/30 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-600 transition hover:bg-indigo-500/20 disabled:opacity-50"
     >
       {busy ? '升级中…' : label}
     </button>

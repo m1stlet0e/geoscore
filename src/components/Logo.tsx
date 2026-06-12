@@ -66,8 +66,8 @@ export function Logo({ className, showWordmark = true, size = 'md' }: LogoProps)
         <circle cx="33.6" cy="11.6" r="1.6" fill="#a5b4fc" />
       </svg>
       {showWordmark ? (
-        <span className={cn('font-semibold tracking-tight text-slate-50', s.text)}>
-          Geo<span className="text-indigo-300">Score</span>
+        <span className={cn('font-semibold tracking-tight text-neutral-900', s.text)}>
+          Geo<span className="text-indigo-500">Score</span>
         </span>
       ) : null}
     </span>

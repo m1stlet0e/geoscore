@@ -60,18 +60,10 @@ async function main() {
       },
     })
 
-    await prisma.competitor.upsert({
-      where: {
-        brandId_competitorId: {
-          brandId: brand.id,
-          competitorId: comp.id
-        }
-      },
-      update: {},
-      create: {
-        brandId: brand.id,
-        competitorId: comp.id,
-      },
+    // NOTE: Competitor model not in schema yet — store as brand with category
+    await prisma.brand.update({
+      where: { id: comp.id },
+      data: { category: 'SEO Tools' },
     })
   }
 

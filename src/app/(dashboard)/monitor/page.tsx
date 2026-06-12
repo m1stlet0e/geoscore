@@ -28,22 +28,22 @@ const STATUS_META: Record<string, { label: string; icon: React.ReactNode; cls: s
   queued: {
     label: '排队中',
     icon: <Loader2 className="h-3 w-3" />,
-    cls: 'border-slate-500/30 bg-slate-500/10 text-slate-300',
+    cls: 'border-neutral-300 bg-neutral-100 text-neutral-300',
   },
   running: {
     label: '运行中',
     icon: <Activity className="h-3 w-3 animate-pulse" />,
-    cls: 'border-indigo-500/30 bg-indigo-500/10 text-indigo-200',
+    cls: 'border-indigo-500/30 bg-indigo-50 text-indigo-600',
   },
   completed: {
     label: '已完成',
     icon: <CheckCircle2 className="h-3 w-3" />,
-    cls: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200',
+    cls: 'border-emerald-500/30 bg-emerald-50 text-emerald-600',
   },
   failed: {
     label: '失败',
     icon: <XCircle className="h-3 w-3" />,
-    cls: 'border-rose-500/30 bg-rose-500/10 text-rose-200',
+    cls: 'border-rose-500/30 bg-rose-50 text-rose-600',
   },
 };
 
@@ -168,8 +168,8 @@ export default async function MonitorPage() {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold text-slate-100">品牌列表</h2>
-            <p className="mt-0.5 text-xs text-slate-400">点击管理 Prompts 查看每个品牌的扫描详情</p>
+            <h2 className="text-base font-semibold text-neutral-800">品牌列表</h2>
+            <p className="mt-0.5 text-xs text-neutral-500">点击管理 Prompts 查看每个品牌的扫描详情</p>
           </div>
         </div>
 
@@ -190,23 +190,23 @@ export default async function MonitorPage() {
                 <Link
                   key={brand.id}
                   href={`/monitor/${brand.id}`}
-                  className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5 transition hover:border-indigo-500/40 hover:shadow-[0_0_0_1px_rgba(99,102,241,0.15)]"
+                  className="group relative flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white p-5 transition hover:border-indigo-500/40 hover:shadow-[0_0_0_1px_rgba(99,102,241,0.15)]"
                 >
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent opacity-0 transition group-hover:opacity-100" />
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <h3 className="truncate text-base font-semibold text-slate-50">
+                      <h3 className="truncate text-base font-semibold text-neutral-900">
                         {brand.name}
                       </h3>
                       {brand.domain ? (
-                        <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-slate-400">
+                        <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-neutral-500">
                           <Globe className="h-3 w-3" />
                           {brand.domain}
                         </p>
                       ) : null}
                     </div>
                     <div className="flex shrink-0 flex-col items-end">
-                      <div className="text-xs uppercase tracking-wider text-slate-500">
+                      <div className="text-xs uppercase tracking-wider text-neutral-500">
                         Visibility
                       </div>
                       <div
@@ -215,8 +215,8 @@ export default async function MonitorPage() {
                           scoreValue >= 30
                             ? 'text-emerald-300'
                             : scoreValue >= 10
-                              ? 'text-indigo-300'
-                              : 'text-slate-300'
+                              ? 'text-indigo-500'
+                              : 'text-neutral-300'
                         )}
                       >
                         {scoreValue}%
@@ -224,7 +224,7 @@ export default async function MonitorPage() {
                     </div>
                   </div>
 
-                  <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-400">
+                  <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-neutral-500">
                     <span className="inline-flex items-center gap-1">
                       <ListChecks className="h-3 w-3" />
                       {brand._count.prompts} prompts
@@ -240,14 +240,14 @@ export default async function MonitorPage() {
                   </div>
 
                   {/* Visibility bar */}
-                  <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-800/70">
+                  <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-white">
                     <div
                       className={cn(
                         'h-full rounded-full transition-all',
                         scoreValue >= 30
                           ? 'bg-gradient-to-r from-emerald-400 to-emerald-500'
                           : scoreValue >= 10
-                            ? 'bg-gradient-to-r from-indigo-400 to-violet-500'
+                            ? 'bg-indigo-400'
                             : 'bg-gradient-to-r from-slate-500 to-slate-400'
                       )}
                       style={{ width: `${Math.max(2, scoreValue)}%` }}
@@ -255,10 +255,10 @@ export default async function MonitorPage() {
                   </div>
 
                   <div className="mt-4 flex items-center justify-between text-xs">
-                    <span className="inline-flex items-center gap-1 text-indigo-300 transition group-hover:gap-2">
+                    <span className="inline-flex items-center gap-1 text-indigo-500 transition group-hover:gap-2">
                       管理 Prompts <ArrowRight className="h-3 w-3" />
                     </span>
-                    <span className="text-slate-500">
+                    <span className="text-neutral-500">
                       {score?.total ?? 0} 次扫描
                     </span>
                   </div>
@@ -270,18 +270,18 @@ export default async function MonitorPage() {
       </section>
 
       {/* Recent scans table */}
-      <section className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5">
+      <section className="rounded-2xl border border-neutral-200 bg-white p-5">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-slate-100">最近扫描记录</h2>
-          <span className="text-xs text-slate-500">最近 10 条</span>
+          <h2 className="text-base font-semibold text-neutral-800">最近扫描记录</h2>
+          <span className="text-xs text-neutral-500">最近 10 条</span>
         </div>
         {recentScans.length === 0 ? (
-          <div className="py-10 text-center text-sm text-slate-500">暂无扫描记录</div>
+          <div className="py-10 text-center text-sm text-neutral-500">暂无扫描记录</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-800/60 text-xs uppercase tracking-wider text-slate-500">
+                <tr className="border-b border-neutral-200 text-xs uppercase tracking-wider text-neutral-500">
                   <th className="px-2 py-2 font-medium">品牌</th>
                   <th className="px-2 py-2 font-medium">平台</th>
                   <th className="px-2 py-2 font-medium">状态</th>
@@ -291,7 +291,7 @@ export default async function MonitorPage() {
                   <th className="px-2 py-2 font-medium text-right">操作</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/40">
+              <tbody className="divide-y divide-neutral-200/40">
                 {recentScans.map((s) => {
                   const meta = STATUS_META[s.status] ?? STATUS_META.queued;
                   const progress = s.totalPrompts
@@ -299,21 +299,21 @@ export default async function MonitorPage() {
                     : 0;
                   const platforms = Array.isArray(s.platforms) ? s.platforms : [];
                   return (
-                    <tr key={s.id} className="transition hover:bg-slate-900/30">
+                    <tr key={s.id} className="transition hover:bg-neutral-100">
                       <td className="px-2 py-3">
-                        <span className="font-medium text-slate-100">{s.brand?.name ?? '-'}</span>
+                        <span className="font-medium text-neutral-800">{s.brand?.name ?? '-'}</span>
                       </td>
                       <td className="px-2 py-3">
                         <div className="flex flex-wrap gap-1">
                           {platforms.length === 0 ? (
-                            <span className="text-slate-500">-</span>
+                            <span className="text-neutral-500">-</span>
                           ) : (
                             platforms.slice(0, 3).map((pid) => {
                               const pm = getPlatformMeta(pid);
                               return (
                                 <span
                                   key={pid}
-                                  className="inline-flex items-center rounded border border-slate-700/60 bg-slate-800/60 px-1.5 py-0.5 text-[10px] text-slate-300"
+                                  className="inline-flex items-center rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-300"
                                   style={{ borderColor: `${pm.color}40` }}
                                 >
                                   {pm.name}
@@ -322,7 +322,7 @@ export default async function MonitorPage() {
                             })
                           )}
                           {platforms.length > 3 ? (
-                            <span className="text-[10px] text-slate-500">+{platforms.length - 3}</span>
+                            <span className="text-[10px] text-neutral-500">+{platforms.length - 3}</span>
                           ) : null}
                         </div>
                       </td>
@@ -339,25 +339,25 @@ export default async function MonitorPage() {
                       </td>
                       <td className="px-2 py-3">
                         <div className="flex items-center gap-2">
-                          <div className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-800">
+                          <div className="h-1.5 w-16 overflow-hidden rounded-full bg-neutral-200">
                             <div
                               className="h-full rounded-full bg-indigo-500"
                               style={{ width: `${progress}%` }}
                             />
                           </div>
-                          <span className="text-xs tabular-nums text-slate-400">
+                          <span className="text-xs tabular-nums text-neutral-500">
                             {s.completedPrompts}/{s.totalPrompts}
                           </span>
                         </div>
                       </td>
-                      <td className="px-2 py-3 text-xs text-slate-400">
+                      <td className="px-2 py-3 text-xs text-neutral-500">
                         {s.triggeredBy === 'user' ? '手动' : s.triggeredBy === 'cron' ? '定时' : s.triggeredBy}
                       </td>
-                      <td className="px-2 py-3 text-xs text-slate-400">{formatDate(s.startedAt)}</td>
+                      <td className="px-2 py-3 text-xs text-neutral-500">{formatDate(s.startedAt)}</td>
                       <td className="px-2 py-3 text-right">
                         <Link
                           href={`/monitor/${s.brandId}`}
-                          className="text-xs text-indigo-300 hover:text-indigo-200"
+                          className="text-xs text-indigo-500 hover:text-indigo-600"
                         >
                           详情
                         </Link>

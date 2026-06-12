@@ -1,60 +1,108 @@
-// DeepSeek client wrapper — uses DEEPSEEK_API_KEY from env
-// Returns a textual completion (no streaming) for prompt generation tasks
-const BASE_URL = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com';
-const API_KEY = process.env.DEEPSEEK_API_KEY || '';
+// ============================================
+// DeepSeek API Client
+// 用于 AI 分析的 LLM 调用
+// ============================================
 
-type ChatMessage = { role: 'system' | 'user' | 'assistant'; content: string };
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || ''
+const DEEPSEEK_BASE_URL = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com'
+const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat'
 
+interface ChatMessage {
+  role: 'system' | 'user' | 'assistant'
+  content: string
+}
+
+interface ChatCompletion {
+  choices: {
+    message: {
+      content: string
+    }
+  }[]
+}
+
+/**
+ * 调用 DeepSeek API 进行聊天补全
+ */
+/**
+ * 简单聊天接口（返回纯文本）
+ */
 export async function chat(
-  messages: ChatMessage[],
-  opts: { model?: 'deepseek-chat' | 'deepseek-reasoner'; maxTokens?: number; temperature?: number } = {}
+  prompt: string,
+  systemPrompt?: string
 ): Promise<string> {
-  if (!API_KEY) {
-    // Local fallback for dev without a real key — return a deterministic stub
-    const last = messages[messages.length - 1].content.slice(0, 200);
-    return `[本地模拟回答] ${last}`;
+  const messages: ChatMessage[] = []
+  if (systemPrompt) {
+    messages.push({ role: 'system', content: systemPrompt })
   }
-  const r = await fetch(`${BASE_URL}/v1/chat/completions`, {
+  messages.push({ role: 'user', content: prompt })
+  return chatCompletion(messages)
+}
+export async function chatCompletion(
+  messages: ChatMessage[],
+  options?: {
+    model?: string
+    temperature?: number
+    maxTokens?: number
+  }
+): Promise<string> {
+  if (!DEEPSEEK_API_KEY) {
+    throw new Error('DEEPSEEK_API_KEY is not configured')
+  }
+
+  const response = await fetch(`${DEEPSEEK_BASE_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${API_KEY}`,
+      Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
     },
     body: JSON.stringify({
-      model: opts.model || 'deepseek-chat',
+      model: options?.model || DEEPSEEK_MODEL,
       messages,
-      max_tokens: opts.maxTokens ?? 2048,
-      temperature: opts.temperature ?? 0.7,
+      temperature: options?.temperature ?? 0.7,
+      max_tokens: options?.maxTokens ?? 2000,
     }),
-  });
-  if (!r.ok) {
-    const t = await r.text();
-    throw new Error(`DeepSeek ${r.status}: ${t.slice(0, 200)}`);
+  })
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => 'Unknown error')
+    throw new Error(`DeepSeek API error: ${response.status} - ${errorText}`)
   }
-  const json = (await r.json()) as { choices: { message: { content: string } }[] };
-  return json.choices[0].message.content;
+
+  const data: ChatCompletion = await response.json()
+  return data.choices[0]?.message?.content || ''
 }
 
-export async function jsonChat<T = unknown>(
+/**
+ * 调用 DeepSeek API 并解析 JSON 响应
+ */
+export async function jsonChat<T = any>(
   messages: ChatMessage[],
-  opts: Parameters<typeof chat>[1] = {}
+  options?: {
+    model?: string
+    temperature?: number
+    maxTokens?: number
+  }
 ): Promise<T> {
-  const txt = await chat(
-    [
-      ...messages,
-      {
-        role: 'system',
-        content:
-          '严格按 JSON 格式输出，不要 markdown 代码块，不要解释。输出的 JSON 必须可被 JSON.parse 直接解析。',
-      },
-    ],
-    opts
-  );
-  // strip code fences if any
-  const clean = txt
-    .trim()
-    .replace(/^```(?:json)?/i, '')
-    .replace(/```$/i, '')
-    .trim();
-  return JSON.parse(clean) as T;
+  const content = await chatCompletion(messages, options)
+
+  // 尝试提取 JSON
+  const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) ||
+    content.match(/```\s*([\s\S]*?)\s*```/) || [null, content]
+
+  const jsonStr = jsonMatch[1] || content
+
+  try {
+    return JSON.parse(jsonStr.trim())
+  } catch {
+    // 如果解析失败，尝试找到第一个 { 或 [
+    const start = jsonStr.indexOf('{')
+    const arrStart = jsonStr.indexOf('[')
+    const actualStart = start === -1 ? arrStart : arrStart === -1 ? start : Math.min(start, arrStart)
+
+    if (actualStart >= 0) {
+      return JSON.parse(jsonStr.slice(actualStart))
+    }
+
+    throw new Error(`Failed to parse JSON from LLM response: ${content.slice(0, 200)}`)
+  }
 }

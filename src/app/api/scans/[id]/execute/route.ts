@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { chat } from '@/lib/deepseek';
+import { chat, chatCompletion } from '@/lib/deepseek';
 import { PLATFORM_IDS } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
@@ -371,7 +371,7 @@ async function executeOneScan(
             ? `（可对比的竞品：${competitors.slice(0, 5).join('、')}）`
             : '';
         const userMsg = `用户问题：「${p.text}」 — 领域：${brand.category ?? 'AI 工具'}${compLine}`;
-        responseText = await chat(
+        responseText = await chatCompletion(
           [
             { role: 'system', content: voice.system },
             { role: 'user', content: userMsg },

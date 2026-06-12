@@ -20,7 +20,7 @@ type PlatformPoint = { id: string; name: string; value: number; color: string };
 export function CitationTrendChart({ data }: { data: TrendPoint[] }) {
   if (!data || data.length === 0) {
     return (
-      <div className="flex h-[280px] items-center justify-center text-sm text-slate-500">
+      <div className="flex h-[280px] items-center justify-center text-sm text-neutral-500">
         暂无趋势数据
       </div>
     );

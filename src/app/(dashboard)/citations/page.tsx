@@ -140,7 +140,7 @@ const SOURCE_TYPE_BADGE: Record<string, { bg: string; border: string; text: stri
   zhihu: { bg: 'bg-blue-500/15', border: 'border-blue-500/30', text: 'text-blue-300' },
   wechat: { bg: 'bg-green-500/15', border: 'border-green-500/30', text: 'text-green-300' },
   blog: { bg: 'bg-purple-500/15', border: 'border-purple-500/30', text: 'text-purple-300' },
-  docs: { bg: 'bg-indigo-500/15', border: 'border-indigo-500/30', text: 'text-indigo-300' },
+  docs: { bg: 'bg-indigo-50', border: 'border-indigo-500/30', text: 'text-indigo-500' },
   forum: { bg: 'bg-orange-500/15', border: 'border-orange-500/30', text: 'text-orange-300' },
 };
 
@@ -181,7 +181,7 @@ const CHART_COLORS = ['#3b82f6', '#22c55e', '#a855f7', '#f97316', '#ec4899', '#1
 // ─── Skeleton Components ─────────────────────────────────────────────────────
 
 function SkeletonPulse({ className }: { className?: string }) {
-  return <div className={`animate-pulse rounded bg-slate-800 ${className}`} />;
+  return <div className={`animate-pulse rounded bg-neutral-200 ${className}`} />;
 }
 
 function StatCardsSkeleton() {
@@ -190,7 +190,7 @@ function StatCardsSkeleton() {
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           key={i}
-          className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5"
+          className="rounded-2xl border border-neutral-200 bg-white p-5"
         >
           <SkeletonPulse className="h-3 w-20 mb-3" />
           <SkeletonPulse className="h-8 w-24 mb-3" />
@@ -204,7 +204,7 @@ function StatCardsSkeleton() {
 function ChartSkeleton({ height = 'h-[320px]' }: { height?: string }) {
   return (
     <div className={`${height} w-full flex items-center justify-center`}>
-      <div className="flex flex-col items-center gap-3 text-slate-500">
+      <div className="flex flex-col items-center gap-3 text-neutral-500">
         <Activity className="h-6 w-6 animate-pulse" />
         <span className="text-xs">加载图表中...</span>
       </div>
@@ -232,7 +232,7 @@ function EvidenceSkeleton() {
   return (
     <div className="space-y-4">
       {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="rounded-xl border border-slate-800/60 bg-slate-900/40 p-4">
+        <div key={i} className="rounded-xl border border-neutral-200 bg-neutral-100 p-4">
           <div className="flex items-center gap-3 mb-3">
             <SkeletonPulse className="h-5 w-16" />
             <SkeletonPulse className="h-4 flex-1" />
@@ -288,9 +288,9 @@ function PlatformBadge({ platform }: { platform: string }) {
 
 function SourceTypeBadge({ type }: { type: string }) {
   const badge = SOURCE_TYPE_BADGE[type] || {
-    bg: 'bg-slate-500/15',
-    border: 'border-slate-500/30',
-    text: 'text-slate-300',
+    bg: 'bg-neutral-500/15',
+    border: 'border-neutral-300',
+    text: 'text-neutral-300',
   };
   return (
     <span
@@ -310,7 +310,8 @@ function FactorIcon({ factor }: { factor: string }) {
 // ─── Main Page Component ─────────────────────────────────────────────────────
 
 export default function CitationsIntelligencePage() {
-  const [brandId, setBrandId] = useState<string>('default-brand');
+  const [brandId, setBrandId] = useState<string>('');
+  const [brands, setBrands] = useState<{ id: string; name: string; domain: string | null }[]>([]);
   const [activeTab, setActiveTab] = useState<Tab>('factors');
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
   const [showAnalyzeModal, setShowAnalyzeModal] = useState(false);
@@ -342,15 +343,36 @@ export default function CitationsIntelligencePage() {
   const [analyzeSources, setAnalyzeSources] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
 
+  // Fetch brands
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/brands');
+        if (!res.ok) return;
+        const data = await res.json();
+        const list = data.brands || [];
+        setBrands(list);
+        if (list.length > 0 && !brandId) {
+          setBrandId(list[0].id);
+        }
+      } catch (err) {
+        console.error('Error fetching brands:', err);
+      }
+    })();
+  }, []);
+
   // ─── Fetchers ────────────────────────────────────────────────────────────
 
   const fetchStats = useCallback(async () => {
+
+
+      if (!brandId) return;
     try {
       setLoadingStats(true);
       const res = await fetch(`/api/citations/stats?brandId=${brandId}`);
       if (!res.ok) throw new Error('Failed to fetch stats');
       const data = await res.json();
-      setStats(data);
+      setStats(data.data || data);
     } catch (err) {
       console.error('Error fetching citation stats:', err);
       setError('加载统计数据失败');
@@ -360,12 +382,15 @@ export default function CitationsIntelligencePage() {
   }, [brandId]);
 
   const fetchFactors = useCallback(async () => {
+
+
+      if (!brandId) return;
     try {
       setLoadingFactors(true);
       const res = await fetch(`/api/citations/factors?brandId=${brandId}`);
       if (!res.ok) throw new Error('Failed to fetch factors');
       const data = await res.json();
-      setFactors(data ?? []);
+      setFactors(data.data ?? data ?? []);
     } catch (err) {
       console.error('Error fetching factors:', err);
     } finally {
@@ -375,6 +400,7 @@ export default function CitationsIntelligencePage() {
 
   const fetchEvidences = useCallback(
     async (page = 1) => {
+      if (!brandId) return;
       try {
         setLoadingEvidences(true);
         const platformParam = selectedPlatform !== 'all' ? `&platform=${selectedPlatform}` : '';
@@ -383,8 +409,9 @@ export default function CitationsIntelligencePage() {
         );
         if (!res.ok) throw new Error('Failed to fetch evidences');
         const data = await res.json();
-        setEvidences(data.evidences ?? []);
-        setPagination(data.pagination ?? null);
+        const result = data.data || data;
+        setEvidences(result.evidences ?? []);
+        setPagination(result.pagination ?? null);
       } catch (err) {
         console.error('Error fetching evidences:', err);
       } finally {
@@ -395,12 +422,15 @@ export default function CitationsIntelligencePage() {
   );
 
   const fetchPlatforms = useCallback(async () => {
+
+
+      if (!brandId) return;
     try {
       setLoadingPlatforms(true);
       const res = await fetch(`/api/citations/platforms?brandId=${brandId}`);
       if (!res.ok) throw new Error('Failed to fetch platforms');
       const data = await res.json();
-      setPlatformData(data);
+      setPlatformData(data.data ?? data);
     } catch (err) {
       console.error('Error fetching platforms:', err);
     } finally {
@@ -409,12 +439,16 @@ export default function CitationsIntelligencePage() {
   }, [brandId]);
 
   const fetchSources = useCallback(async () => {
+
+
+      if (!brandId) return;
     try {
       setLoadingSources(true);
       const res = await fetch(`/api/citations/sources?brandId=${brandId}`);
       if (!res.ok) throw new Error('Failed to fetch sources');
       const data = await res.json();
-      setSources(data.sources ?? []);
+      const result = data.data || data;
+      setSources(result.sources ?? []);
     } catch (err) {
       console.error('Error fetching sources:', err);
     } finally {
@@ -525,16 +559,16 @@ export default function CitationsIntelligencePage() {
           subtitle="谁在影响 AI 推荐你的品牌 — 真正的推荐因子分析"
         />
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-slate-700/60 bg-slate-900/60">
-            <Database className="h-8 w-8 text-slate-500" />
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-neutral-300 bg-neutral-50">
+            <Database className="h-8 w-8 text-neutral-500" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-200">暂无引用数据</h3>
-          <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-500">
+          <h3 className="text-lg font-semibold text-neutral-700">暂无引用数据</h3>
+          <p className="mt-2 max-w-md text-sm leading-relaxed text-neutral-500">
             完成至少一次 AI 扫描后，这里会展示品牌在 AI 平台中的引用情况、推荐因子分析和来源影响力。
           </p>
           <button
             onClick={() => setShowAnalyzeModal(true)}
-            className="mt-6 inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400"
+            className="mt-6 inline-flex items-center gap-1.5 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400"
           >
             <Sparkles className="h-4 w-4" /> 开始分析
           </button>
@@ -555,23 +589,23 @@ export default function CitationsIntelligencePage() {
           className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           onClick={() => !analyzing && setShowAnalyzeModal(false)}
         />
-        <div className="relative w-full max-w-lg rounded-2xl border border-slate-700/60 bg-slate-900 p-6 shadow-2xl">
+        <div className="relative w-full max-w-lg rounded-2xl border border-neutral-300 bg-neutral-50 p-6 shadow-2xl">
           <button
             onClick={() => !analyzing && setShowAnalyzeModal(false)}
-            className="absolute right-4 top-4 text-slate-400 hover:text-slate-200 transition"
+            className="absolute right-4 top-4 text-neutral-500 hover:text-neutral-700 transition"
           >
             <X className="h-5 w-5" />
           </button>
-          <h3 className="text-lg font-semibold text-slate-100 mb-1">运行引用分析</h3>
-          <p className="text-xs text-slate-400 mb-5">输入 AI 平台的回答内容，分析推荐因子</p>
+          <h3 className="text-lg font-semibold text-neutral-800 mb-1">运行引用分析</h3>
+          <p className="text-xs text-neutral-500 mb-5">输入 AI 平台的回答内容，分析推荐因子</p>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">平台</label>
+              <label className="block text-xs font-medium text-neutral-300 mb-1.5">平台</label>
               <select
                 value={analyzePlatform}
                 onChange={(e) => setAnalyzePlatform(e.target.value)}
-                className="w-full rounded-lg border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-sm text-slate-200 outline-none focus:border-indigo-500/50"
+                className="w-full rounded-lg border border-neutral-300 bg-neutral-100 px-3 py-2 text-sm text-neutral-700 outline-none focus:border-indigo-500/50"
               >
                 {[...DOMESTIC_PLATFORMS.filter((p) => p.key !== 'all'), ...INTERNATIONAL_PLATFORMS].map((p) => (
                   <option key={p.key} value={p.key}>
@@ -581,7 +615,7 @@ export default function CitationsIntelligencePage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-medium text-neutral-300 mb-1.5">
                 Prompt <span className="text-rose-400">*</span>
               </label>
               <input
@@ -589,11 +623,11 @@ export default function CitationsIntelligencePage() {
                 value={analyzePrompt}
                 onChange={(e) => setAnalyzePrompt(e.target.value)}
                 placeholder="输入查询的 Prompt..."
-                className="w-full rounded-lg border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-sm text-slate-200 outline-none focus:border-indigo-500/50 placeholder:text-slate-600"
+                className="w-full rounded-lg border border-neutral-300 bg-neutral-100 px-3 py-2 text-sm text-neutral-700 outline-none focus:border-indigo-500/50 placeholder:text-neutral-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-medium text-neutral-300 mb-1.5">
                 回答内容
               </label>
               <textarea
@@ -601,19 +635,19 @@ export default function CitationsIntelligencePage() {
                 onChange={(e) => setAnalyzeAnswer(e.target.value)}
                 placeholder="粘贴 AI 平台的回答内容..."
                 rows={4}
-                className="w-full rounded-lg border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-sm text-slate-200 outline-none focus:border-indigo-500/50 placeholder:text-slate-600 resize-none"
+                className="w-full rounded-lg border border-neutral-300 bg-neutral-100 px-3 py-2 text-sm text-neutral-700 outline-none focus:border-indigo-500/50 placeholder:text-neutral-500 resize-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                引用来源 <span className="text-slate-500">(每行一个 URL)</span>
+              <label className="block text-xs font-medium text-neutral-300 mb-1.5">
+                引用来源 <span className="text-neutral-500">(每行一个 URL)</span>
               </label>
               <textarea
                 value={analyzeSources}
                 onChange={(e) => setAnalyzeSources(e.target.value)}
                 placeholder="https://example.com/article&#10;https://github.com/repo"
                 rows={3}
-                className="w-full rounded-lg border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-sm text-slate-200 outline-none focus:border-indigo-500/50 placeholder:text-slate-600 resize-none"
+                className="w-full rounded-lg border border-neutral-300 bg-neutral-100 px-3 py-2 text-sm text-neutral-700 outline-none focus:border-indigo-500/50 placeholder:text-neutral-500 resize-none"
               />
             </div>
           </div>
@@ -622,14 +656,14 @@ export default function CitationsIntelligencePage() {
             <button
               onClick={() => setShowAnalyzeModal(false)}
               disabled={analyzing}
-              className="rounded-lg border border-slate-700/60 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60 transition disabled:opacity-50"
+              className="rounded-lg border border-neutral-300 px-4 py-2 text-sm text-neutral-300 hover:bg-neutral-100 transition disabled:opacity-50"
             >
               取消
             </button>
             <button
               onClick={handleAnalyze}
               disabled={analyzing || !analyzePrompt.trim()}
-              className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400 disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400 disabled:opacity-50"
             >
               {analyzing ? (
                 <>
@@ -660,20 +694,30 @@ export default function CitationsIntelligencePage() {
 
       {/* Error banner */}
       {error && (
-        <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">
+        <div className="rounded-xl border border-rose-500/30 bg-rose-50 px-4 py-3 text-sm text-rose-300">
           {error}
         </div>
       )}
 
-      {/* Brand ID input */}
-      <div className="flex items-center gap-3">
-        <label className="text-xs font-medium text-slate-400">Brand ID:</label>
-        <input
-          type="text"
-          value={brandId}
-          onChange={(e) => setBrandId(e.target.value)}
-          className="rounded-lg border border-slate-700/60 bg-slate-800/40 px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-indigo-500/50 w-48"
-        />
+      {/* Brand selector */}
+      <div className="flex items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-100 p-3">
+        <Globe className="h-4 w-4 text-indigo-400" />
+        <label className="text-xs font-medium text-neutral-500">选择品牌:</label>
+        {brands.length === 0 ? (
+          <span className="text-xs text-amber-400">请先在品牌管理中添加品牌</span>
+        ) : (
+          <select
+            value={brandId}
+            onChange={(e) => setBrandId(e.target.value)}
+            className="rounded-lg border border-neutral-300 bg-neutral-200/40 px-3 py-1.5 text-xs text-neutral-700 outline-none focus:border-indigo-500/50"
+          >
+            {brands.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name} {b.domain ? `(${b.domain})` : ''}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Stat Cards */}
@@ -729,12 +773,12 @@ export default function CitationsIntelligencePage() {
       ) : null}
 
       {/* Platform Selector */}
-      <section className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5">
-        <h3 className="text-sm font-semibold text-slate-200 mb-3">选择平台</h3>
+      <section className="rounded-2xl border border-neutral-200 bg-white p-5">
+        <h3 className="text-sm font-semibold text-neutral-700 mb-3">选择平台</h3>
 
         {/* Domestic */}
         <div className="mb-3">
-          <span className="text-[11px] uppercase tracking-wider text-slate-500 mb-2 block">
+          <span className="text-[11px] uppercase tracking-wider text-neutral-500 mb-2 block">
             国内平台
           </span>
           <div className="flex flex-wrap gap-2">
@@ -746,8 +790,8 @@ export default function CitationsIntelligencePage() {
                   onClick={() => setSelectedPlatform(p.key)}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                     isActive
-                      ? 'border-indigo-500/50 bg-indigo-500/20 text-indigo-200 shadow-sm shadow-indigo-500/10'
-                      : 'border-slate-700/60 bg-slate-800/40 text-slate-400 hover:border-slate-600/60 hover:text-slate-300'
+                      ? 'border-indigo-500/50 bg-indigo-500/20 text-indigo-600 shadow-sm shadow-indigo-500/10'
+                      : 'border-neutral-300 bg-neutral-200/40 text-neutral-500 hover:border-neutral-400/60 hover:text-neutral-300'
                   }`}
                 >
                   <span>{p.emoji}</span>
@@ -760,7 +804,7 @@ export default function CitationsIntelligencePage() {
 
         {/* International */}
         <div>
-          <span className="text-[11px] uppercase tracking-wider text-slate-500 mb-2 block">
+          <span className="text-[11px] uppercase tracking-wider text-neutral-500 mb-2 block">
             国际平台
           </span>
           <div className="flex flex-wrap gap-2">
@@ -772,8 +816,8 @@ export default function CitationsIntelligencePage() {
                   onClick={() => setSelectedPlatform(p.key)}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                     isActive
-                      ? 'border-indigo-500/50 bg-indigo-500/20 text-indigo-200 shadow-sm shadow-indigo-500/10'
-                      : 'border-slate-700/60 bg-slate-800/40 text-slate-400 hover:border-slate-600/60 hover:text-slate-300'
+                      ? 'border-indigo-500/50 bg-indigo-500/20 text-indigo-600 shadow-sm shadow-indigo-500/10'
+                      : 'border-neutral-300 bg-neutral-200/40 text-neutral-500 hover:border-neutral-400/60 hover:text-neutral-300'
                   }`}
                 >
                   <span>{p.emoji}</span>
@@ -786,15 +830,15 @@ export default function CitationsIntelligencePage() {
       </section>
 
       {/* Tab Navigation */}
-      <nav className="flex gap-1 rounded-xl border border-slate-800/60 bg-slate-900/40 p-1">
+      <nav className="flex gap-1 rounded-xl border border-neutral-200 bg-neutral-100 p-1">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition ${
               activeTab === tab.key
-                ? 'bg-gradient-to-r from-indigo-500/20 to-violet-500/20 text-indigo-200 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                ? 'bg-gradient-to-r from-indigo-500/20 to-violet-500/20 text-indigo-600 shadow-sm'
+                : 'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200/40'
             }`}
           >
             {tab.label}
@@ -806,16 +850,16 @@ export default function CitationsIntelligencePage() {
       {activeTab === 'factors' && (
         <div className="space-y-6">
           {/* Factor Distribution Chart */}
-          <section className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5">
+          <section className="rounded-2xl border border-neutral-200 bg-white p-5">
             <div className="mb-4">
-              <h2 className="text-base font-semibold text-slate-100">推荐因子分布</h2>
-              <p className="mt-0.5 text-xs text-slate-400">各推荐因子的影响占比</p>
+              <h2 className="text-base font-semibold text-neutral-800">推荐因子分布</h2>
+              <p className="mt-0.5 text-xs text-neutral-500">各推荐因子的影响占比</p>
             </div>
             {loadingFactors ? (
               <ChartSkeleton />
             ) : factorChartData.length === 0 ? (
-              <div className="flex h-[320px] flex-col items-center justify-center text-sm text-slate-500">
-                <BarChart3 className="mb-2 h-6 w-6 text-slate-600" />
+              <div className="flex h-[320px] flex-col items-center justify-center text-sm text-neutral-500">
+                <BarChart3 className="mb-2 h-6 w-6 text-neutral-500" />
                 暂无因子数据
               </div>
             ) : (
@@ -875,13 +919,13 @@ export default function CitationsIntelligencePage() {
 
           {/* Factor Explanation Cards */}
           <section>
-            <h2 className="text-base font-semibold text-slate-100 mb-4">因子详细分析</h2>
+            <h2 className="text-base font-semibold text-neutral-800 mb-4">因子详细分析</h2>
             {loadingFactors ? (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={i}
-                    className="rounded-xl border border-slate-800/60 bg-slate-900/40 p-5"
+                    className="rounded-xl border border-neutral-200 bg-neutral-100 p-5"
                   >
                     <SkeletonPulse className="h-5 w-24 mb-3" />
                     <SkeletonPulse className="h-3 w-full mb-2" />
@@ -891,9 +935,9 @@ export default function CitationsIntelligencePage() {
                 ))}
               </div>
             ) : factors.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-700/60 bg-slate-900/30 p-12 text-center">
-                <Zap className="mx-auto mb-3 h-8 w-8 text-slate-600" />
-                <p className="text-sm text-slate-500">暂无因子数据</p>
+              <div className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-100 p-12 text-center">
+                <Zap className="mx-auto mb-3 h-8 w-8 text-neutral-500" />
+                <p className="text-sm text-neutral-500">暂无因子数据</p>
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -902,26 +946,26 @@ export default function CitationsIntelligencePage() {
                   return (
                     <div
                       key={f.factor}
-                      className="group rounded-xl border border-slate-800/60 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5 transition hover:border-indigo-500/30"
+                      className="group rounded-xl border border-neutral-200 bg-white p-5 transition hover:border-indigo-500/30"
                     >
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-indigo-500/20 bg-indigo-500/10 text-indigo-300">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-indigo-500/20 bg-indigo-50 text-indigo-500">
                           <FactorIcon factor={f.factor} />
                         </div>
                         <div>
-                          <h3 className="text-sm font-semibold text-slate-100">{f.label}</h3>
-                          <span className="text-[11px] text-slate-500">{f.factor}</span>
+                          <h3 className="text-sm font-semibold text-neutral-800">{f.label}</h3>
+                          <span className="text-[11px] text-neutral-500">{f.factor}</span>
                         </div>
                       </div>
 
                       <div className="mb-3">
                         <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-xs text-slate-400">影响占比</span>
-                          <span className="text-xs font-semibold text-indigo-300">
+                          <span className="text-xs text-neutral-500">影响占比</span>
+                          <span className="text-xs font-semibold text-indigo-500">
                             {f.percentage.toFixed(1)}%
                           </span>
                         </div>
-                        <div className="h-2 overflow-hidden rounded-full bg-slate-800/70">
+                        <div className="h-2 overflow-hidden rounded-full bg-white">
                           <div
                             className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-500"
                             style={{ width: `${Math.min(f.percentage, 100)}%` }}
@@ -929,18 +973,18 @@ export default function CitationsIntelligencePage() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4 text-[11px] text-slate-500 mb-3">
+                      <div className="flex items-center gap-4 text-[11px] text-neutral-500 mb-3">
                         <span>出现 {f.count} 次</span>
                         <span>平均权重 {f.avgWeight.toFixed(2)}</span>
                       </div>
 
-                      <p className="text-xs leading-relaxed text-slate-400 mb-2">
+                      <p className="text-xs leading-relaxed text-neutral-500 mb-2">
                         {FACTOR_DESCRIPTIONS[f.factor] || '推荐因子对 AI 推荐结果有重要影响'}
                       </p>
 
                       <button
                         onClick={() => toggleFactorExpand(f.factor)}
-                        className="inline-flex items-center gap-1 text-[11px] font-medium text-indigo-400 hover:text-indigo-300 transition"
+                        className="inline-flex items-center gap-1 text-[11px] font-medium text-indigo-400 hover:text-indigo-500 transition"
                       >
                         影响说明
                         {isExpanded ? (
@@ -951,11 +995,11 @@ export default function CitationsIntelligencePage() {
                       </button>
 
                       {isExpanded && (
-                        <div className="mt-3 rounded-lg border border-slate-800/60 bg-slate-800/30 p-3 text-xs leading-relaxed text-slate-400">
+                        <div className="mt-3 rounded-lg border border-neutral-200 bg-neutral-200/30 p-3 text-xs leading-relaxed text-neutral-500">
                           <p>
-                            <strong className="text-slate-300">{f.label}</strong> 因子在分析中出现了{' '}
-                            <strong className="text-slate-300">{f.count}</strong> 次，占总权重的{' '}
-                            <strong className="text-indigo-300">{f.percentage.toFixed(1)}%</strong>
+                            <strong className="text-neutral-300">{f.label}</strong> 因子在分析中出现了{' '}
+                            <strong className="text-neutral-300">{f.count}</strong> 次，占总权重的{' '}
+                            <strong className="text-indigo-500">{f.percentage.toFixed(1)}%</strong>
                             。平均权重为 {f.avgWeight.toFixed(2)}。
                           </p>
                           <p className="mt-2">
@@ -977,16 +1021,16 @@ export default function CitationsIntelligencePage() {
         <div className="space-y-6">
           <section className="grid gap-4 lg:grid-cols-5">
             {/* Source Type Pie Chart */}
-            <div className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5 lg:col-span-2">
+            <div className="rounded-2xl border border-neutral-200 bg-white p-5 lg:col-span-2">
               <div className="mb-3">
-                <h2 className="text-base font-semibold text-slate-100">来源类型分布</h2>
-                <p className="mt-0.5 text-xs text-slate-400">按引用次数统计</p>
+                <h2 className="text-base font-semibold text-neutral-800">来源类型分布</h2>
+                <p className="mt-0.5 text-xs text-neutral-500">按引用次数统计</p>
               </div>
               {loadingSources ? (
                 <ChartSkeleton height="h-[280px]" />
               ) : sourceTypePieData.length === 0 ? (
-                <div className="flex h-[280px] flex-col items-center justify-center text-sm text-slate-500">
-                  <Link2 className="mb-2 h-6 w-6 text-slate-600" />
+                <div className="flex h-[280px] flex-col items-center justify-center text-sm text-neutral-500">
+                  <Link2 className="mb-2 h-6 w-6 text-neutral-500" />
                   暂无来源类型数据
                 </div>
               ) : (
@@ -1027,23 +1071,23 @@ export default function CitationsIntelligencePage() {
             </div>
 
             {/* Source Rankings Table */}
-            <div className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5 lg:col-span-3">
+            <div className="rounded-2xl border border-neutral-200 bg-white p-5 lg:col-span-3">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-base font-semibold text-slate-100">来源排名</h2>
-                <span className="text-xs text-slate-500">按影响力排序</span>
+                <h2 className="text-base font-semibold text-neutral-800">来源排名</h2>
+                <span className="text-xs text-neutral-500">按影响力排序</span>
               </div>
               {loadingSources ? (
                 <TableSkeleton rows={8} />
               ) : sources.length === 0 ? (
-                <div className="flex h-[280px] flex-col items-center justify-center text-sm text-slate-500">
-                  <Link2 className="mb-2 h-6 w-6 text-slate-600" />
+                <div className="flex h-[280px] flex-col items-center justify-center text-sm text-neutral-500">
+                  <Link2 className="mb-2 h-6 w-6 text-neutral-500" />
                   暂无来源数据
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm">
                     <thead>
-                      <tr className="border-b border-slate-800/60 text-xs uppercase tracking-wider text-slate-500">
+                      <tr className="border-b border-neutral-200 text-xs uppercase tracking-wider text-neutral-500">
                         <th className="px-3 py-2.5 font-medium">#</th>
                         <th className="px-3 py-2.5 font-medium">域名</th>
                         <th className="px-3 py-2.5 font-medium">类型</th>
@@ -1053,47 +1097,47 @@ export default function CitationsIntelligencePage() {
                         <th className="px-3 py-2.5 font-medium">推荐原因</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/40">
+                    <tbody className="divide-y divide-neutral-200/40">
                       {sources.map((s, i) => {
                         const maxInfluence = sources[0]?.influenceScore ?? 1;
                         const width =
                           maxInfluence > 0 ? (s.influenceScore / maxInfluence) * 100 : 0;
                         return (
-                          <tr key={s.id} className="transition hover:bg-slate-900/30">
+                          <tr key={s.id} className="transition hover:bg-neutral-100">
                             <td className="px-3 py-3">
-                              <span className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-700 bg-slate-900/40 text-[10px] font-semibold text-slate-400">
+                              <span className="flex h-6 w-6 items-center justify-center rounded-full border border-neutral-300 bg-neutral-100 text-[10px] font-semibold text-neutral-500">
                                 {i + 1}
                               </span>
                             </td>
                             <td className="px-3 py-3">
-                              <span className="text-sm font-medium text-slate-100">
+                              <span className="text-sm font-medium text-neutral-800">
                                 {s.domain}
                               </span>
                             </td>
                             <td className="px-3 py-3">
                               <SourceTypeBadge type={s.type} />
                             </td>
-                            <td className="px-3 py-3 text-center font-mono text-xs text-slate-300">
+                            <td className="px-3 py-3 text-center font-mono text-xs text-neutral-300">
                               {s.weight.toFixed(1)}
                             </td>
-                            <td className="px-3 py-3 text-center font-mono text-xs text-indigo-300">
+                            <td className="px-3 py-3 text-center font-mono text-xs text-indigo-500">
                               {s.citationCount}
                             </td>
                             <td className="px-3 py-3">
                               <div className="flex items-center gap-2">
-                                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800/70">
+                                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white">
                                   <div
-                                    className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500"
+                                    className="h-full rounded-full bg-indigo-500"
                                     style={{ width: `${width}%` }}
                                   />
                                 </div>
-                                <span className="shrink-0 text-xs tabular-nums text-slate-400">
+                                <span className="shrink-0 text-xs tabular-nums text-neutral-500">
                                   {s.influenceScore.toFixed(1)}
                                 </span>
                               </div>
                             </td>
                             <td className="max-w-[200px] px-3 py-3">
-                              <p className="line-clamp-1 text-xs text-slate-400">
+                              <p className="line-clamp-1 text-xs text-neutral-500">
                                 {s.recommendationReason || '-'}
                               </p>
                             </td>
@@ -1112,22 +1156,22 @@ export default function CitationsIntelligencePage() {
       {/* ─── Tab: 证据详情 ──────────────────────────────────────────────── */}
       {activeTab === 'evidences' && (
         <div className="space-y-6">
-          <section className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5">
+          <section className="rounded-2xl border border-neutral-200 bg-white p-5">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-base font-semibold text-slate-100">证据详情</h2>
-                <p className="mt-0.5 text-xs text-slate-400">AI 推荐的具体证据记录</p>
+                <h2 className="text-base font-semibold text-neutral-800">证据详情</h2>
+                <p className="mt-0.5 text-xs text-neutral-500">AI 推荐的具体证据记录</p>
               </div>
               {pagination && (
-                <span className="text-xs text-slate-500">共 {pagination.total} 条</span>
+                <span className="text-xs text-neutral-500">共 {pagination.total} 条</span>
               )}
             </div>
 
             {loadingEvidences ? (
               <EvidenceSkeleton />
             ) : evidences.length === 0 ? (
-              <div className="flex h-[200px] flex-col items-center justify-center text-sm text-slate-500">
-                <Database className="mb-2 h-6 w-6 text-slate-600" />
+              <div className="flex h-[200px] flex-col items-center justify-center text-sm text-neutral-500">
+                <Database className="mb-2 h-6 w-6 text-neutral-500" />
                 暂无证据记录
               </div>
             ) : (
@@ -1144,7 +1188,7 @@ export default function CitationsIntelligencePage() {
                   return (
                     <div
                       key={ev.id}
-                      className="rounded-xl border border-slate-800/60 bg-slate-900/40 p-4 transition hover:border-slate-700/60"
+                      className="rounded-xl border border-neutral-200 bg-neutral-100 p-4 transition hover:border-neutral-300"
                     >
                       {/* Header row */}
                       <div className="flex items-start justify-between gap-3 mb-2">
@@ -1152,7 +1196,7 @@ export default function CitationsIntelligencePage() {
                           <PlatformBadge platform={ev.platform} />
                           {ev.sourceType && <SourceTypeBadge type={ev.sourceType} />}
                         </div>
-                        <span className="text-[11px] text-slate-500 shrink-0">
+                        <span className="text-[11px] text-neutral-500 shrink-0">
                           {new Date(ev.createdAt).toLocaleDateString('zh-CN', {
                             year: 'numeric',
                             month: 'short',
@@ -1162,7 +1206,7 @@ export default function CitationsIntelligencePage() {
                       </div>
 
                       {/* Prompt */}
-                      <p className="text-sm text-slate-200 mb-2 line-clamp-2">
+                      <p className="text-sm text-neutral-700 mb-2 line-clamp-2">
                         {ev.promptText}
                       </p>
 
@@ -1172,7 +1216,7 @@ export default function CitationsIntelligencePage() {
                           href={ev.sourceUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 transition mb-3"
+                          className="inline-flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-500 transition mb-3"
                         >
                           <ExternalLink className="h-3 w-3" />
                           {ev.sourceUrl.length > 60
@@ -1185,22 +1229,22 @@ export default function CitationsIntelligencePage() {
                       <div className="flex items-center gap-4 flex-wrap">
                         {/* Confidence */}
                         <div className="flex items-center gap-2">
-                          <span className="text-[11px] text-slate-500">置信度</span>
-                          <div className="h-1.5 w-24 overflow-hidden rounded-full bg-slate-800/70">
+                          <span className="text-[11px] text-neutral-500">置信度</span>
+                          <div className="h-1.5 w-24 overflow-hidden rounded-full bg-white">
                             <div
                               className={`h-full rounded-full bg-gradient-to-r ${confidenceTone}`}
                               style={{ width: `${ev.confidence * 100}%` }}
                             />
                           </div>
-                          <span className="text-[11px] font-mono text-slate-400">
+                          <span className="text-[11px] font-mono text-neutral-500">
                             {(ev.confidence * 100).toFixed(0)}%
                           </span>
                         </div>
 
                         {/* Weight */}
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[11px] text-slate-500">权重</span>
-                          <span className="text-[11px] font-mono text-indigo-300">
+                          <span className="text-[11px] text-neutral-500">权重</span>
+                          <span className="text-[11px] font-mono text-indigo-500">
                             {ev.weight.toFixed(2)}
                           </span>
                         </div>
@@ -1208,7 +1252,7 @@ export default function CitationsIntelligencePage() {
 
                       {/* Recommendation reason preview */}
                       {ev.recommendationReason && (
-                        <p className="mt-2 text-xs text-slate-500 line-clamp-1">
+                        <p className="mt-2 text-xs text-neutral-500 line-clamp-1">
                           💡 {ev.recommendationReason}
                         </p>
                       )}
@@ -1216,7 +1260,7 @@ export default function CitationsIntelligencePage() {
                       {/* Expandable */}
                       <button
                         onClick={() => toggleEvidenceExpand(ev.id)}
-                        className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-indigo-400 hover:text-indigo-300 transition"
+                        className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-indigo-400 hover:text-indigo-500 transition"
                       >
                         {isExpanded ? '收起详情' : '展开详情'}
                         {isExpanded ? (
@@ -1227,28 +1271,28 @@ export default function CitationsIntelligencePage() {
                       </button>
 
                       {isExpanded && (
-                        <div className="mt-3 rounded-lg border border-slate-800/60 bg-slate-800/30 p-3 space-y-2">
+                        <div className="mt-3 rounded-lg border border-neutral-200 bg-neutral-200/30 p-3 space-y-2">
                           {ev.answerText && (
                             <div>
-                              <span className="text-[11px] font-medium text-slate-400">
+                              <span className="text-[11px] font-medium text-neutral-500">
                                 回答内容
                               </span>
-                              <p className="mt-1 text-xs leading-relaxed text-slate-400">
+                              <p className="mt-1 text-xs leading-relaxed text-neutral-500">
                                 {ev.answerText}
                               </p>
                             </div>
                           )}
                           {ev.recommendationReason && (
                             <div>
-                              <span className="text-[11px] font-medium text-slate-400">
+                              <span className="text-[11px] font-medium text-neutral-500">
                                 推荐原因
                               </span>
-                              <p className="mt-1 text-xs leading-relaxed text-slate-400">
+                              <p className="mt-1 text-xs leading-relaxed text-neutral-500">
                                 {ev.recommendationReason}
                               </p>
                             </div>
                           )}
-                          <div className="flex gap-4 text-[11px] text-slate-500">
+                          <div className="flex gap-4 text-[11px] text-neutral-500">
                             <span>置信度: {(ev.confidence * 100).toFixed(1)}%</span>
                             <span>权重: {ev.weight.toFixed(3)}</span>
                             <span>
@@ -1270,7 +1314,7 @@ export default function CitationsIntelligencePage() {
                 <button
                   onClick={() => fetchEvidences(Math.max(1, pagination.page - 1))}
                   disabled={pagination.page <= 1}
-                  className="h-8 rounded-lg border border-slate-700/60 px-3 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition disabled:opacity-40"
+                  className="h-8 rounded-lg border border-neutral-300 px-3 text-xs text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200/40 transition disabled:opacity-40"
                 >
                   上一页
                 </button>
@@ -1283,13 +1327,13 @@ export default function CitationsIntelligencePage() {
                     const showEllipsis = idx > 0 && p - arr[idx - 1] > 1;
                     return (
                       <span key={p} className="flex items-center gap-1">
-                        {showEllipsis && <span className="text-slate-600 text-xs">...</span>}
+                        {showEllipsis && <span className="text-neutral-500 text-xs">...</span>}
                         <button
                           onClick={() => fetchEvidences(p)}
                           className={`h-8 min-w-[32px] rounded-lg px-2 text-xs font-medium transition ${
                             p === pagination.page
-                              ? 'bg-indigo-500/20 text-indigo-200 border border-indigo-500/40'
-                              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                              ? 'bg-indigo-500/20 text-indigo-600 border border-indigo-500/40'
+                              : 'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200/40'
                           }`}
                         >
                           {p}
@@ -1302,7 +1346,7 @@ export default function CitationsIntelligencePage() {
                     fetchEvidences(Math.min(pagination.totalPages, pagination.page + 1))
                   }
                   disabled={pagination.page >= pagination.totalPages}
-                  className="h-8 rounded-lg border border-slate-700/60 px-3 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition disabled:opacity-40"
+                  className="h-8 rounded-lg border border-neutral-300 px-3 text-xs text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200/40 transition disabled:opacity-40"
                 >
                   下一页
                 </button>
@@ -1315,7 +1359,7 @@ export default function CitationsIntelligencePage() {
       {/* Floating Analyze Button */}
       <button
         onClick={() => setShowAnalyzeModal(true)}
-        className="fixed bottom-8 right-8 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30 transition hover:scale-105 hover:shadow-indigo-500/50"
+        className="fixed bottom-8 right-8 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 transition hover:scale-105 hover:shadow-indigo-500/50"
         title="运行引用分析"
       >
         <Sparkles className="h-6 w-6" />

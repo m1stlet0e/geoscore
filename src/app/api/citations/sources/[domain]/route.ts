@@ -10,7 +10,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { domain: string } }
+  ctx: { params: Promise<{ domain: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -26,7 +26,7 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    const { domain } = params
+    const { domain } = await ctx.params
     const { searchParams } = new URL(request.url)
     const brandId = searchParams.get('brandId')
 

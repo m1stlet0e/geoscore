@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { chat } from '@/lib/deepseek';
+import { chat, chatCompletion } from '@/lib/deepseek';
 import { CONTENT_TYPES, PLAN_LIMITS } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
@@ -53,7 +53,7 @@ async function generateOne(
   hint: string
 ): Promise<{ title: string; body: string }> {
   const sys = TYPE_PROMPTS[type]?.(brand, hint) ?? `为 ${brand.name} 写一段简短介绍。`;
-  const body = await chat(
+  const body = await chatCompletion(
     [
       { role: 'system', content: sys },
       { role: 'user', content: hint.trim() || '请开始生成' },

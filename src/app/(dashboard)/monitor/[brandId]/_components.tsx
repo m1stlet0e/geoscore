@@ -60,12 +60,12 @@ export function PromptRow({
   };
 
   return (
-    <tr className="transition hover:bg-slate-900/30">
+    <tr className="transition hover:bg-neutral-100">
       <td className="px-2 py-3">
-        <p className="line-clamp-2 max-w-xl text-sm text-slate-200">{prompt.text}</p>
+        <p className="line-clamp-2 max-w-xl text-sm text-neutral-700">{prompt.text}</p>
       </td>
       <td className="px-2 py-3">
-        <span className="inline-flex items-center rounded-full border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] text-slate-300">
+        <span className="inline-flex items-center rounded-full border border-neutral-300 bg-neutral-100 px-2 py-0.5 text-[10px] text-neutral-300">
           {categoryLabel}
         </span>
       </td>
@@ -78,24 +78,24 @@ export function PromptRow({
             'inline-flex h-5 w-9 items-center gap-0.5 rounded-full border px-0.5 transition',
             active
               ? 'border-indigo-500/50 bg-indigo-500/30 justify-end'
-              : 'border-slate-700 bg-slate-800 justify-start'
+              : 'border-neutral-300 bg-neutral-200 justify-start'
           )}
         >
           <span
             className={cn(
               'h-3.5 w-3.5 rounded-full transition',
-              active ? 'bg-indigo-200' : 'bg-slate-400'
+              active ? 'bg-indigo-200' : 'bg-neutral-500'
             )}
           />
         </button>
       </td>
-      <td className="px-2 py-3 text-xs text-slate-400">{formatDate(prompt.createdAt)}</td>
+      <td className="px-2 py-3 text-xs text-neutral-500">{formatDate(prompt.createdAt)}</td>
       <td className="px-2 py-3 text-right">
         <button
           type="button"
           onClick={remove}
           disabled={busy}
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-slate-400 transition hover:bg-rose-500/10 hover:text-rose-200"
+          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-neutral-500 transition hover:bg-rose-50 hover:text-rose-600"
         >
           {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
         </button>
@@ -143,39 +143,39 @@ export function GeneratePromptsButton({ brandId }: { brandId: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-3 py-1.5 text-sm font-medium text-indigo-200 transition hover:bg-indigo-500/20"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-500/40 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-600 transition hover:bg-indigo-500/20"
       >
         <Sparkles className="h-3.5 w-3.5" /> AI 生成 Prompts
       </button>
 
       {open ? (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 p-4 backdrop-blur-sm"
           onClick={() => !busy && setOpen(false)}
         >
           <div
-            className="w-full max-w-md overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl"
+            className="w-full max-w-md overflow-hidden rounded-2xl border border-neutral-300 bg-neutral-50 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-slate-800 px-5 py-4">
+            <div className="flex items-center justify-between border-b border-neutral-300 px-5 py-4">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-300">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-500">
                   <Sparkles className="h-4 w-4" />
                 </div>
-                <h3 className="text-base font-semibold text-slate-100">AI 生成 Prompts</h3>
+                <h3 className="text-base font-semibold text-neutral-800">AI 生成 Prompts</h3>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 disabled={busy}
-                className="rounded-md p-1 text-slate-400 transition hover:bg-slate-800"
+                className="rounded-md p-1 text-neutral-500 transition hover:bg-neutral-200"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
             <form onSubmit={submit} className="space-y-4 p-5">
               <div>
-                <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-slate-400">
+                <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-neutral-500">
                   生成数量
                 </label>
                 <input
@@ -184,14 +184,14 @@ export function GeneratePromptsButton({ brandId }: { brandId: string }) {
                   max={100}
                   value={count}
                   onChange={(e) => setCount(Math.max(1, Math.min(100, Number(e.target.value) || 1)))}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-800 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
-                <p className="mt-1.5 text-xs text-slate-500">
+                <p className="mt-1.5 text-xs text-neutral-500">
                   GeoScore 将基于品牌信息、竞品、分类,自动生成最可能被问到的 {count} 个问题。
                 </p>
               </div>
               {error ? (
-                <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
+                <p className="rounded-lg border border-rose-500/30 bg-rose-50 px-3 py-2 text-sm text-rose-600">
                   {error}
                 </p>
               ) : null}
@@ -200,14 +200,14 @@ export function GeneratePromptsButton({ brandId }: { brandId: string }) {
                   type="button"
                   onClick={() => setOpen(false)}
                   disabled={busy}
-                  className="rounded-lg border border-slate-700 bg-slate-900/60 px-3.5 py-2 text-sm font-medium text-slate-300 transition hover:border-slate-600"
+                  className="rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 py-2 text-sm font-medium text-neutral-300 transition hover:border-neutral-400"
                 >
                   取消
                 </button>
                 <button
                   type="submit"
                   disabled={busy}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400 disabled:opacity-60"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400 disabled:opacity-60"
                 >
                   {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                   生成
@@ -260,7 +260,7 @@ export function ScanNowButton({ brandId }: { brandId: string }) {
         type="button"
         onClick={run}
         disabled={busy}
-        className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-3.5 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400 disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500 px-3.5 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400 disabled:opacity-60"
       >
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
         立即扫描
@@ -292,10 +292,10 @@ type ScanLite = {
 };
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
-  queued: { label: '排队中', cls: 'border-slate-500/30 bg-slate-500/10 text-slate-300' },
-  running: { label: '运行中', cls: 'border-indigo-500/30 bg-indigo-500/10 text-indigo-200' },
-  completed: { label: '已完成', cls: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200' },
-  failed: { label: '失败', cls: 'border-rose-500/30 bg-rose-500/10 text-rose-200' },
+  queued: { label: '排队中', cls: 'border-neutral-300 bg-neutral-100 text-neutral-300' },
+  running: { label: '运行中', cls: 'border-indigo-500/30 bg-indigo-50 text-indigo-600' },
+  completed: { label: '已完成', cls: 'border-emerald-500/30 bg-emerald-50 text-emerald-600' },
+  failed: { label: '失败', cls: 'border-rose-500/30 bg-rose-50 text-rose-600' },
 };
 
 function relativeTime(d: Date | string): string {
@@ -323,7 +323,7 @@ export function ScanHistoryClient({ scans }: { scans: ScanLite[] }) {
         return (
           <li
             key={s.id}
-            className="overflow-hidden rounded-xl border border-slate-800/70 bg-slate-900/40 transition hover:border-slate-700"
+            className="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100 transition hover:border-neutral-300"
           >
             <button
               type="button"
@@ -332,8 +332,8 @@ export function ScanHistoryClient({ scans }: { scans: ScanLite[] }) {
             >
               <ChevronRight
                 className={cn(
-                  'h-4 w-4 shrink-0 text-slate-500 transition',
-                  isOpen && 'rotate-90 text-indigo-300'
+                  'h-4 w-4 shrink-0 text-neutral-500 transition',
+                  isOpen && 'rotate-90 text-indigo-500'
                 )}
               />
               <div className="min-w-0 flex-1">
@@ -346,11 +346,11 @@ export function ScanHistoryClient({ scans }: { scans: ScanLite[] }) {
                   >
                     {meta.label}
                   </span>
-                  <span className="text-xs text-slate-300">
+                  <span className="text-xs text-neutral-300">
                     {s.completedPrompts} / {s.totalPrompts} 完成 ({progress}%)
                   </span>
-                  <span className="text-xs text-slate-500">·</span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-neutral-500">·</span>
+                  <span className="text-xs text-neutral-500">
                     {relativeTime(new Date(s.startedAt))}
                   </span>
                 </div>
@@ -360,7 +360,7 @@ export function ScanHistoryClient({ scans }: { scans: ScanLite[] }) {
                     return (
                       <span
                         key={pid}
-                        className="inline-flex items-center rounded border border-slate-700/60 bg-slate-800/60 px-1.5 py-0.5 text-[10px] text-slate-300"
+                        className="inline-flex items-center rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-300"
                         style={{ borderColor: `${pm.color}40` }}
                       >
                         {pm.name}
@@ -371,9 +371,9 @@ export function ScanHistoryClient({ scans }: { scans: ScanLite[] }) {
               </div>
             </button>
             {isOpen ? (
-              <div className="border-t border-slate-800/60 bg-slate-950/40 px-4 py-3">
+              <div className="border-t border-neutral-200 bg-white/40 px-4 py-3">
                 {s.promptScans.length === 0 ? (
-                  <p className="text-xs text-slate-500">该次扫描还没有 Prompt 结果。</p>
+                  <p className="text-xs text-neutral-500">该次扫描还没有 Prompt 结果。</p>
                 ) : (
                   <ul className="space-y-1.5">
                     {s.promptScans.map((ps) => {
@@ -381,10 +381,10 @@ export function ScanHistoryClient({ scans }: { scans: ScanLite[] }) {
                       return (
                         <li
                           key={ps.id}
-                          className="flex items-start gap-2 rounded-lg border border-slate-800/40 bg-slate-900/30 px-3 py-2 text-xs"
+                          className="flex items-start gap-2 rounded-lg border border-neutral-300/40 bg-neutral-100 px-3 py-2 text-xs"
                         >
                           <span
-                            className="mt-0.5 inline-flex shrink-0 items-center rounded border border-slate-700/60 bg-slate-800/60 px-1.5 py-0.5 text-[10px] text-slate-300"
+                            className="mt-0.5 inline-flex shrink-0 items-center rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-300"
                             style={{ borderColor: `${pm.color}40` }}
                           >
                             {pm.name}
@@ -392,18 +392,18 @@ export function ScanHistoryClient({ scans }: { scans: ScanLite[] }) {
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
                               {ps.brandMentioned ? (
-                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] text-emerald-200">
+                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] text-emerald-600">
                                   <Check className="h-2.5 w-2.5" /> 提及
                                   {ps.brandRank ? ` #${ps.brandRank}` : ''}
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center rounded-full bg-slate-700/40 px-1.5 py-0.5 text-[10px] text-slate-400">
+                                <span className="inline-flex items-center rounded-full bg-neutral-300/40 px-1.5 py-0.5 text-[10px] text-neutral-500">
                                   未提及
                                 </span>
                               )}
                             </div>
                             {ps.responseText ? (
-                              <p className="mt-1 line-clamp-2 text-slate-400">
+                              <p className="mt-1 line-clamp-2 text-neutral-500">
                                 {ps.responseText.slice(0, 200)}
                                 {ps.responseText.length > 200 ? '…' : ''}
                               </p>

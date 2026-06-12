@@ -15,6 +15,7 @@ import {
   Globe,
   Play,
   Hash,
+  History,
 } from 'lucide-react';
 import { PromptRow, GeneratePromptsButton, ScanNowButton, ScanHistoryClient } from './_components';
 
@@ -84,7 +85,7 @@ export default async function BrandDetailPage({
         eyebrow={
           <Link
             href="/monitor"
-            className="inline-flex items-center gap-1 text-indigo-300 hover:text-indigo-200"
+            className="inline-flex items-center gap-1 text-indigo-500 hover:text-indigo-600"
           >
             <ArrowLeft className="h-3 w-3" /> 返回监控中心
           </Link>
@@ -96,19 +97,19 @@ export default async function BrandDetailPage({
         }
       />
 
-      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+      <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-500">
         {brand.domain ? (
-          <span className="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900/40 px-2.5 py-1">
+          <span className="inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-neutral-100 px-2.5 py-1">
             <Globe className="h-3 w-3" /> {brand.domain}
           </span>
         ) : null}
         {brand.category ? (
-          <span className="inline-flex items-center gap-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-1 text-indigo-200">
+          <span className="inline-flex items-center gap-1 rounded-full border border-indigo-500/30 bg-indigo-50 px-2.5 py-1 text-indigo-600">
             <Hash className="h-3 w-3" /> {brand.category}
           </span>
         ) : null}
         {Array.isArray(brand.competitors) && brand.competitors.length > 0 ? (
-          <span className="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900/40 px-2.5 py-1">
+          <span className="inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-neutral-100 px-2.5 py-1">
             {brand.competitors.length} 个竞品
           </span>
         ) : null}
@@ -144,11 +145,11 @@ export default async function BrandDetailPage({
       </section>
 
       {/* Prompts management */}
-      <section className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5">
+      <section className="rounded-2xl border border-neutral-200 bg-white p-5">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold text-slate-100">Prompts 管理</h2>
-            <p className="mt-0.5 text-xs text-slate-400">追踪 AI 在回答哪些问题时提及你的品牌</p>
+            <h2 className="text-base font-semibold text-neutral-800">Prompts 管理</h2>
+            <p className="mt-0.5 text-xs text-neutral-500">追踪 AI 在回答哪些问题时提及你的品牌</p>
           </div>
           <GeneratePromptsButton brandId={brand.id} />
         </div>
@@ -163,7 +164,7 @@ export default async function BrandDetailPage({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-800/60 text-xs uppercase tracking-wider text-slate-500">
+                <tr className="border-b border-neutral-200 text-xs uppercase tracking-wider text-neutral-500">
                   <th className="px-2 py-2 font-medium">Prompt 文本</th>
                   <th className="px-2 py-2 font-medium">分类</th>
                   <th className="px-2 py-2 font-medium">状态</th>
@@ -171,7 +172,7 @@ export default async function BrandDetailPage({
                   <th className="px-2 py-2 font-medium text-right">操作</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/40">
+              <tbody className="divide-y divide-neutral-200/40">
                 {prompts.map((p) => (
                   <PromptRow
                     key={p.id}
@@ -192,13 +193,13 @@ export default async function BrandDetailPage({
       </section>
 
       {/* Scan history */}
-      <section className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5">
+      <section className="rounded-2xl border border-neutral-200 bg-white p-5">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold text-slate-100">扫描历史</h2>
-            <p className="mt-0.5 text-xs text-slate-400">点击展开查看每次扫描的 Prompt 结果</p>
+            <h2 className="text-base font-semibold text-neutral-800">扫描历史</h2>
+            <p className="mt-0.5 text-xs text-neutral-500">点击展开查看每次扫描的 Prompt 结果</p>
           </div>
-          <span className="text-xs text-slate-500">共 {scanRuns.length} 次</span>
+          <span className="text-xs text-neutral-500">共 {scanRuns.length} 次</span>
         </div>
 
         {scanRuns.length === 0 ? (

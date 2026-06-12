@@ -8,7 +8,7 @@ export function CitationReasonChart({ data }: { data: ReasonPoint[] }) {
   const total = data.reduce((s, d) => s + d.value, 0);
   if (total === 0) {
     return (
-      <div className="flex h-[280px] items-center justify-center text-sm text-slate-500">
+      <div className="flex h-[280px] items-center justify-center text-sm text-neutral-500">
         暂无数据
       </div>
     );

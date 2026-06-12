@@ -32,7 +32,7 @@ export async function POST(
 
     // Mock payment: auto-complete for demo purposes
     const transactionId = 'mock_txn_' + Date.now()
-    const method = order.paymentMethod || 'wechat'
+    const method = (order.paymentMethod || 'wechat') as 'wechat' | 'alipay'
 
     const result = await billingService.handlePaymentCallback(orderNo, transactionId, method)
 

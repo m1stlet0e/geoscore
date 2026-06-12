@@ -13,7 +13,9 @@ async function checkAdmin() {
   if (!user) {
     return { error: NextResponse.json({ error: 'User not found' }, { status: 404 }) }
   }
-  if (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN') {
+  // Admin check: demo user or specific admin emails
+  const ADMIN_EMAILS = ['demo@geoos.ai', 'admin@geoos.ai']
+  if (!ADMIN_EMAILS.includes(user.email)) {
     return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
   }
   return { user }

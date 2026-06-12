@@ -100,15 +100,15 @@ export default async function InfluencePage() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Main graph */}
-        <div className="overflow-hidden rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5 lg:col-span-2">
+        <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white p-5 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-base font-semibold text-slate-100">知识图谱</h2>
-              <p className="mt-0.5 text-xs text-slate-400">
+              <h2 className="text-base font-semibold text-neutral-800">知识图谱</h2>
+              <p className="mt-0.5 text-xs text-neutral-500">
                 节点大小 = 权重 · 颜色 = 类型 · 边粗细 = 关联强度
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-400">
+            <div className="flex flex-wrap items-center gap-2 text-[10px] text-neutral-500">
               {Object.entries(TYPE_COLOR).map(([type, color]) => (
                 <span key={type} className="inline-flex items-center gap-1">
                   <span
@@ -141,12 +141,12 @@ export default async function InfluencePage() {
         </div>
 
         {/* Top competitors side panel */}
-        <div className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5">
-          <h2 className="text-base font-semibold text-slate-100">最邻近竞品</h2>
-          <p className="mt-0.5 text-xs text-slate-400">按与你品牌的关联强度排序</p>
+        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+          <h2 className="text-base font-semibold text-neutral-800">最邻近竞品</h2>
+          <p className="mt-0.5 text-xs text-neutral-500">按与你品牌的关联强度排序</p>
           {topCompetitors.length === 0 ? (
-            <div className="mt-6 flex flex-col items-center text-center text-sm text-slate-500">
-              <NetworkIcon className="mb-2 h-6 w-6 text-slate-600" />
+            <div className="mt-6 flex flex-col items-center text-center text-sm text-neutral-500">
+              <NetworkIcon className="mb-2 h-6 w-6 text-neutral-500" />
               暂无竞品关系数据
             </div>
           ) : (
@@ -154,7 +154,7 @@ export default async function InfluencePage() {
               {topCompetitors.map((c, i) => (
                 <li
                   key={c.node.id}
-                  className="group relative overflow-hidden rounded-xl border border-slate-800/70 bg-slate-900/40 p-3 transition hover:border-slate-700"
+                  className="group relative overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100 p-3 transition hover:border-neutral-300"
                 >
                   <div className="flex items-start gap-3">
                     <div
@@ -167,13 +167,13 @@ export default async function InfluencePage() {
                       #{i + 1}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-slate-100">
+                      <p className="truncate text-sm font-semibold text-neutral-800">
                         {c.node.label}
                       </p>
-                      <p className="mt-0.5 text-[11px] text-slate-500">
+                      <p className="mt-0.5 text-[11px] text-neutral-500">
                         {TYPE_LABEL[c.node.type] ?? c.node.type} · 权重 {c.weight.toFixed(2)}
                       </p>
-                      <div className="mt-2 h-1 overflow-hidden rounded-full bg-slate-800/70">
+                      <div className="mt-2 h-1 overflow-hidden rounded-full bg-white">
                         <div
                           className="h-full rounded-full"
                           style={{
@@ -192,63 +192,63 @@ export default async function InfluencePage() {
       </div>
 
       {/* Competitor comparison matrix */}
-      <section className="rounded-2xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-5">
+      <section className="rounded-2xl border border-neutral-200 bg-white p-5">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold text-slate-100">竞品对比矩阵</h2>
-            <p className="mt-0.5 text-xs text-slate-400">知识图谱中与你关系最强的竞品</p>
+            <h2 className="text-base font-semibold text-neutral-800">竞品对比矩阵</h2>
+            <p className="mt-0.5 text-xs text-neutral-500">知识图谱中与你关系最强的竞品</p>
           </div>
         </div>
         {matrix.length === 0 ? (
-          <div className="py-10 text-center text-sm text-slate-500">暂无对比数据</div>
+          <div className="py-10 text-center text-sm text-neutral-500">暂无对比数据</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-800/60 text-xs uppercase tracking-wider text-slate-500">
+                <tr className="border-b border-neutral-200 text-xs uppercase tracking-wider text-neutral-500">
                   <th className="px-2 py-2 font-medium">竞品</th>
                   <th className="px-2 py-2 font-medium">类型</th>
                   <th className="px-2 py-2 font-medium">关联强度</th>
                   <th className="px-2 py-2 font-medium">关系类型</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/40">
+              <tbody className="divide-y divide-neutral-200/40">
                 {matrix.map((m) => (
-                  <tr key={m.competitor.id} className="transition hover:bg-slate-900/30">
+                  <tr key={m.competitor.id} className="transition hover:bg-neutral-100">
                     <td className="px-2 py-3">
                       <div className="flex items-center gap-2">
                         <span
                           className="h-2 w-2 rounded-full"
                           style={{ background: TYPE_COLOR[m.competitor.type] ?? '#6366f1' }}
                         />
-                        <span className="font-medium text-slate-100">{m.competitor.label}</span>
+                        <span className="font-medium text-neutral-800">{m.competitor.label}</span>
                       </div>
                     </td>
                     <td className="px-2 py-3">
-                      <span className="inline-flex items-center rounded-full border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] text-slate-300">
+                      <span className="inline-flex items-center rounded-full border border-neutral-300 bg-neutral-100 px-2 py-0.5 text-[10px] text-neutral-300">
                         {TYPE_LABEL[m.competitor.type] ?? m.competitor.type}
                       </span>
                     </td>
                     <td className="px-2 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="h-1.5 w-24 overflow-hidden rounded-full bg-slate-800/70">
+                        <div className="h-1.5 w-24 overflow-hidden rounded-full bg-white">
                           <div
-                            className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500"
+                            className="h-full rounded-full bg-indigo-500"
                             style={{ width: `${Math.min(100, m.weight * 100)}%` }}
                           />
                         </div>
-                        <span className="text-xs tabular-nums text-slate-300">
+                        <span className="text-xs tabular-nums text-neutral-300">
                           {m.weight.toFixed(2)}
                         </span>
                       </div>
                     </td>
                     <td className="px-2 py-3">
                       {m.edgeType ? (
-                        <span className="inline-flex items-center gap-1 text-xs text-slate-400">
+                        <span className="inline-flex items-center gap-1 text-xs text-neutral-500">
                           <Hash className="h-3 w-3" /> {m.edgeType}
                         </span>
                       ) : (
-                        <span className="text-xs text-slate-500">无关联</span>
+                        <span className="text-xs text-neutral-500">无关联</span>
                       )}
                     </td>
                   </tr>

@@ -176,21 +176,21 @@ export function InfluenceGraph({ nodes, edges }: { nodes: Node[]; edges: Edge[] 
       {/* Hover tooltip */}
       {hoveredNode ? (
         <div
-          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg border border-slate-700 bg-slate-900/95 px-3 py-2 text-xs shadow-2xl backdrop-blur"
+          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg border border-neutral-300 bg-neutral-50/95 px-3 py-2 text-xs shadow-2xl backdrop-blur"
           style={{
             left: `${(hoveredNode.x / size.w) * 100}%`,
             top: `${(hoveredNode.y / size.h) * 100}%`,
           }}
         >
-          <p className="font-semibold text-slate-100">{hoveredNode.label}</p>
-          <p className="mt-0.5 text-slate-400">
+          <p className="font-semibold text-neutral-800">{hoveredNode.label}</p>
+          <p className="mt-0.5 text-neutral-500">
             类型: {hoveredNode.type} · 权重: {hoveredNode.weight.toFixed(2)}
           </p>
         </div>
       ) : null}
 
       {/* Legend overlay (bottom-right) */}
-      <div className="pointer-events-none absolute bottom-2 right-2 rounded-md border border-slate-800/60 bg-slate-900/60 px-2 py-1 text-[10px] text-slate-500 backdrop-blur">
+      <div className="pointer-events-none absolute bottom-2 right-2 rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1 text-[10px] text-neutral-500 backdrop-blur">
         悬停查看详情
       </div>
     </div>

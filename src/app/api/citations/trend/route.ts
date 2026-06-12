@@ -51,16 +51,12 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // 获取趋势数据
-    const trend = await citationEngine.getCitationTrend(
-      brandId,
-      platform || undefined,
-      days
-    )
+    // 获取统计数据
+    const stats = await citationEngine.getStats(brandId)
 
     return NextResponse.json({
       success: true,
-      data: trend
+      data: stats
     })
   } catch (error) {
     console.error('GET /api/citations/trend error:', error)

@@ -45,10 +45,10 @@ export const PUBLISH_CHANNELS = [
 ] as const;
 
 export const PLAN_LIMITS = {
-  FREE: { keywords: 5, prompts: 50, scansPerDay: 1, contentPieces: 0, seats: 1, price: 0 },
-  PRO: { keywords: 100, prompts: 5000, scansPerDay: 10, contentPieces: 20, seats: 1, price: 99 },
-  GROWTH: { keywords: 500, prompts: 50000, scansPerDay: 50, contentPieces: 200, seats: 3, price: 299 },
-  ENTERPRISE: { keywords: -1, prompts: -1, scansPerDay: -1, contentPieces: -1, seats: -1, price: 999 },
+  FREE: { keywords: 5, prompts: 50, scansPerDay: 1, contentPieces: 0, seats: 1, price: 0, brands: 1 },
+  PRO: { keywords: 100, prompts: 5000, scansPerDay: 10, contentPieces: 20, seats: 1, price: 99, brands: 5 },
+  GROWTH: { keywords: 500, prompts: 50000, scansPerDay: 50, contentPieces: 200, seats: 3, price: 299, brands: 20 },
+  ENTERPRISE: { keywords: -1, prompts: -1, scansPerDay: -1, contentPieces: -1, seats: -1, price: 999, brands: -1 },
 } as const;
 
 export function getPlatformMeta(id: string) {
