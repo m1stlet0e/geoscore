@@ -52,10 +52,10 @@ type SidebarProps = {
 };
 
 const planStyles: Record<Plan, { ring: string; text: string; bg: string; label: string }> = {
-  FREE:       { ring: 'ring-neutral-300',     text: 'text-neutral-300',     bg: 'bg-slate-900/40',     label: 'FREE' },
-  PRO:        { ring: 'ring-indigo-500/40',    text: 'text-indigo-200',    bg: 'bg-indigo-400/10',    label: 'PRO' },
-  GROWTH:     { ring: 'ring-violet-500/40',    text: 'text-violet-200',    bg: 'bg-violet-500/10',    label: 'GROWTH' },
-  ENTERPRISE: { ring: 'ring-amber-400/40',     text: 'text-amber-200',     bg: 'bg-amber-500/10',     label: 'ENTERPRISE' },
+  FREE:       { ring: 'ring-neutral-700',     text: 'text-neutral-300',     bg: 'bg-neutral-800/50',     label: 'FREE' },
+  PRO:        { ring: 'ring-indigo-500/30',    text: 'text-indigo-300',    bg: 'bg-indigo-500/10',    label: 'PRO' },
+  GROWTH:     { ring: 'ring-violet-500/30',    text: 'text-violet-300',    bg: 'bg-violet-500/10',    label: 'GROWTH' },
+  ENTERPRISE: { ring: 'ring-amber-400/30',     text: 'text-amber-300',     bg: 'bg-amber-500/10',     label: 'ENTERPRISE' },
 };
 
 export function Sidebar({ plan = 'FREE', userEmail, userName }: SidebarProps) {
@@ -64,14 +64,14 @@ export function Sidebar({ plan = 'FREE', userEmail, userName }: SidebarProps) {
 
   return (
     <aside
-      className="fixed inset-y-0 left-0 z-40 hidden w-[240px] flex-col border-r border-neutral-800 bg-neutral-950 md:flex"
+      className="sidebar-dark fixed inset-y-0 left-0 z-40 hidden w-[260px] flex-col md:flex"
       aria-label="主导航"
     >
       {/* Brand */}
-      <div className="flex h-16 items-center justify-between border-b border-neutral-800 px-4">
-        <Link href="/dashboard" className="group flex items-center gap-2.5">
+      <div className="flex h-16 items-center justify-between border-b border-neutral-800 px-5">
+        <Link href="/dashboard" className="group flex items-center gap-2.5 transition-transform hover:scale-[1.02]">
           <Logo size="sm" />
-          <span className="inline-flex items-center rounded-md border border-indigo-500/30 bg-indigo-400/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-indigo-200">
+          <span className="inline-flex items-center rounded-md border border-indigo-500/30 bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-indigo-300">
             AI
           </span>
         </Link>
@@ -79,44 +79,44 @@ export function Sidebar({ plan = 'FREE', userEmail, userName }: SidebarProps) {
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-3 py-4">
-        <div className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+        <div className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
           工作台
         </div>
-        <ul className="space-y-0.5">
-          {NAV_ITEMS.map((item) => {
+        <ul className="space-y-1">
+          {NAV_ITEMS.map((item, index) => {
             const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
             const Icon = item.icon;
             return (
-              <li key={item.href}>
+              <li key={item.href} style={{ animationDelay: `${index * 30}ms` }}>
                 <Link
                   href={item.href}
                   className={cn(
-                    'group relative flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm transition',
+                    'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200',
                     isActive
-                      ? 'bg-indigo-400/15 text-slate-50'
-                      : 'text-slate-500 hover:bg-slate-900/60 hover:text-slate-100'
+                      ? 'bg-indigo-500/10 text-white'
+                      : 'text-neutral-400 hover:bg-white/5 hover:text-neutral-200'
                   )}
                 >
-                  {isActive ? (
-                    <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-indigo-400" />
-                  ) : null}
+                  {isActive && (
+                    <span className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-indigo-500 transition-all" />
+                  )}
                   <Icon
                     className={cn(
-                      'h-4 w-4 shrink-0 transition',
-                      isActive ? 'text-indigo-300' : 'text-slate-500 group-hover:text-neutral-100'
+                      'h-4 w-4 shrink-0 transition-colors',
+                      isActive ? 'text-indigo-400' : 'text-neutral-500 group-hover:text-neutral-300'
                     )}
                   />
                   <span className="flex-1 truncate">{item.label}</span>
-                  {item.hint ? (
+                  {item.hint && (
                     <span
                       className={cn(
-                        'hidden text-[10px] text-slate-500 lg:inline',
-                        isActive && 'text-indigo-300/80'
+                        'hidden text-[10px] text-neutral-600 transition-colors lg:inline',
+                        isActive && 'text-indigo-400/60'
                       )}
                     >
                       {item.hint}
                     </span>
-                  ) : null}
+                  )}
                 </Link>
               </li>
             );
@@ -125,32 +125,37 @@ export function Sidebar({ plan = 'FREE', userEmail, userName }: SidebarProps) {
       </nav>
 
       {/* Footer — plan + user + sign out */}
-      <div className="border-t border-neutral-800 p-3">
-        <div className={cn('mb-3 flex items-center justify-between rounded-lg border border-slate-800/60 bg-slate-900/60 px-2.5 py-2', planStyle.ring)}>
-          <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-wider text-slate-500">当前计划</div>
-            <div className={cn('mt-0.5 text-sm font-semibold', planStyle.text)}>{planStyle.label}</div>
+      <div className="border-t border-neutral-800 p-4 space-y-3">
+        {/* Plan badge */}
+        <div className={cn('rounded-lg border border-neutral-800 bg-neutral-900/50 p-3', planStyle.ring)}>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-neutral-500">当前计划</div>
+              <div className={cn('mt-0.5 text-sm font-semibold', planStyle.text)}>{planStyle.label}</div>
+            </div>
+            {plan === 'FREE' && (
+              <Link
+                href="/pricing"
+                className="rounded-md bg-indigo-500/10 border border-indigo-500/30 px-2.5 py-1 text-[11px] font-medium text-indigo-300 transition-all hover:bg-indigo-500/20 hover:border-indigo-500/50"
+              >
+                升级
+              </Link>
+            )}
           </div>
-          {plan === 'FREE' ? (
-            <Link
-              href="/pricing"
-              className="rounded-md border border-indigo-500/30 bg-indigo-400/10 px-2 py-1 text-[11px] font-medium text-indigo-200 transition hover:bg-indigo-400/20"
-            >
-              升级
-            </Link>
-          ) : null}
         </div>
 
+        {/* User info */}
         {userEmail || userName ? (
-          <div className="mb-2 truncate rounded-lg bg-slate-900/40 px-2.5 py-2 text-xs">
-            <div className="truncate font-medium text-neutral-200">{userName ?? '已登录'}</div>
-            <div className="truncate text-slate-500">{userEmail}</div>
+          <div className="rounded-lg bg-neutral-900/30 p-3">
+            <div className="truncate text-sm font-medium text-neutral-200">{userName ?? '已登录'}</div>
+            <div className="truncate text-xs text-neutral-500 mt-0.5">{userEmail}</div>
           </div>
         ) : null}
 
+        {/* Sign out */}
         <button
           onClick={() => signOut({ callbackUrl: '/' })}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-800/60 bg-slate-900/60 px-3 py-2 text-xs font-medium text-slate-500 transition hover:border-slate-800/60 hover:bg-slate-900/60 hover:text-slate-100"
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-800 bg-neutral-900/50 px-3 py-2.5 text-xs font-medium text-neutral-400 transition-all hover:bg-neutral-800 hover:text-neutral-200 hover:border-neutral-700"
         >
           <LogOut className="h-3.5 w-3.5" />
           退出登录

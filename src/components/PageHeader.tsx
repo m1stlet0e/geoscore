@@ -1,34 +1,43 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { FadeIn } from '@/components/animations';
 
 type PageHeaderProps = {
+  eyebrow?: ReactNode;
   title: string;
   subtitle?: string;
-  eyebrow?: ReactNode;
   actions?: ReactNode;
-  children?: ReactNode;
   className?: string;
 };
 
-export function PageHeader({ title, subtitle, eyebrow, actions, children, className }: PageHeaderProps) {
+export function PageHeader({ eyebrow, title, subtitle, actions, className }: PageHeaderProps) {
   return (
-    <header className={cn('flex flex-col gap-4 border-b border-neutral-200 pb-6 sm:flex-row sm:items-end sm:justify-between', className)}>
-      <div className="min-w-0">
-        {eyebrow ? (
-          <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-50 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider text-indigo-600">
-            {eyebrow}
+    <div className={cn('flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between', className)}>
+      <FadeIn direction="left" delay={0}>
+        <div>
+          {eyebrow && (
+            <span className="inline-block rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-indigo-600 mb-2">
+              {eyebrow}
+            </span>
+          )}
+          <h1 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="mt-2 text-sm text-neutral-500 max-w-2xl">
+              {subtitle}
+            </p>
+          )}
+        </div>
+      </FadeIn>
+      {actions && (
+        <FadeIn direction="right" delay={100}>
+          <div className="flex items-center gap-3">
+            {actions}
           </div>
-        ) : null}
-        <h1 className="truncate text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl">
-          {title}
-        </h1>
-        {subtitle ? (
-          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-neutral-500">{subtitle}</p>
-        ) : null}
-        {children ? <div className="mt-4">{children}</div> : null}
-      </div>
-      {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
-    </header>
+        </FadeIn>
+      )}
+    </div>
   );
 }
 

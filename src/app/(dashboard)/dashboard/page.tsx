@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { PageHeader } from '@/components/PageHeader';
 import { StatCard } from '@/components/StatCard';
-import { EmptyState } from '@/components/EmptyState';
 import { prisma } from '@/lib/prisma';
 import { AI_PLATFORMS, getPlatformMeta } from '@/lib/constants';
 import { cn, formatNumber, formatDate, pct } from '@/lib/utils';
@@ -20,6 +19,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { CitationTrendChart, PlatformDistributionChart } from './_charts';
+import { FadeIn, StaggerChildren, AnimatedNumber } from '@/components/animations';
 
 export const dynamic = 'force-dynamic';
 
@@ -95,13 +95,11 @@ export default async function DashboardPage() {
       take: 5,
       include: { brand: { select: { name: true } } },
     }),
-    // citation trend by day — fetch last 30d then bucket in JS to keep it simple
     prisma.citation.findMany({
       where: { userId, createdAt: { gte: thirtyDaysAgo } },
       select: { createdAt: true, platform: true },
       orderBy: { createdAt: 'asc' },
     }),
-    // platform distribution for pie chart (from prompt scans)
     prisma.promptScan.groupBy({
       by: ['platform'],
       where: {
@@ -136,7 +134,7 @@ export default async function DashboardPage() {
     };
   });
 
-  // Citation rate (30d): % of prompt scans where brandMentioned=true
+  // Citation rate (30d)
   const [mentioned, total] = await Promise.all([
     prisma.promptScan.count({
       where: {
@@ -153,200 +151,271 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        eyebrow="DASHBOARD"
-        title={`欢迎回来,${userName}`}
-        subtitle="这是你品牌的 AI 可见性总览。开始添加品牌、配置 prompt,让 AI 主动提起你。"
-        actions={
-          <>
-            <Link
-              href="/monitor"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 py-2 text-sm font-medium text-neutral-700 transition hover:border-neutral-400 hover:bg-neutral-50"
-            >
-              <Activity className="h-4 w-4 text-indigo-500" /> 查看监控
-            </Link>
-            <Link
-              href="/alerts"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500 px-3.5 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400"
-            >
-              <Sparkles className="h-4 w-4" /> 智能预警
-            </Link>
-          </>
-        }
-      />
+      {/* Header with entrance animation */}
+      <FadeIn direction="down" duration={600}>
+        <PageHeader
+          eyebrow="DASHBOARD"
+          title={`欢迎回来,${userName}`}
+          subtitle="这是你品牌的 AI 可见性总览。开始添加品牌、配置 prompt,让 AI 主动提起你。"
+          actions={
+            <>
+              <Link
+                href="/monitor"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 transition-all hover:border-neutral-400 hover:shadow-md hover:-translate-y-0.5"
+              >
+                <Activity className="h-4 w-4 text-indigo-500" /> 查看监控
+              </Link>
+              <Link
+                href="/alerts"
+                className="btn-primary inline-flex items-center gap-1.5 rounded-lg bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20"
+              >
+                <Sparkles className="h-4 w-4" /> 智能预警
+              </Link>
+            </>
+          }
+        />
+      </FadeIn>
 
-      {/* Stat cards row */}
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label="总品牌数"
-          value={brandCount}
-          icon={<Eye className="h-4 w-4" />}
-          subline={brandCount > 0 ? '监控中' : '前往监控中心添加'}
-        />
-        <StatCard
-          label="本月扫描"
-          value={scanLast30}
-          icon={<Radar className="h-4 w-4" />}
-          subline="近 30 天"
-        />
-        <StatCard
-          label="引用率"
-          value={`${citationRate}%`}
-          icon={<TrendingUp className="h-4 w-4" />}
-          tone={citationRate >= 30 ? 'positive' : citationRate >= 10 ? 'default' : 'warning'}
-          subline={`${mentioned} / ${total} 次提及`}
-        />
-        <StatCard
-          label="待处理警报"
-          value={unreadAlertsCount}
-          icon={<AlertCircle className="h-4 w-4" />}
-          tone={unreadAlertsCount > 0 ? 'warning' : 'positive'}
-          subline={unreadAlertsCount > 0 ? '需要关注' : '一切平稳'}
-        />
+      {/* Stat cards with stagger animation */}
+      <StaggerChildren staggerDelay={80}>
+        <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <FadeIn delay={0}>
+            <div className="surface-raised p-6 hover-lift">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-neutral-500">总品牌数</span>
+                <div className="p-2 bg-indigo-50 rounded-lg">
+                  <Eye className="h-4 w-4 text-indigo-600" />
+                </div>
+              </div>
+              <div className="metric-value text-3xl text-neutral-900">
+                <AnimatedNumber value={brandCount} duration={800} />
+              </div>
+              <p className="mt-2 text-sm text-neutral-500">
+                {brandCount > 0 ? '监控中' : '前往监控中心添加'}
+              </p>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={80}>
+            <div className="surface-raised p-6 hover-lift">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-neutral-500">本月扫描</span>
+                <div className="p-2 bg-violet-50 rounded-lg">
+                  <Radar className="h-4 w-4 text-violet-600" />
+                </div>
+              </div>
+              <div className="metric-value text-3xl text-neutral-900">
+                <AnimatedNumber value={scanLast30} duration={800} />
+              </div>
+              <p className="mt-2 text-sm text-neutral-500">近 30 天</p>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={160}>
+            <div className="surface-raised p-6 hover-lift">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-neutral-500">引用率</span>
+                <div className={cn(
+                  'p-2 rounded-lg',
+                  citationRate >= 30 ? 'bg-emerald-50' : citationRate >= 10 ? 'bg-amber-50' : 'bg-rose-50'
+                )}>
+                  <TrendingUp className={cn(
+                    'h-4 w-4',
+                    citationRate >= 30 ? 'text-emerald-600' : citationRate >= 10 ? 'text-amber-600' : 'text-rose-600'
+                  )} />
+                </div>
+              </div>
+              <div className="metric-value text-3xl text-neutral-900">
+                {citationRate}%
+              </div>
+              <p className="mt-2 text-sm text-neutral-500">
+                {mentioned} / {total} 次提及
+              </p>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={240}>
+            <div className="surface-raised p-6 hover-lift">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-neutral-500">待处理警报</span>
+                <div className={cn(
+                  'p-2 rounded-lg',
+                  unreadAlertsCount > 0 ? 'bg-amber-50' : 'bg-emerald-50'
+                )}>
+                  <AlertCircle className={cn(
+                    'h-4 w-4',
+                    unreadAlertsCount > 0 ? 'text-amber-600' : 'text-emerald-600'
+                  )} />
+                </div>
+              </div>
+              <div className="metric-value text-3xl text-neutral-900">
+                <AnimatedNumber value={unreadAlertsCount} duration={800} />
+              </div>
+              <p className="mt-2 text-sm text-neutral-500">
+                {unreadAlertsCount > 0 ? '需要关注' : '一切平稳'}
+              </p>
+            </div>
+          </FadeIn>
+        </section>
+      </StaggerChildren>
+
+      {/* Charts with slide-in animation */}
+      <section className="grid gap-5 lg:grid-cols-3">
+        <FadeIn direction="left" delay={300} className="lg:col-span-2">
+          <div className="surface-raised p-6">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-neutral-900">AI 引用趋势</h2>
+                <p className="mt-0.5 text-sm text-neutral-500">近 30 天每日提及次数</p>
+              </div>
+              <Link
+                href="/citations"
+                className="inline-flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 transition-colors"
+              >
+                查看详情 <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <CitationTrendChart data={trendData} />
+          </div>
+        </FadeIn>
+
+        <FadeIn direction="right" delay={400}>
+          <div className="surface-raised p-6">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-neutral-900">平台曝光分布</h2>
+                <p className="mt-0.5 text-sm text-neutral-500">7 大 AI 平台</p>
+              </div>
+            </div>
+            {platformData.length === 0 ? (
+              <div className="flex h-[280px] items-center justify-center">
+                <div className="text-center">
+                  <div className="empty-state-icon mb-3 text-4xl">📊</div>
+                  <p className="text-sm text-neutral-500">暂无扫描数据</p>
+                </div>
+              </div>
+            ) : (
+              <PlatformDistributionChart data={platformData} />
+            )}
+          </div>
+        </FadeIn>
       </section>
 
-      {/* Charts row */}
-      <section className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl border border-neutral-200 bg-white p-5 lg:col-span-2">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-semibold text-neutral-800">AI 引用趋势</h2>
-              <p className="mt-0.5 text-xs text-neutral-500">近 30 天每日提及次数</p>
+      {/* Recent activity with stagger */}
+      <section className="grid gap-5 lg:grid-cols-2">
+        <FadeIn delay={500}>
+          <div className="surface-raised p-6">
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-neutral-900">最近扫描</h2>
+              <Link
+                href="/monitor"
+                className="text-sm text-indigo-600 hover:text-indigo-700 transition-colors"
+              >
+                查看全部 →
+              </Link>
             </div>
-            <Link
-              href="/citations"
-              className="inline-flex items-center gap-1 text-xs text-indigo-500 hover:text-indigo-600"
-            >
-              查看详情 <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-          <CitationTrendChart data={trendData} />
-        </div>
-
-        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-semibold text-neutral-800">7 大 AI 平台曝光分布</h2>
-              <p className="mt-0.5 text-xs text-neutral-500">近 30 天扫描分布</p>
-            </div>
-          </div>
-          {platformData.length === 0 ? (
-            <div className="flex h-[280px] items-center justify-center text-sm text-neutral-500">
-              暂无扫描数据
-            </div>
-          ) : (
-            <PlatformDistributionChart data={platformData} />
-          )}
-        </div>
-      </section>
-
-      {/* Recent activity row */}
-      <section className="grid gap-4 lg:grid-cols-2">
-        {/* Recent scans */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-neutral-800">最近扫描</h2>
-            <Link
-              href="/monitor"
-              className="text-xs text-indigo-500 hover:text-indigo-600"
-            >
-              查看全部 →
-            </Link>
-          </div>
-          {recentScans.length === 0 ? (
-            <div className="py-10 text-center text-sm text-neutral-500">暂无扫描记录</div>
-          ) : (
-            <ul className="divide-y divide-neutral-200">
-              {recentScans.map((s) => {
-                const meta = STATUS_META[s.status] ?? STATUS_META.queued;
-                const progress = s.totalPrompts
-                  ? Math.round((s.completedPrompts / s.totalPrompts) * 100)
-                  : 0;
-                return (
-                  <li
-                    key={s.id}
-                    className="flex items-center justify-between gap-3 py-3 transition hover:px-1"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="truncate text-sm font-medium text-neutral-800">
-                          {s.brand?.name ?? '未知品牌'}
-                        </span>
-                        <span
-                          className={cn(
-                            'inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium',
-                            meta.cls
-                          )}
-                        >
-                          {meta.icon}
-                          {meta.label}
-                        </span>
-                      </div>
-                      <div className="mt-1 flex items-center gap-3 text-xs text-neutral-500">
-                        <span>{s.completedPrompts} / {s.totalPrompts} 完成</span>
-                        <span>·</span>
-                        <span>{formatDate(s.startedAt)}</span>
-                      </div>
-                    </div>
-                    <div className="text-xs tabular-nums text-neutral-500">{progress}%</div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
-
-        {/* Recent alerts */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-neutral-800">最新警报</h2>
-            <Link
-              href="/alerts"
-              className="text-xs text-indigo-500 hover:text-indigo-600"
-            >
-              查看全部 →
-            </Link>
-          </div>
-          {recentAlerts.length === 0 ? (
-            <div className="py-10 text-center text-sm text-neutral-500">暂无警报</div>
-          ) : (
-            <ul className="space-y-2">
-              {recentAlerts.map((a) => {
-                const sev = SEVERITY_STYLES[a.severity] ?? SEVERITY_STYLES.low;
-                return (
-                  <li
-                    key={a.id}
-                    className={cn(
-                      'group relative overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100 p-3 transition hover:border-neutral-300',
-                      !a.isRead && 'ring-1 ring-indigo-500/20'
-                    )}
-                  >
-                    <div className={cn('absolute left-0 top-0 h-full w-0.5', sev.dot)} />
-                    <div className="flex items-start gap-2 pl-2">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className={cn('text-[10px] font-semibold uppercase tracking-wider', sev.text)}>
-                            {ALERT_TYPE_LABEL[a.type] ?? a.type}
-                          </span>
-                          {!a.isRead ? (
-                            <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
-                          ) : null}
+            {recentScans.length === 0 ? (
+              <div className="py-12 text-center">
+                <div className="empty-state-icon mb-3 text-4xl">🔍</div>
+                <p className="text-sm text-neutral-500">暂无扫描记录</p>
+              </div>
+            ) : (
+              <ul className="divide-y divide-neutral-100">
+                {recentScans.map((s, i) => {
+                  const meta = STATUS_META[s.status] ?? STATUS_META.queued;
+                  const progress = s.totalPrompts
+                    ? Math.round((s.completedPrompts / s.totalPrompts) * 100)
+                    : 0;
+                  return (
+                    <FadeIn key={s.id} delay={600 + i * 60}>
+                      <li className="flex items-center justify-between gap-3 py-4 transition hover:bg-neutral-50 -mx-2 px-2 rounded-lg">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="truncate text-sm font-medium text-neutral-900">
+                              {s.brand?.name ?? '未知品牌'}
+                            </span>
+                            <span
+                              className={cn(
+                                'inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium',
+                                meta.cls
+                              )}
+                            >
+                              {meta.icon}
+                              {meta.label}
+                            </span>
+                          </div>
+                          <div className="mt-1 flex items-center gap-3 text-xs text-neutral-500">
+                            <span>{s.completedPrompts} / {s.totalPrompts} 完成</span>
+                            <span>·</span>
+                            <span>{formatDate(s.startedAt)}</span>
+                          </div>
                         </div>
-                        <p className="mt-0.5 truncate text-sm font-medium text-neutral-800">
-                          {a.title}
-                        </p>
-                        <p className="mt-0.5 line-clamp-1 text-xs text-neutral-500">{a.message}</p>
-                      </div>
-                      <div className="shrink-0 text-right">
-                        <p className="text-[10px] text-neutral-500">{relativeTime(a.createdAt)}</p>
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
+                        <div className="text-xs tabular-nums text-neutral-500">{progress}%</div>
+                      </li>
+                    </FadeIn>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </FadeIn>
+
+        <FadeIn delay={600}>
+          <div className="surface-raised p-6">
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-neutral-900">最新警报</h2>
+              <Link
+                href="/alerts"
+                className="text-sm text-indigo-600 hover:text-indigo-700 transition-colors"
+              >
+                查看全部 →
+              </Link>
+            </div>
+            {recentAlerts.length === 0 ? (
+              <div className="py-12 text-center">
+                <div className="empty-state-icon mb-3 text-4xl">🔔</div>
+                <p className="text-sm text-neutral-500">暂无警报</p>
+              </div>
+            ) : (
+              <ul className="space-y-3">
+                {recentAlerts.map((a, i) => {
+                  const sev = SEVERITY_STYLES[a.severity] ?? SEVERITY_STYLES.low;
+                  return (
+                    <FadeIn key={a.id} delay={700 + i * 60}>
+                      <li
+                        className={cn(
+                          'group relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-4 transition-all hover:border-neutral-300 hover:shadow-md',
+                          !a.isRead && 'ring-2 ring-indigo-500/20'
+                        )}
+                      >
+                        <div className={cn('absolute left-0 top-0 h-full w-1', sev.dot)} />
+                        <div className="flex items-start gap-3 pl-3">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className={cn('text-xs font-semibold uppercase tracking-wider', sev.text)}>
+                                {ALERT_TYPE_LABEL[a.type] ?? a.type}
+                              </span>
+                              {!a.isRead && (
+                                <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                              )}
+                            </div>
+                            <p className="mt-1 truncate text-sm font-medium text-neutral-900">
+                              {a.title}
+                            </p>
+                            <p className="mt-0.5 line-clamp-1 text-xs text-neutral-500">{a.message}</p>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <p className="text-xs text-neutral-400">{relativeTime(a.createdAt)}</p>
+                          </div>
+                        </div>
+                      </li>
+                    </FadeIn>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </FadeIn>
       </section>
     </div>
   );
