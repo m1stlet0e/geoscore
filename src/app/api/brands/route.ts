@@ -41,6 +41,7 @@ export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: '未登录' }, { status: 401 });
   const userId = (session.user as { id: string }).id;
+  console.log('[BRANDS POST] userId:', userId);
 
   let json: unknown;
   try {
@@ -78,17 +79,33 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: '已存在同名品牌' }, { status: 400 });
   }
 
-  const brand = await prisma.brand.create({
-    data: {
-      userId,
-      name: parsed.data.name,
-      domain: parsed.data.domain ?? null,
-      description: parsed.data.description ?? null,
-      category: parsed.data.category ?? null,
-      competitors: parsed.data.competitors ?? [],
-      status: 'active',
-    },
-  });
-
-  return NextResponse.json({ brand }, { status: 201 });
+  console.log('[BRANDS POST] Creating brand for userId:', userId, 'name:', parsed.data.name);
+  try {
+    const brand = await prisma.brand.create({
+      data: {
+        userId,
+        name: parsed.data.name,
+        domain: parsed.data.domain ?? null,
+        description: parsed.data.description ?? null,
+        category: parsed.data.category ?? null,
+        competitors: parsed.data.competitors ?? [],
+        status: 'active',
+      },
+      include: {
+        _count: {
+          select: {
+            prompts: true,
+            scans: true,
+            citations: true,
+            contentPieces: true,
+          },
+        },
+      },
+    });
+    return NextResponse.json({ brand }, { status: 201 });
+  } catch (err: unknown) {
+    const e = err as { code?: string; message?: string };
+    console.error('[BRANDS POST] Create error:', e.code, e.message);
+    return NextResponse.json({ error: `创建失败: ${e.code} - ${e.message}` }, { status: 500 });
+  }
 }

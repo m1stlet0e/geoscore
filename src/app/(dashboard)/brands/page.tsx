@@ -154,9 +154,9 @@ export default function BrandsPage() {
               )}
 
               <div className="mt-4 flex items-center gap-4 text-xs text-neutral-500">
-                <span>{brand._count.prompts} prompts</span>
-                <span>{brand._count.scans} 扫描</span>
-                <span>{brand._count.citations} 引用</span>
+                <span>{brand._count?.prompts ?? 0} prompts</span>
+                <span>{brand._count?.scans ?? 0} 扫描</span>
+                <span>{brand._count?.citations ?? 0} 引用</span>
               </div>
             </div>
           ))}
