@@ -48,7 +48,8 @@ export function CitationTrendChart({ data }: { data: TrendPoint[] }) {
             stroke="#9ca3af"
             tick={{ fontSize: 10, fill: '#6b7280' }}
             allowDecimals={false}
-            tickCount={5}
+            domain={[0, (dataMax: number) => Math.max(dataMax + 1, 5)]}
+            tickCount={6}
             width={32}
           />
           <Tooltip
