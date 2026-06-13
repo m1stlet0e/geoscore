@@ -59,24 +59,28 @@ export default async function GrowthPage({ searchParams }: { searchParams: Promi
       {/* Content type quick generate */}
       {activeBrand && (
         <div className="rounded-2xl border border-neutral-200 bg-neutral-100 p-5">
-          <div className="mb-4 flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-fuchsia-300" />
-            <h3 className="text-sm font-medium">为「{activeBrand.name}」生成内容</h3>
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-fuchsia-300" />
+              <h3 className="text-sm font-medium">为「{activeBrand.name}」生成内容</h3>
+            </div>
+            <Link
+              href={`/content?brandId=${activeBrand.id}`}
+              className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+            >
+              打开内容中心 <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {CONTENT_TYPES.map((t) => (
-              <form key={t.id} action="/api/content" method="post" className="contents">
-                <input type="hidden" name="brandId" value={activeBrand.id} />
-                <input type="hidden" name="type" value={t.id} />
-                <button
-                  type="submit"
-                  formAction={`/growth?brandId=${activeBrand.id}`}
-                  className="rounded-xl border border-neutral-200 bg-white/40 p-3 text-left transition hover:border-fuchsia-500/40 hover:bg-fuchsia-500/5"
-                >
-                  <div className="text-sm font-medium text-neutral-800">{t.label}</div>
-                  <div className="mt-1 text-xs text-neutral-500">{t.desc}</div>
-                </button>
-              </form>
+              <Link
+                key={t.id}
+                href={`/content?brandId=${activeBrand.id}&type=${t.id}`}
+                className="rounded-xl border border-neutral-200 bg-white/40 p-3 text-left transition hover:border-fuchsia-500/40 hover:bg-fuchsia-500/5"
+              >
+                <div className="text-sm font-medium text-neutral-800">{t.label}</div>
+                <div className="mt-1 text-xs text-neutral-500">{t.desc}</div>
+              </Link>
             ))}
           </div>
         </div>
@@ -115,7 +119,7 @@ export default async function GrowthPage({ searchParams }: { searchParams: Promi
             return (
               <Link
                 key={p.id}
-                href={`/growth/${p.id}`}
+                href={`/content?brandId=${p.brandId}`}
                 className="block rounded-2xl border border-neutral-200 bg-neutral-100 p-5 transition hover:border-neutral-300"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -130,7 +134,7 @@ export default async function GrowthPage({ searchParams }: { searchParams: Promi
                       <span className="text-xs text-neutral-500">{p.brand.name}</span>
                     </div>
                     <h3 className="text-base font-medium text-neutral-800">{p.title}</h3>
-                    <p className="line-clamp-2 text-sm text-neutral-500">{p.body.slice(0, 200)}</p>
+                    <p className="line-clamp-2 text-sm text-neutral-500">{(p.body ?? '').slice(0, 200)}</p>
                   </div>
                   <ArrowRight className="h-4 w-4 text-neutral-500" />
                 </div>

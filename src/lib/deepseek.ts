@@ -106,3 +106,28 @@ export async function jsonChat<T = any>(
     throw new Error(`Failed to parse JSON from LLM response: ${content.slice(0, 200)}`)
   }
 }
+
+/**
+ * 兼容旧版 SDK 风格调用（deepseek.chat.completions.create）
+ */
+export const deepseek = {
+  chat: {
+    completions: {
+      create: async (options: {
+        model?: string
+        messages: ChatMessage[]
+        temperature?: number
+        max_tokens?: number
+      }) => {
+        const content = await chatCompletion(options.messages, {
+          model: options.model,
+          temperature: options.temperature,
+          maxTokens: options.max_tokens,
+        })
+        return {
+          choices: [{ message: { content } }],
+        }
+      },
+    },
+  },
+}

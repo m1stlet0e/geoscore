@@ -1,12 +1,8 @@
-// ============================================
-// GET /api/citations/factors
-// 获取因素分布 (Citation Intelligence 2.0)
-// ============================================
-
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { citationEngine } from '@/lib/engines/citation.engine'
 import { recommendationFactorEngine } from '@/lib/engines/recommendation-factor.engine'
 
 export async function GET(request: NextRequest) {
@@ -26,6 +22,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const brandId = searchParams.get('brandId')
+    const platform = searchParams.get('platform') || undefined
 
     if (!brandId) {
       return NextResponse.json(
@@ -49,11 +46,27 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const result = await recommendationFactorEngine.getFactors(brandId)
+    const distribution = await citationEngine.getFactorDistribution(brandId, platform)
+    if (distribution.length > 0) {
+      return NextResponse.json({ success: true, data: distribution })
+    }
+
+    const report = await recommendationFactorEngine.getFactors(brandId)
+    const factors = report.factors ?? []
+    const totalWeight =
+      factors.reduce((sum, f) => sum + Math.abs(f.impact || f.weight || 0), 0) || 1
+    const mapped = factors.map((f) => ({
+      factor: f.factor,
+      label: f.factor,
+      count: f.mentions ?? 1,
+      totalWeight: f.weight ?? 0,
+      avgWeight: f.weight ?? 0,
+      percentage: (Math.abs(f.impact || f.weight || 0) / totalWeight) * 100,
+    }))
 
     return NextResponse.json({
       success: true,
-      data: result
+      data: mapped,
     })
   } catch (error) {
     console.error('GET /api/citations/factors error:', error)

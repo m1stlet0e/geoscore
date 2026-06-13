@@ -14,15 +14,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const userName = session.user.name ?? null;
 
   return (
-    <div className="min-h-screen bg-white text-neutral-800">
-      {/* Subtle grid — only on large screens */}
-      <div className="pointer-events-none fixed inset-0 hidden bg-grid opacity-30 lg:block" aria-hidden="true" />
+    <div className="min-h-screen bg-[#fafafa] text-neutral-900 selection:bg-indigo-100 selection:text-indigo-700">
+      {/* Background Decorations */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute top-[10%] right-[5%] h-[400px] w-[400px] rounded-full bg-indigo-500/5 blur-[100px]" />
+        <div className="absolute bottom-[10%] left-[5%] h-[500px] w-[500px] rounded-full bg-violet-500/5 blur-[120px]" />
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay" />
+      </div>
 
       <Sidebar plan={plan} userEmail={userEmail} userName={userName} />
 
       {/* Main content — pushed right by sidebar width on desktop */}
-      <div className="relative md:pl-[240px]">
-        <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <div className="relative z-10 md:pl-[280px]">
+        <main className="mx-auto w-full max-w-[1400px] px-6 py-8 sm:px-10 sm:py-10">
           {children}
         </main>
       </div>

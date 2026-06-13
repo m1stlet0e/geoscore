@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { StatCard } from '@/components/StatCard';
+import { normalizePagination } from '@/lib/utils';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -396,7 +397,22 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/stats');
       if (res.ok) {
         const data = await res.json();
-        setStats(data);
+        const planDistribution = Array.isArray(data.planDistribution)
+          ? data.planDistribution
+          : Object.entries(data.planDistribution ?? {}).map(([plan, count]) => ({
+              plan,
+              count: Number(count),
+            }));
+        setStats({
+          totalUsers: data.totalUsers ?? 0,
+          activeUsers: data.activeUsers ?? 0,
+          totalBrands: data.totalBrands ?? 0,
+          totalCitations: data.totalCitations ?? 0,
+          totalScans: data.totalScans ?? 0,
+          totalRevenue: data.totalRevenue ?? 0,
+          planDistribution,
+          recentSignups: data.recentSignups ?? 0,
+        });
       }
     } catch (e) {
       console.error('Failed to fetch admin stats:', e);
@@ -414,8 +430,8 @@ export default function AdminPage() {
       const res = await fetch(`/api/admin/users?${params}`);
       if (res.ok) {
         const data = await res.json();
-        setUsers(data.users);
-        setUsersPagination(data.pagination);
+        setUsers(data.users ?? []);
+        setUsersPagination(normalizePagination(data.pagination) ?? { page: 1, limit: 50, total: 0, totalPages: 0 });
         // Assume first user in admin response gives us our role context
         // In real app this would come from session
       }
@@ -434,8 +450,8 @@ export default function AdminPage() {
       const res = await fetch(`/api/admin/orders?${params}`);
       if (res.ok) {
         const data = await res.json();
-        setOrders(data.orders);
-        setOrdersPagination(data.pagination);
+        setOrders(data.orders ?? []);
+        setOrdersPagination(normalizePagination(data.pagination) ?? { page: 1, limit: 50, total: 0, totalPages: 0 });
       }
     } catch (e) {
       console.error('Failed to fetch orders:', e);
@@ -450,7 +466,25 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/quota');
       if (res.ok) {
         const data = await res.json();
-        setQuotas(data);
+        setQuotas(
+          (Array.isArray(data) ? data : []).map((q: {
+            userId?: string;
+            user?: { id?: string; email?: string; plan?: Plan };
+            type?: string;
+            quotaType?: string;
+            used?: number;
+            total?: number;
+            remaining?: number;
+          }) => ({
+            userId: q.userId ?? q.user?.id ?? '',
+            userEmail: q.user?.email ?? '-',
+            plan: (q.user?.plan ?? 'FREE') as Plan,
+            quotaType: q.quotaType ?? q.type ?? '-',
+            used: q.used ?? 0,
+            total: q.total ?? 0,
+            remaining: q.remaining ?? Math.max(0, (q.total ?? 0) - (q.used ?? 0)),
+          }))
+        );
       }
     } catch (e) {
       console.error('Failed to fetch quotas:', e);
@@ -467,8 +501,8 @@ export default function AdminPage() {
       const res = await fetch(`/api/admin/logs?${params}`);
       if (res.ok) {
         const data = await res.json();
-        setLogs(data.logs);
-        setLogsPagination(data.pagination);
+        setLogs(data.logs ?? []);
+        setLogsPagination(normalizePagination(data.pagination) ?? { page: 1, limit: 100, total: 0, totalPages: 0 });
       }
     } catch (e) {
       console.error('Failed to fetch logs:', e);
@@ -483,7 +517,8 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/config');
       if (res.ok) {
         const data = await res.json();
-        setConfigs(data.map((c: ConfigItem) => ({ ...c, editing: false, editValue: c.value })));
+        const list = Array.isArray(data) ? data : [];
+        setConfigs(list.map((c: ConfigItem) => ({ ...c, editing: false, editValue: c.value })));
       }
     } catch (e) {
       console.error('Failed to fetch configs:', e);
@@ -619,7 +654,7 @@ export default function AdminPage() {
       ) : null}
 
       {/* Plan Distribution */}
-      {stats && stats.planDistribution.length > 0 && (
+      {stats && (stats.planDistribution?.length ?? 0) > 0 && (
         <section className="rounded-2xl border border-neutral-200 bg-white p-5">
           <h3 className="text-sm font-medium text-neutral-500 mb-4">套餐分布</h3>
           <div className="flex gap-3">

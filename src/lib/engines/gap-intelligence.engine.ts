@@ -4,7 +4,7 @@
 // ============================================
 
 import { prisma } from '@/lib/prisma'
-import { deepseek } from '@/lib/deepseek'
+import { jsonChat } from '@/lib/deepseek'
 
 // 预定义的 Gap 类型及默认影响值
 const GAP_TYPES = {
@@ -123,18 +123,13 @@ AI 回答摘要: ${r.answerText.slice(0, 800)}
 只返回 JSON 数组，不要其他内容。`
 
     try {
-      const response = await deepseek.chat.completions.create({
-        model: 'deepseek-chat',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.3,
-        max_tokens: 4000,
-      })
+      const gaps = await jsonChat<QuantifiedGap[]>(
+        [{ role: 'user', content: prompt }],
+        { temperature: 0.3, maxTokens: 4000 }
+      )
 
-      const text = response.choices[0]?.message?.content || '[]'
-      const jsonMatch = text.match(/\[[\s\S]*\]/)
-      if (!jsonMatch) return []
+      if (!Array.isArray(gaps)) return []
 
-      const gaps = JSON.parse(jsonMatch[0]) as QuantifiedGap[]
       return gaps.filter(g => g.type && g.impact)
     } catch (error) {
       console.error('Gap analysis failed:', error)

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Sparkles,
   FileText,
@@ -25,6 +26,7 @@ import {
 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { StatCard } from '@/components/StatCard';
+import { normalizePagination, normalizeTrend } from '@/lib/utils';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -101,6 +103,14 @@ const PUBLISH_STATUS_BADGES: Record<PublishStatus, { bg: string; text: string; l
   published: { bg: 'bg-emerald-500/15 border-emerald-500/30', text: 'text-emerald-300', label: '已发布' },
   failed: { bg: 'bg-rose-500/15 border-rose-500/30', text: 'text-rose-300', label: '失败' },
 };
+
+function getContentStatusBadge(status: string) {
+  return STATUS_BADGES[status as ContentStatus] ?? STATUS_BADGES.draft;
+}
+
+function getPublishStatusBadge(status: string) {
+  return PUBLISH_STATUS_BADGES[status as PublishStatus] ?? PUBLISH_STATUS_BADGES.pending;
+}
 
 const PUBLISH_CHANNELS: { key: PublishChannel; label: string; icon: string }[] = [
   { key: 'wordpress', label: 'WordPress', icon: '🌐' },
@@ -184,6 +194,7 @@ function ContentCardsSkeleton() {
 // ─── Main Page Component ─────────────────────────────────────────────────────
 
 export default function ContentPage() {
+  const searchParams = useSearchParams();
   const [brandId, setBrandId] = useState<string>('');
   const [brands, setBrands] = useState<{ id: string; name: string; domain: string | null }[]>([]);
   const [activeTab, setActiveTab] = useState<Tab>('list');
@@ -244,7 +255,11 @@ export default function ContentPage() {
     })();
   }, []);
 
-  // ─── Fetchers ────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const urlBrandId = searchParams.get('brandId');
+    if (urlBrandId) setBrandId(urlBrandId);
+  }, [searchParams]);
+
   // ─── Fetchers ────────────────────────────────────────────────────────────
 
   const fetchStats = useCallback(async () => {
@@ -256,7 +271,15 @@ export default function ContentPage() {
       const res = await fetch(`/api/content/stats?brandId=${brandId}`);
       if (!res.ok) throw new Error('Failed to fetch stats');
       const data = await res.json();
-      setStats(data.data ?? data);
+      const raw = data.data ?? data;
+      setStats({
+        totalPieces: raw.totalPieces ?? 0,
+        publishedCount: raw.publishedCount ?? 0,
+        draftCount: raw.draftCount ?? 0,
+        avgQuality: raw.avgQuality ?? 0,
+        topType: raw.topType ?? '-',
+        recentTrend: normalizeTrend(raw.recentTrend),
+      });
     } catch (err) {
       console.error('Error fetching content stats:', err);
       setError('加载统计数据失败');
@@ -283,7 +306,7 @@ export default function ContentPage() {
         const data = await res.json();
         const result = data.data || data;
         setContents(result.contents ?? []);
-        setPagination(result.pagination ?? null);
+        setPagination(normalizePagination(result.pagination));
         // Collect all publish jobs from content items
         const jobs: PublishJob[] = [];
         (result.contents ?? []).forEach((c: ContentItem) => {
@@ -535,28 +558,28 @@ export default function ContentPage() {
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard
             label="总内容数"
-            value={stats.totalPieces.toLocaleString()}
+            value={(stats.totalPieces ?? 0).toLocaleString()}
             icon={<FileText className="h-4 w-4" />}
             subline="全部类型"
           />
           <StatCard
             label="已发布"
-            value={stats.publishedCount.toLocaleString()}
+            value={(stats.publishedCount ?? 0).toLocaleString()}
             icon={<Check className="h-4 w-4" />}
             tone="positive"
             subline="已上线内容"
           />
           <StatCard
             label="草稿"
-            value={stats.draftCount.toLocaleString()}
+            value={(stats.draftCount ?? 0).toLocaleString()}
             icon={<FileText className="h-4 w-4" />}
             subline="待处理"
           />
           <StatCard
             label="平均质量"
-            value={stats.avgQuality.toFixed(1)}
+            value={(stats.avgQuality ?? 0).toFixed(1)}
             icon={<BarChart3 className="h-4 w-4" />}
-            tone={getQualityTone(stats.avgQuality)}
+            tone={getQualityTone(stats.avgQuality ?? 0)}
             subline="满分 100"
           />
           <StatCard
@@ -661,7 +684,7 @@ export default function ContentPage() {
             <div className="grid gap-4 lg:grid-cols-2">
               {contents.map((item) => {
                 const typeInfo = getTypeInfo(item.type);
-                const statusBadge = STATUS_BADGES[item.status];
+                const statusBadge = getContentStatusBadge(item.status);
                 return (
                   <div
                     key={item.id}
@@ -688,8 +711,8 @@ export default function ContentPage() {
 
                     {/* Body preview */}
                     <p className="text-xs text-neutral-500 leading-relaxed mb-4 line-clamp-3">
-                      {item.body.slice(0, 150)}
-                      {item.body.length > 150 ? '...' : ''}
+                      {(item.body ?? '').slice(0, 150)}
+                      {(item.body?.length ?? 0) > 150 ? '...' : ''}
                     </p>
 
                     {/* Quality bar */}
@@ -819,7 +842,7 @@ export default function ContentPage() {
                     const parentContent = contents.find((c) =>
                       c.publishJobs?.some((pj) => pj.id === job.id)
                     );
-                    const pBadge = PUBLISH_STATUS_BADGES[job.status];
+                    const pBadge = getPublishStatusBadge(job.status);
                     return (
                       <tr key={job.id} className="transition hover:bg-neutral-200/20">
                         <td className="px-5 py-3 text-neutral-700">
@@ -903,9 +926,9 @@ export default function ContentPage() {
                   );
                 })()}
                 <span
-                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGES[selectedContent.status].bg} ${STATUS_BADGES[selectedContent.status].text}`}
+                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${getContentStatusBadge(selectedContent.status).bg} ${getContentStatusBadge(selectedContent.status).text}`}
                 >
-                  {STATUS_BADGES[selectedContent.status].label}
+                  {getContentStatusBadge(selectedContent.status).label}
                 </span>
               </div>
               <button

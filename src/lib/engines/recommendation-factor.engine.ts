@@ -4,7 +4,7 @@
 // ============================================
 
 import { prisma } from '@/lib/prisma'
-import { deepseek } from '@/lib/deepseek'
+import { jsonChat } from '@/lib/deepseek'
 
 // 预定义的推荐因子类别
 const FACTOR_CATEGORIES = {
@@ -123,19 +123,13 @@ ${a.answer.slice(0, 1500)}
 只返回 JSON 数组，不要其他内容。`
 
     try {
-      const response = await deepseek.chat.completions.create({
-        model: 'deepseek-chat',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.3,
-        max_tokens: 4000,
-      })
+      const factors = await jsonChat<FactorAnalysis[]>(
+        [{ role: 'user', content: prompt }],
+        { temperature: 0.3, maxTokens: 4000 }
+      )
 
-      const text = response.choices[0]?.message?.content || '[]'
-      // 提取 JSON 数组
-      const jsonMatch = text.match(/\[[\s\S]*\]/)
-      if (!jsonMatch) return []
-      
-      const factors = JSON.parse(jsonMatch[0]) as FactorAnalysis[]
+      if (!Array.isArray(factors)) return []
+
       return factors.filter(f => f.factor && f.category)
     } catch (error) {
       console.error('Recommendation factor extraction failed:', error)

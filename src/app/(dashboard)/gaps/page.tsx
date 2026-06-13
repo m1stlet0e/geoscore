@@ -40,6 +40,7 @@ import {
 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { StatCard } from '@/components/StatCard';
+import { normalizeGapAnalysis, normalizePagination } from '@/lib/utils';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -295,7 +296,20 @@ export default function GapsPage() {
       const res = await fetch(`/api/gaps/summary?brandId=${brandId}`);
       if (!res.ok) throw new Error('Failed to fetch summary');
       const data = await res.json();
-      setSummary(data.data ?? data);
+      const raw = data.data ?? data;
+      setSummary({
+        totalAnalyses: raw.totalAnalyses ?? raw.summary?.totalGaps ?? 0,
+        avgGap: raw.avgGap ?? raw.summary?.avgScore ?? 0,
+        biggestGap: raw.biggestGap ?? 0,
+        openItems: raw.openItems ?? 0,
+        topGapType: raw.topGapType ?? '-',
+        trend:
+          raw.trend === 'improving' || raw.trend === 'up'
+            ? 'up'
+            : raw.trend === 'worsening' || raw.trend === 'down'
+              ? 'down'
+              : 'stable',
+      });
     } catch (err) {
       console.error('Error fetching gap summary:', err);
       setError('加载统计数据失败');
@@ -319,8 +333,8 @@ export default function GapsPage() {
         if (!res.ok) throw new Error('Failed to fetch analyses');
         const data = await res.json();
         const result = data.data || data;
-        setAnalyses(result.analyses ?? []);
-        setPagination(result.pagination ?? null);
+        setAnalyses((result.analyses ?? []).map((a: Analysis) => normalizeGapAnalysis(a) as Analysis));
+        setPagination(normalizePagination(result.pagination));
       } catch (err) {
         console.error('Error fetching gap analyses:', err);
       } finally {
@@ -336,7 +350,7 @@ export default function GapsPage() {
       const res = await fetch(`/api/gaps/${id}`);
       if (!res.ok) throw new Error('Failed to fetch detail');
       const data = await res.json();
-      setSelectedAnalysis(data.data ?? data);
+      setSelectedAnalysis(normalizeGapAnalysis(data.data ?? data) as Analysis);
       setActiveTab('detail');
     } catch (err) {
       console.error('Error fetching gap detail:', err);
@@ -619,7 +633,7 @@ export default function GapsPage() {
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard
             label="总分析数"
-            value={summary.totalAnalyses.toLocaleString()}
+            value={(summary.totalAnalyses ?? 0).toLocaleString()}
             icon={<FileText className="h-4 w-4" />}
             subline="全部平台"
           />
@@ -639,9 +653,9 @@ export default function GapsPage() {
           />
           <StatCard
             label="待处理项"
-            value={summary.openItems}
+            value={summary.openItems ?? 0}
             icon={<Clock className="h-4 w-4" />}
-            tone={summary.openItems > 10 ? 'warning' : 'default'}
+            tone={(summary.openItems ?? 0) > 10 ? 'warning' : 'default'}
             subline="需要改进"
           />
           <StatCard
@@ -871,7 +885,7 @@ export default function GapsPage() {
                     <div className="h-3 overflow-hidden rounded-full bg-white">
                       <div
                         className="h-full rounded-full bg-indigo-500 transition-all duration-700"
-                        style={{ width: `${Math.min(selectedAnalysis.benchmarkScore, 100)}%` }}
+                        style={{ width: `${Math.min(selectedAnalysis.benchmarkScore ?? 0, 100)}%` }}
                       />
                     </div>
                   </div>
@@ -974,8 +988,8 @@ export default function GapsPage() {
                                     onChange={async (e) => {
                                       const newStatus = e.target.value as GapStatus;
                                       try {
-                                        await fetch(`/api/gaps/items/${item.id}`, {
-                                          method: 'PATCH',
+                                        await fetch(`/api/gaps/${selectedAnalysis.id}/items/${item.id}`, {
+                                          method: 'PUT',
                                           headers: { 'Content-Type': 'application/json' },
                                           body: JSON.stringify({ status: newStatus }),
                                         });
@@ -1005,8 +1019,8 @@ export default function GapsPage() {
                                   <button
                                     onClick={async () => {
                                       try {
-                                        await fetch(`/api/gaps/items/${item.id}`, {
-                                          method: 'PATCH',
+                                        await fetch(`/api/gaps/${selectedAnalysis.id}/items/${item.id}`, {
+                                          method: 'PUT',
                                           headers: { 'Content-Type': 'application/json' },
                                           body: JSON.stringify({ status: 'resolved' }),
                                         });

@@ -37,6 +37,7 @@ import {
   Layers,
   BarChart3,
 } from 'lucide-react';
+import { normalizePagination } from '@/lib/utils';
 import { PageHeader } from '@/components/PageHeader';
 import { StatCard } from '@/components/StatCard';
 
@@ -372,7 +373,15 @@ export default function CitationsIntelligencePage() {
       const res = await fetch(`/api/citations/stats?brandId=${brandId}`);
       if (!res.ok) throw new Error('Failed to fetch stats');
       const data = await res.json();
-      setStats(data.data || data);
+      const raw = data.data ?? data;
+      setStats({
+        totalEvidence: raw.totalEvidence ?? 0,
+        avgConfidence: raw.avgConfidence ?? 0,
+        topPlatform: raw.topPlatform ?? '-',
+        topFactor: raw.topFactor ?? '-',
+        domesticCount: raw.domesticCount ?? 0,
+        internationalCount: raw.internationalCount ?? 0,
+      });
     } catch (err) {
       console.error('Error fetching citation stats:', err);
       setError('加载统计数据失败');
@@ -390,7 +399,8 @@ export default function CitationsIntelligencePage() {
       const res = await fetch(`/api/citations/factors?brandId=${brandId}`);
       if (!res.ok) throw new Error('Failed to fetch factors');
       const data = await res.json();
-      setFactors(data.data ?? data ?? []);
+      const raw = data.data ?? data;
+      setFactors(Array.isArray(raw) ? raw : []);
     } catch (err) {
       console.error('Error fetching factors:', err);
     } finally {
@@ -411,7 +421,7 @@ export default function CitationsIntelligencePage() {
         const data = await res.json();
         const result = data.data || data;
         setEvidences(result.evidences ?? []);
-        setPagination(result.pagination ?? null);
+        setPagination(normalizePagination(result.pagination));
       } catch (err) {
         console.error('Error fetching evidences:', err);
       } finally {
@@ -727,18 +737,18 @@ export default function CitationsIntelligencePage() {
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
           <StatCard
             label="总证据数"
-            value={stats.totalEvidence.toLocaleString()}
+            value={(stats.totalEvidence ?? 0).toLocaleString()}
             icon={<Database className="h-4 w-4" />}
             subline="全部平台"
           />
           <StatCard
             label="平均置信度"
-            value={`${stats.avgConfidence.toFixed(1)}%`}
+            value={`${(stats.avgConfidence ?? 0).toFixed(1)}%`}
             icon={<Activity className="h-4 w-4" />}
             tone={
-              stats.avgConfidence >= 70
+              (stats.avgConfidence ?? 0) >= 70
                 ? 'positive'
-                : stats.avgConfidence >= 40
+                : (stats.avgConfidence ?? 0) >= 40
                   ? 'default'
                   : 'warning'
             }

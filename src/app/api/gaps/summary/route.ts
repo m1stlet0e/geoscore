@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
 import { prisma } from '@/lib/prisma'
-import { gapIntelligenceEngine } from '@/lib/engines/gap-intelligence.engine'
+import { gapEngine } from '@/lib/engines/gap.engine'
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,7 +31,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
     }
 
-    const data = await gapIntelligenceEngine.getGapReport(brandId)
+    const summary = await gapEngine.getSummary(brandId, user.id)
+    const data = {
+      ...summary,
+      trend:
+        summary.trend === 'improving'
+          ? 'up'
+          : summary.trend === 'worsening'
+            ? 'down'
+            : 'stable',
+    }
+
     return NextResponse.json({ success: true, data })
   } catch (error) {
     console.error('[GAP_SUMMARY_GET]', error)
