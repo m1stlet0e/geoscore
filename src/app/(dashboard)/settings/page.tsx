@@ -10,10 +10,10 @@ import { UpgradeButton } from './_upgrade-button';
 export const dynamic = 'force-dynamic';
 
 const PLAN_STYLE: Record<Plan, { label: string; cls: string; price: string }> = {
-  FREE: { label: 'FREE', cls: 'border-neutral-300 bg-neutral-100 text-neutral-700', price: '$0' },
-  PRO: { label: 'PRO', cls: 'border-indigo-500/30 bg-indigo-50 text-indigo-600', price: '$99/月' },
-  GROWTH: { label: 'GROWTH', cls: 'border-violet-500/30 bg-violet-50 text-violet-600', price: '$299/月' },
-  ENTERPRISE: { label: 'ENTERPRISE', cls: 'border-amber-500/30 bg-amber-50 text-amber-600', price: '$999/月' },
+  FREE: { label: 'FREE', cls: 'border-neutral-300 bg-neutral-100 text-neutral-700', price: '¥0' },
+  PRO: { label: 'PRO', cls: 'border-indigo-500/30 bg-indigo-50 text-indigo-600', price: '¥299/月' },
+  GROWTH: { label: 'GROWTH', cls: 'border-violet-500/30 bg-violet-50 text-violet-600', price: '¥799/月' },
+  ENTERPRISE: { label: 'ENTERPRISE', cls: 'border-amber-500/30 bg-amber-50 text-amber-600', price: '¥2999/月' },
 };
 
 export default async function SettingsPage() {
