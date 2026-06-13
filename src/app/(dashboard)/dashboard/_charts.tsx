@@ -35,29 +35,32 @@ export function CitationTrendChart({ data }: { data: TrendPoint[] }) {
               <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" vertical={false} />
+          <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" vertical={false} />
           <XAxis
             dataKey="date"
-            stroke="#64748b"
-            tick={{ fontSize: 10 }}
+            stroke="#9ca3af"
+            tick={{ fontSize: 10, fill: '#6b7280' }}
             tickFormatter={(v) => v.slice(5)}
             interval="preserveStartEnd"
             minTickGap={24}
           />
           <YAxis
-            stroke="#64748b"
-            tick={{ fontSize: 10 }}
+            stroke="#9ca3af"
+            tick={{ fontSize: 10, fill: '#6b7280' }}
             allowDecimals={false}
+            tickCount={5}
             width={32}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#0f172a',
-              border: '1px solid #1e293b',
+              backgroundColor: '#ffffff',
+              border: '1px solid #e5e7eb',
               borderRadius: 8,
               fontSize: 12,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
             }}
-            labelStyle={{ color: '#94a3b8' }}
+            labelStyle={{ color: '#374151' }}
+            formatter={(value: number) => [`${value} 次`, '提及']}
             labelFormatter={(v) => `日期 ${v}`}
           />
           <Line
@@ -98,12 +101,13 @@ export function PlatformDistributionChart({ data }: { data: PlatformPoint[] }) {
           </Pie>
           <Tooltip
             contentStyle={{
-              backgroundColor: '#0f172a',
-              border: '1px solid #1e293b',
+              backgroundColor: '#ffffff',
+              border: '1px solid #e5e7eb',
               borderRadius: 8,
               fontSize: 12,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
             }}
-            labelStyle={{ color: '#94a3b8' }}
+            labelStyle={{ color: '#374151' }}
             formatter={(value: number, name: string) => [
               `${value} (${((value / total) * 100).toFixed(1)}%)`,
               name,
@@ -114,7 +118,7 @@ export function PlatformDistributionChart({ data }: { data: PlatformPoint[] }) {
             height={36}
             iconType="circle"
             iconSize={8}
-            wrapperStyle={{ fontSize: 11, color: '#94a3b8' }}
+            wrapperStyle={{ fontSize: 11, color: '#6b7280' }}
           />
         </PieChart>
       </ResponsiveContainer>
