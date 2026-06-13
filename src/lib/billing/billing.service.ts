@@ -1,6 +1,6 @@
 // ============================================
 // Billing Service
-// 支付逻辑 + 额度管理
+// 支付逻辑 + 额度管理（Payjs 版本）
 // ============================================
 
 import { prisma } from '@/lib/prisma'
@@ -88,6 +88,8 @@ export class BillingService {
     orderNo: string
     amount: number
     paymentUrl: string
+    codeUrl?: string
+    cashierUrl?: string
   }> {
     const config = PLAN_CONFIG[plan]
     if (!config) throw new Error('Invalid plan')
@@ -109,38 +111,27 @@ export class BillingService {
       },
     })
 
-    // 模拟支付 URL（实际需要对接微信/支付宝 API）
-    const paymentUrl = this.generatePaymentUrl(orderNo, config.price, paymentMethod)
+    // 调用 Payjs 支付 API
+    const { paymentService } = await import('@/lib/payment')
+    
+    const paymentResult = await paymentService.createPayment({
+      orderNo,
+      amount: config.price * 100, // 转为分
+      description: `GeoScore ${config.name}`,
+      method: paymentMethod
+    })
 
     return {
       orderNo,
       amount: config.price,
-      paymentUrl,
+      paymentUrl: paymentResult.cashierUrl || paymentResult.codeUrl || '',
+      codeUrl: paymentResult.codeUrl,
+      cashierUrl: paymentResult.cashierUrl
     }
   }
 
   // ============================================
-  // 2. 生成支付 URL（模拟）
-  // ============================================
-
-  private generatePaymentUrl(
-    orderNo: string,
-    amount: number,
-    method: 'wechat' | 'alipay'
-  ): string {
-    // 实际生产环境需要对接微信支付/支付宝 API
-    // 这里返回模拟 URL
-    if (method === 'wechat') {
-      return `weixin://wxpay/bizpayurl?pr=${orderNo}`
-    } else {
-      return `alipays://platformapi/startapp?appId=20000067&url=${encodeURIComponent(
-        `https://geoscore.ai/pay/${orderNo}`
-      )}`
-    }
-  }
-
-  // ============================================
-  // 3. 处理支付回调
+  // 2. 处理支付回调
   // ============================================
 
   async handlePaymentCallback(
@@ -189,7 +180,7 @@ export class BillingService {
   }
 
   // ============================================
-  // 4. 激活订阅
+  // 3. 激活订阅
   // ============================================
 
   private async activateSubscription(
@@ -209,162 +200,125 @@ export class BillingService {
     })
 
     // 创建新订阅
-    const startDate = new Date()
-    const endDate = new Date()
-    endDate.setMonth(endDate.getMonth() + 1) // 1 个月
+    const now = new Date()
+    const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate())
 
     await prisma.subscription.create({
       data: {
         userId,
         plan,
         status: 'ACTIVE',
-        startDate,
-        endDate,
-        autoRenew: true,
+        startDate: now,
+        endDate: periodEnd,
       },
     })
 
-    // 更新用户计划
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        plan,
-        planExpiresAt: endDate,
-      },
+    // 关联订单到订阅（通过 subscriptionId 字段）
+    const sub = await prisma.subscription.findFirst({
+      where: { userId, plan, status: 'ACTIVE' },
+      orderBy: { createdAt: 'desc' },
     })
-  }
-
-  // ============================================
-  // 5. 分配额度
-  // ============================================
-
-  private async allocateQuotas(userId: string, plan: Plan): Promise<void> {
-    const config = PLAN_CONFIG[plan]
-    const now = new Date()
-    const periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
-    const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-
-    for (const [type, total] of Object.entries(config.quotas)) {
-      await prisma.quota.upsert({
-        where: {
-          userId_type_period_periodStart: {
-            userId,
-            type: type as QuotaType,
-            period: 'monthly',
-            periodStart,
-          },
-        },
-        update: {
-          total,
-          remaining: total,
-          used: 0,
-          periodEnd,
-        },
-        create: {
-          userId,
-          type: type as QuotaType,
-          total,
-          used: 0,
-          remaining: total,
-          period: 'monthly',
-          periodStart,
-          periodEnd,
-        },
+    if (sub) {
+      await prisma.order.update({
+        where: { id: orderId },
+        data: { subscriptionId: sub.id },
       })
     }
   }
 
   // ============================================
-  // 6. 检查额度
+  // 4. 分配额度
   // ============================================
 
-  async checkQuota(
-    userId: string,
-    type: QuotaType,
-    amount: number = 1
-  ): Promise<{ allowed: boolean; remaining: number }> {
+  private async allocateQuotas(userId: string, plan: Plan): Promise<void> {
+    const config = PLAN_CONFIG[plan]
+    if (!config) return
+
     const now = new Date()
     const periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
+    const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
 
-    const quota = await prisma.quota.findUnique({
+    // 删除旧额度
+    await prisma.quota.deleteMany({
       where: {
-        userId_type_period_periodStart: {
-          userId,
-          type,
-          period: 'monthly',
-          periodStart,
-        },
+        userId,
+        period: 'monthly',
+        periodStart,
       },
     })
 
-    if (!quota) {
-      // 没有额度记录，分配免费额度
-      await this.allocateQuotas(userId, 'FREE')
-      return this.checkQuota(userId, type, amount)
-    }
+    // 创建新额度
+    const quotaEntries = Object.entries(config.quotas).map(([type, total]) => ({
+      userId,
+      type: type as QuotaType,
+      total,
+      used: 0,
+      remaining: total,
+      period: 'monthly' as const,
+      periodStart,
+      periodEnd,
+    }))
 
-    return {
-      allowed: quota.remaining >= amount,
-      remaining: quota.remaining,
-    }
+    await prisma.quota.createMany({
+      data: quotaEntries,
+    })
   }
 
   // ============================================
-  // 7. 消费额度
+  // 5. 检查额度
   // ============================================
 
-  async consumeQuota(
-    userId: string,
-    type: QuotaType,
-    amount: number = 1,
-    description?: string,
-    meta?: Record<string, any>
-  ): Promise<boolean> {
+  async checkQuota(userId: string, type: QuotaType): Promise<{ allowed: boolean; remaining: number }> {
     const now = new Date()
     const periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
 
-    const quota = await prisma.quota.findUnique({
+    const quota = await prisma.quota.findFirst({
       where: {
-        userId_type_period_periodStart: {
-          userId,
-          type,
-          period: 'monthly',
-          periodStart,
-        },
+        userId,
+        type,
+        period: 'monthly',
+        periodStart,
       },
     })
 
-    if (!quota || quota.remaining < amount) {
+    if (!quota) return { allowed: false, remaining: 0 }
+    return { allowed: quota.used < quota.total, remaining: quota.total - quota.used }
+  }
+
+  // ============================================
+  // 6. 使用额度
+  // ============================================
+
+  async useQuota(userId: string, type: QuotaType): Promise<boolean> {
+    const now = new Date()
+    const periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
+
+    const quota = await prisma.quota.findFirst({
+      where: {
+        userId,
+        type,
+        period: 'monthly',
+        periodStart,
+      },
+    })
+
+    if (!quota || quota.used >= quota.total) {
       return false
     }
 
-    // 更新额度
     await prisma.quota.update({
       where: { id: quota.id },
-      data: {
-        used: { increment: amount },
-        remaining: { decrement: amount },
-      },
-    })
-
-    // 记录用量
-    await prisma.quotaUsage.create({
-      data: {
-        quotaId: quota.id,
-        amount,
-        description,
-        meta,
-      },
+      data: { used: quota.used + 1 },
     })
 
     return true
   }
 
   // ============================================
-  // 8. 获取用户订阅
+  // 7. 获取用户订阅
   // ============================================
 
-  async getSubscription(userId: string): Promise<any | null> {
+  async getSubscription(userId: string) {
     return prisma.subscription.findFirst({
       where: {
         userId,
@@ -375,30 +329,22 @@ export class BillingService {
   }
 
   // ============================================
-  // 9. 获取订单列表
+  // 8. 获取用户订单
   // ============================================
 
-  async getOrders(
-    userId: string,
-    page: number = 1,
-    limit: number = 20
-  ): Promise<{
-    orders: any[]
-    pagination: { page: number; limit: number; total: number; pages: number }
-  }> {
-    const total = await prisma.order.count({
-      where: { userId },
-    })
-
-    const orders = await prisma.order.findMany({
-      where: { userId },
-      include: {
-        payments: true,
-      },
-      orderBy: { createdAt: 'desc' },
-      skip: (page - 1) * limit,
-      take: limit,
-    })
+  async getOrders(userId: string, page = 1, limit = 10) {
+    const [orders, total] = await Promise.all([
+      prisma.order.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          payments: true,
+        },
+      }),
+      prisma.order.count({ where: { userId } }),
+    ])
 
     return {
       orders,
@@ -412,7 +358,7 @@ export class BillingService {
   }
 
   // ============================================
-  // 10. 获取用户额度
+  // 9. 获取用户额度
   // ============================================
 
   async getQuotas(userId: string): Promise<any[]> {
@@ -425,28 +371,29 @@ export class BillingService {
         period: 'monthly',
         periodStart,
       },
-      include: {
-        usages: {
-          orderBy: { createdAt: 'desc' },
-          take: 10,
-        },
-      },
     })
   }
 
   // ============================================
-  // 11. 取消订阅
+  // 10. 取消订阅
   // ============================================
 
   async cancelSubscription(userId: string): Promise<boolean> {
-    const subscription = await this.getSubscription(userId)
-    if (!subscription) return false
+    const subscription = await prisma.subscription.findFirst({
+      where: {
+        userId,
+        status: 'ACTIVE',
+      },
+    })
+
+    if (!subscription) {
+      return false
+    }
 
     await prisma.subscription.update({
       where: { id: subscription.id },
       data: {
         status: 'CANCELLED',
-        autoRenew: false,
       },
     })
 
@@ -454,13 +401,39 @@ export class BillingService {
   }
 
   // ============================================
-  // 12. 获取套餐对比
+  // 11. 消费额度
   // ============================================
 
-  getPlanComparison(): typeof PLAN_CONFIG {
-    return PLAN_CONFIG
+  async consumeQuota(userId: string, type: QuotaType, amount: number = 1, description?: string, meta?: Record<string, any>): Promise<void> {
+    const now = new Date()
+    const periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
+
+    const quota = await prisma.quota.findFirst({
+      where: {
+        userId,
+        type,
+        period: 'monthly',
+        periodStart,
+      },
+    })
+
+    if (!quota) {
+      throw new Error(`No quota found for user ${userId}, type ${type}`)
+    }
+
+    if (quota.used + amount > quota.total) {
+      throw new Error(`Quota exceeded: ${quota.used}/${quota.total}`)
+    }
+
+    await prisma.quota.update({
+      where: { id: quota.id },
+      data: {
+        used: quota.used + amount,
+        remaining: quota.total - (quota.used + amount),
+      },
+    })
   }
 }
 
-// 导出单例
+// 单例
 export const billingService = new BillingService()

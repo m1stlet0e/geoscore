@@ -1,80 +1,93 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
+// Disposable email domains blocklist
+const BLOCKED_DOMAINS = new Set([
+  'mailinator.com', 'guerrillamail.com', 'tempmail.com', 'throwaway.email',
+  'yopmail.com', 'sharklasers.com', 'guerrillamailblock.com', 'grr.la',
+  'guerrillamail.info', 'dispostable.com', 'trashmail.com', 'mailnesia.com',
+  '10minutemail.com', 'temp-mail.org', 'fakeinbox.com', 'tempinbox.com',
+  'maildrop.cc', 'mailnator.com', 'getnada.com', 'mohmal.com',
+]);
 
-const Body = z.object({
-  email: z.string().email('邮箱格式不正确'),
-  password: z.string().min(8, '密码至少 8 位'),
-  name: z.string().min(1).max(60).optional(),
-});
+function isValidEmail(email: string): boolean {
+  // Basic format check
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) return false;
+
+  // Block disposable email domains
+  const domain = email.split('@')[1]?.toLowerCase();
+  if (!domain) return false;
+  if (BLOCKED_DOMAINS.has(domain)) return false;
+
+  // Block common fake patterns
+  if (/^(test|fake|spam|trash|delete)@/i.test(email)) return false;
+
+  return true;
+}
 
 export async function POST(req: Request) {
-  let json: unknown;
   try {
-    json = await req.json();
-  } catch {
-    return NextResponse.json({ error: '请求体不是合法 JSON' }, { status: 400 });
-  }
+    const body = await req.json();
+    const { name, email, password } = body;
 
-  const parsed = Body.safeParse(json);
-  if (!parsed.success) {
-    const first = parsed.error.issues[0];
-    return NextResponse.json(
-      { error: first?.message ?? '参数错误', issues: parsed.error.flatten() },
-      { status: 400 }
-    );
-  }
-
-  const { email, password, name } = parsed.data;
-  const emailLower = email.toLowerCase().trim();
-
-  try {
-    const existing = await prisma.user.findUnique({ where: { email: emailLower } });
-    if (existing) {
-      return NextResponse.json({ error: '该邮箱已注册' }, { status: 400 });
+    // Validate required fields
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: '邮箱和密码为必填项' },
+        { status: 400 }
+      );
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    // Validate email format + disposable check
+    if (!isValidEmail(email)) {
+      return NextResponse.json(
+        { error: '请使用真实的工作邮箱注册' },
+        { status: 400 }
+      );
+    }
 
+    // Validate password strength
+    if (password.length < 8) {
+      return NextResponse.json(
+        { error: '密码至少需要 8 个字符' },
+        { status: 400 }
+      );
+    }
+
+    // Check if email already exists
+    const existing = await prisma.user.findUnique({
+      where: { email: email.toLowerCase().trim() },
+    });
+    if (existing) {
+      return NextResponse.json(
+        { error: '该邮箱已注册，请直接登录' },
+        { status: 409 }
+      );
+    }
+
+    // Hash password
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    // Create user
     const user = await prisma.user.create({
       data: {
-        email: emailLower,
-        name: name?.trim() || emailLower.split('@')[0],
+        name: name?.trim() || email.split('@')[0],
+        email: email.toLowerCase().trim(),
         passwordHash,
-        plan: 'FREE',
       },
-      select: { id: true, email: true, name: true, plan: true },
     });
 
-    // Auto-create a default brand for the new user so the dashboard isn't empty
-    const defaultBrandName = (name?.trim() || emailLower.split('@')[0]) + ' 的主品牌';
-    try {
-      await prisma.brand.create({
-        data: {
-          userId: user.id,
-          name: defaultBrandName,
-          status: 'active',
-        },
-      });
-    } catch {
-      // Ignore brand creation failure (e.g. duplicate name); user creation still succeeds
-    }
-
-    return NextResponse.json(
-      {
-        userId: user.id,
-        email: user.email,
-        name: user.name,
-        plan: user.plan,
-      },
-      { status: 201 }
-    );
+    return NextResponse.json({
+      ok: true,
+      user: { id: user.id, email: user.email, name: user.name },
+    });
   } catch (err) {
-    const message = err instanceof Error ? err.message : '服务器内部错误';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('Register error:', err);
+    return NextResponse.json(
+      { error: '注册失败，请稍后重试' },
+      { status: 500 }
+    );
   }
 }

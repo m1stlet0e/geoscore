@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+export const maxDuration = 300;
+
 // Helper: detect cron mode
 function isCron(req: NextRequest): boolean {
   const authHeader = req.headers.get('authorization') || '';
@@ -16,7 +19,7 @@ async function ensureAuth(req: NextRequest) {
   return { userId: (session.user as { id: string }).id, isCron: false };
 }
 
-// Daily scan: trigger one scan per active brand
+// Daily scan: create ScanRun + trigger execution
 export async function POST(req: NextRequest) {
   const authz = await ensureAuth(req);
   if (!authz.isCron && !authz.userId) {
@@ -29,19 +32,58 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, brandCount: 0, message: '无活跃品牌' });
   }
 
-  const results: { brandId: string; scanId: string }[] = [];
+  const cnPlatforms = ['deepseek', 'tongyi', 'wenxin', 'zhipu', 'kimi', 'doubao', 'yuanbao'];
+  const results: { brandId: string; scanId: string; executed: boolean }[] = [];
+
   for (const brand of brands) {
+    // Count active prompts
+    const promptCount = await prisma.prompt.count({
+      where: { brandId: brand.id, isActive: true },
+    });
+    if (promptCount === 0) {
+      results.push({ brandId: brand.id, scanId: '', executed: false });
+      continue;
+    }
+
+    // Create scan
     const scan = await prisma.scanRun.create({
       data: {
         brandId: brand.id,
         userId: brand.userId,
         status: 'running',
-        platforms: ['chatgpt', 'gemini', 'claude', 'perplexity', 'google_aio', 'mistral', 'deepseek'],
-        totalPrompts: 0,
+        platforms: cnPlatforms,
+        totalPrompts: promptCount,
         triggeredBy: authz.isCron ? 'cron' : 'user',
       },
     });
-    results.push({ brandId: brand.id, scanId: scan.id });
+
+    // Execute scan inline (call the same logic as /api/scans/[id]/execute)
+    try {
+      const baseUrl = req.nextUrl.origin;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+
+      // For cron mode, pass the cron secret; for user mode, forward cookies
+      if (authz.isCron) {
+        headers['authorization'] = `Bearer ${process.env.CRON_SECRET}`;
+      } else {
+        const cookie = req.headers.get('cookie') || '';
+        headers['cookie'] = cookie;
+      }
+
+      const execRes = await fetch(`${baseUrl}/api/scans/${scan.id}/execute`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ triggeredBy: authz.isCron ? 'cron' : 'user' }),
+      });
+
+      results.push({
+        brandId: brand.id,
+        scanId: scan.id,
+        executed: execRes.ok,
+      });
+    } catch {
+      results.push({ brandId: brand.id, scanId: scan.id, executed: false });
+    }
   }
 
   return NextResponse.json({

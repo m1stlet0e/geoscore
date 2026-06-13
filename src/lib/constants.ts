@@ -2,13 +2,13 @@
 // GeoScore — Constants for the 7 monitored AI platforms
 // ============================================
 export const AI_PLATFORMS = [
-  { id: 'chatgpt', name: 'ChatGPT', color: '#10a37f', icon: '🤖' },
-  { id: 'gemini', name: 'Gemini', color: '#4285f4', icon: '✨' },
-  { id: 'claude', name: 'Claude', color: '#d97706', icon: '🧠' },
-  { id: 'perplexity', name: 'Perplexity', color: '#22b8cd', icon: '🔍' },
-  { id: 'google_aio', name: 'Google AI Overview', color: '#ea4335', icon: '🌐' },
-  { id: 'mistral', name: 'Mistral', color: '#7c3aed', icon: '🌊' },
   { id: 'deepseek', name: 'DeepSeek', color: '#5b21b6', icon: '🐳' },
+  { id: 'tongyi', name: '通义千问', color: '#ff6a00', icon: '🔮' },
+  { id: 'wenxin', name: '文心一言', color: '#2932e1', icon: '📝' },
+  { id: 'zhipu', name: '智谱清言', color: '#00b578', icon: '🧪' },
+  { id: 'kimi', name: 'Kimi', color: '#1677ff', icon: '🌙' },
+  { id: 'doubao', name: '豆包', color: '#fe2c55', icon: '🫘' },
+  { id: 'yuanbao', name: '腾讯元宝', color: '#07c160', icon: '💰' },
 ] as const;
 
 export const PLATFORM_IDS = AI_PLATFORMS.map((p) => p.id);

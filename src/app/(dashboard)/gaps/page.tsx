@@ -625,14 +625,14 @@ export default function GapsPage() {
           />
           <StatCard
             label="平均差距"
-            value={`${summary.avgGap.toFixed(1)}%`}
+            value={`${(summary.avgGap ?? 0).toFixed(1)}%`}
             icon={<Activity className="h-4 w-4" />}
-            tone={summary.avgGap < -30 ? 'critical' : summary.avgGap < -10 ? 'warning' : 'default'}
+            tone={(summary.avgGap ?? 0) < -30 ? 'critical' : (summary.avgGap ?? 0) < -10 ? 'warning' : 'default'}
             subline="品牌 vs 基准"
           />
           <StatCard
             label="最大差距"
-            value={`${summary.biggestGap.toFixed(1)}%`}
+            value={`${(summary.biggestGap ?? 0).toFixed(1)}%`}
             icon={<AlertTriangle className="h-4 w-4" />}
             tone="critical"
             subline="最严重缺口"
@@ -742,17 +742,17 @@ export default function GapsPage() {
                         <div className="flex items-center gap-1.5">
                           <span className="text-neutral-500">评分</span>
                           <span className={`font-mono font-semibold ${getScoreColor(a.score)}`}>
-                            {a.score.toFixed(0)}
+                            {(a.score ?? 0).toFixed(0)}
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <span className="text-neutral-500">基准</span>
-                          <span className="font-mono text-neutral-500">{a.benchmarkScore.toFixed(0)}</span>
+                          <span className="font-mono text-neutral-500">{(a.benchmarkScore ?? 0).toFixed(0)}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <span className="text-neutral-500">差距</span>
                           <span className="font-mono font-semibold text-rose-300">
-                            {a.gap.toFixed(1)}%
+                            {(a.gap ?? 0).toFixed(1)}%
                           </span>
                         </div>
                         <div className="text-neutral-500">
@@ -849,7 +849,7 @@ export default function GapsPage() {
                     <div className="mb-2 flex items-center justify-between text-xs">
                       <span className="text-neutral-500">品牌评分</span>
                       <span className={`font-mono font-semibold ${getScoreColor(selectedAnalysis.score)}`}>
-                        {selectedAnalysis.score.toFixed(0)}
+                        {(selectedAnalysis.score ?? 0).toFixed(0)}
                       </span>
                     </div>
                     <div className="h-3 overflow-hidden rounded-full bg-white">
@@ -865,7 +865,7 @@ export default function GapsPage() {
                     <div className="mb-2 flex items-center justify-between text-xs">
                       <span className="text-neutral-500">基准评分</span>
                       <span className="font-mono font-semibold text-indigo-500">
-                        {selectedAnalysis.benchmarkScore.toFixed(0)}
+                        {(selectedAnalysis.benchmarkScore ?? 0).toFixed(0)}
                       </span>
                     </div>
                     <div className="h-3 overflow-hidden rounded-full bg-white">
@@ -882,7 +882,7 @@ export default function GapsPage() {
                   <AlertTriangle className="h-5 w-5 text-rose-400" />
                   <div>
                     <span className="text-sm text-rose-300">
-                      差距 <span className="font-mono font-semibold">{selectedAnalysis.gap.toFixed(1)}%</span>
+                      差距 <span className="font-mono font-semibold">{(selectedAnalysis.gap ?? 0).toFixed(1)}%</span>
                     </span>
                     <span className="ml-2 text-xs text-neutral-500">
                       {selectedAnalysis.gapItems?.length ?? 0} 个改进建议
@@ -926,7 +926,7 @@ export default function GapsPage() {
                             const isExpanded = expandedDescriptions.has(item.id);
                             const desc = item.description || '';
                             const shortDesc = desc.length > 60 ? desc.slice(0, 60) + '...' : desc;
-                            const absImpact = Math.abs(item.impact);
+                            const absImpact = Math.abs(item.impact ?? 0);
                             return (
                               <tr key={item.id} className="transition hover:bg-neutral-100">
                                 <td className="px-3 py-3">

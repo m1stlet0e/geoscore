@@ -59,7 +59,7 @@ function RegisterForm() {
       }
 
       startTransition(() => {
-        router.push('/dashboard');
+        router.push('/onboarding');
         router.refresh();
       });
     } catch (err) {
@@ -179,9 +179,9 @@ function RegisterForm() {
             </p>
           </form>
 
-          <div className="my-5 flex items-center gap-3 text-[10px] uppercase tracking-wider text-neutral-500">
+          <div className="mt-3 flex items-center gap-3 text-[10px] uppercase tracking-wider text-neutral-500">
             <div className="h-px flex-1 bg-neutral-200" />
-            已有账号?
+            已有账号？
             <div className="h-px flex-1 bg-neutral-200" />
           </div>
 

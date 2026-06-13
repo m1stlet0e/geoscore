@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
 import { prisma } from '@/lib/prisma'
-import { citationEngine } from '@/lib/engines/citation.engine'
+import { recommendationFactorEngine } from '@/lib/engines/recommendation-factor.engine'
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,7 +26,6 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const brandId = searchParams.get('brandId')
-    const platform = searchParams.get('platform') || undefined
 
     if (!brandId) {
       return NextResponse.json(
@@ -50,11 +49,11 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const factors = await citationEngine.getFactorDistribution(brandId, platform)
+    const result = await recommendationFactorEngine.getFactors(brandId)
 
     return NextResponse.json({
       success: true,
-      data: factors
+      data: result
     })
   } catch (error) {
     console.error('GET /api/citations/factors error:', error)
