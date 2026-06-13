@@ -55,7 +55,7 @@ const FAQ_ITEMS = [
   { q: '你们怎么调用 ChatGPT / Perplexity 这些模型？', a: '使用各家官方 API，在受控 prompt 模板下发出与真实用户最接近的查询，记录完整 response、citation、latency 与情感倾向。' },
   { q: '品牌还没在 AI 里被引用，接入有意义吗？', a: '更有意义。你能在被竞品"先占位"之前看清空白点，GeoScore 会告诉你"应该发什么"。' },
   { q: '数据安全 / 隐私？', a: 'GROWTH 及以上套餐支持 SSO/SAML、审计日志。账号密码 bcrypt 加盐存储，会话采用 NextAuth JWT。' },
-  { q: '能试用吗？', a: '免费版支持监控 1 个品牌、5 个关键词，无需信用卡，直接注册即用。' },
+  { q: '能试用吗？', a: '免费版支持监控 1 个品牌、5 个关键词，无需任何支付信息，直接注册即用。' },
 ];
 
 const STATS = [
@@ -147,7 +147,7 @@ export default function HomePage() {
           </div>
 
           <p className="mt-5 text-xs text-neutral-400">
-            免信用卡 · 1 分钟接入 · 永久免费版可用
+            无需预付 · 1 分钟接入 · 永久免费版可用
           </p>
         </div>
 
@@ -335,7 +335,7 @@ export default function HomePage() {
                 让 AI 主动提起你
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-lg text-indigo-100">
-                注册 30 秒拿到你品牌的 AI 可见性快照。免费版永久可用，不需要信用卡。
+                注册 30 秒拿到你品牌的 AI 可见性快照。免费版永久可用，无需任何支付信息。
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
