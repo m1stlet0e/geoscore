@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 // Disposable email domains blocklist
 const BLOCKED_DOMAINS = new Set([
@@ -28,6 +29,22 @@ function isValidEmail(email: string): boolean {
 }
 
 export async function POST(req: Request) {
+  // IP 级别 rate limiting：每 IP 每分钟最多 3 次注册
+  const ip = getClientIp(req);
+  const rl = rateLimit(`register:${ip}`, { maxRequests: 3, windowMs: 60_000 });
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: '操作过于频繁，请稍后再试' },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': String(Math.ceil(rl.resetIn / 1000)),
+          'X-RateLimit-Remaining': String(rl.remaining),
+        },
+      }
+    );
+  }
+
   try {
     const body = await req.json();
     const { name, email, password } = body;

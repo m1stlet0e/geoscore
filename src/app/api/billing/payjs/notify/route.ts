@@ -3,6 +3,7 @@
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 import { paymentService } from '@/lib/payment'
 import { billingService } from '@/lib/billing/billing.service'
 
@@ -30,11 +31,18 @@ export async function POST(request: NextRequest) {
       // 支付成功
       const orderNo = params.out_trade_no
       const payjsOrderId = params.payjs_order_id
-      const totalFee = params.total_fee
 
       console.log(`Payjs payment success: orderNo=${orderNo}, payjsOrderId=${payjsOrderId}`)
 
-      await billingService.handlePaymentCallback(orderNo, payjsOrderId, 'wechat')
+      // 从订单记录中读取实际支付方式，而非硬编码
+      const order = await prisma.order.findUnique({
+        where: { orderNo },
+        select: { paymentMethod: true },
+      })
+
+      const method = (order?.paymentMethod as 'wechat' | 'alipay') || 'wechat'
+
+      await billingService.handlePaymentCallback(orderNo, payjsOrderId, method)
     }
 
     // 返回 success（Payjs 要求返回 "success"）

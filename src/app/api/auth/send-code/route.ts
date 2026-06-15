@@ -6,6 +6,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { sendSmsCode, generateCode, saveCode, canSendCode, markCodeSent } from '@/lib/sms'
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -15,6 +16,19 @@ const Body = z.object({
 })
 
 export async function POST(req: Request) {
+  // IP 级别 rate limiting：每 IP 每分钟最多 3 次发送
+  const ip = getClientIp(req)
+  const rl = rateLimit(`send-code:${ip}`, { maxRequests: 3, windowMs: 60_000 })
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: '操作过于频繁，请稍后再试' },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(Math.ceil(rl.resetIn / 1000)) },
+      }
+    )
+  }
+
   let json: unknown
   try {
     json = await req.json()
@@ -33,7 +47,7 @@ export async function POST(req: Request) {
 
   const { phone } = parsed.data
 
-  // 检查发送频率
+  // 检查发送频率（同一手机号 1 分钟 1 条）
   if (!canSendCode(phone)) {
     return NextResponse.json(
       { error: '请稍后再试，1 分钟内只能发送 1 次' },

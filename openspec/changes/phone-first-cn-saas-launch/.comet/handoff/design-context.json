@@ -1,0 +1,13 @@
+{
+  "change": "phone-first-cn-saas-launch",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "1b1825d4f72e7e898075ae7b50a96e95f285e082fe4d1dbe8b3f351ab4d436c1",
+  "files": [
+    { "path": "openspec/changes/phone-first-cn-saas-launch/proposal.md", "sha256": "ef70c8fa1ef748365d58e1c7cbcc0bb857ba3829a9a5c7b98ebd8ccbcd3fe533" },
+    { "path": "openspec/changes/phone-first-cn-saas-launch/design.md", "sha256": "1f64f32bc34b861079b5f2fa0999f41b9b88f3ec48541f35315a785d33c5a4ce" },
+    { "path": "openspec/changes/phone-first-cn-saas-launch/tasks.md", "sha256": "9ac37e67a5ed86c51c18783627aa813fde0a297290f83bbe6efff62fdf688a99" }
+  ]
+}

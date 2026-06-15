@@ -238,6 +238,20 @@ export class BillingService {
     const periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
     const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
 
+    // 读取旧额度，保留当月已用量
+    const oldQuotas = await prisma.quota.findMany({
+      where: {
+        userId,
+        period: 'monthly',
+        periodStart,
+      },
+    })
+
+    const oldUsedMap = new Map<string, number>()
+    for (const q of oldQuotas) {
+      oldUsedMap.set(q.type, q.used)
+    }
+
     // 删除旧额度
     await prisma.quota.deleteMany({
       where: {
@@ -247,17 +261,21 @@ export class BillingService {
       },
     })
 
-    // 创建新额度
-    const quotaEntries = Object.entries(config.quotas).map(([type, total]) => ({
-      userId,
-      type: type as QuotaType,
-      total,
-      used: 0,
-      remaining: total,
-      period: 'monthly' as const,
-      periodStart,
-      periodEnd,
-    }))
+    // 创建新额度，保留已用量（不超过新总额度）
+    const quotaEntries = Object.entries(config.quotas).map(([type, total]) => {
+      const oldUsed = oldUsedMap.get(type) || 0
+      const used = Math.min(oldUsed, total)
+      return {
+        userId,
+        type: type as QuotaType,
+        total,
+        used,
+        remaining: total - used,
+        period: 'monthly' as const,
+        periodStart,
+        periodEnd,
+      }
+    })
 
     await prisma.quota.createMany({
       data: quotaEntries,

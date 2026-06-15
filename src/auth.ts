@@ -4,6 +4,9 @@ import { getServerSession } from 'next-auth';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 
+// 统一的 JWT secret
+const AUTH_SECRET = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+
 /* ─── 微信 OAuth 自定义 Provider ─── */
 function WeChatProvider() {
   return {
@@ -147,6 +150,7 @@ if (process.env.ALIPAY_APP_ID && process.env.ALIPAY_APP_SECRET) {
 }
 
 export const authOptions: NextAuthOptions = {
+  secret: AUTH_SECRET,
   session: { strategy: 'jwt' },
   pages: { signIn: '/login' },
   providers,
