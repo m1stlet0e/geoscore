@@ -8,34 +8,34 @@ datasource db {
 }
 
 model User {
-  id                String             @id @default(cuid())
-  email             String?            @unique
-  phone             String?            @unique
-  name              String?
-  passwordHash      String?
-  image             String?
-  plan              Plan               @default(FREE)
-  planExpiresAt     DateTime?
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  accounts          Account[]
-  adminLogs         AdminLog[]
-  alerts            Alert[]
-  brands            Brand[]
-  citations         Citation[]
-  citationEvidences CitationEvidence[]
-  citationSources   CitationSource[]
-  contentPieces     ContentPiece[]
-  forecasts         Forecast[]
-  gapAnalyses       GapAnalysis[]
-  orders            Order[]
-  prompts           Prompt[]
-  publishJobs       PublishJob[]
-  quotas            Quota[]
-  scans             ScanRun[]
-  sessions          Session[]
-  subscriptions     Subscription[]
-  trendSignals      TrendSignal[]
+  id                    String                 @id @default(cuid())
+  email                 String?                @unique
+  phone                 String?                @unique
+  name                  String?
+  passwordHash          String?
+  image                 String?
+  plan                  Plan                   @default(FREE)
+  planExpiresAt         DateTime?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  accounts              Account[]
+  adminLogs             AdminLog[]
+  alerts                Alert[]
+  brands                Brand[]
+  citations             Citation[]
+  citationEvidences     CitationEvidence[]
+  citationSources       CitationSource[]
+  contentPieces         ContentPiece[]
+  forecasts             Forecast[]
+  gapAnalyses           GapAnalysis[]
+  orders                Order[]
+  prompts               Prompt[]
+  publishJobs           PublishJob[]
+  quotas                Quota[]
+  scans                 ScanRun[]
+  sessions              Session[]
+  subscriptions         Subscription[]
+  trendSignals          TrendSignal[]
   recommendationFactors RecommendationFactor[]
 }
 
@@ -165,27 +165,27 @@ model VerificationToken {
 }
 
 model Brand {
-  id                String             @id @default(cuid())
-  userId            String
-  name              String
-  domain            String?
-  description       String?
-  category          String?
-  competitors       String[]
-  status            String             @default("active")
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  alerts            Alert[]
-  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  citations         Citation[]
-  citationEvidences CitationEvidence[]
-  citationSources   CitationSource[]
-  contentPieces     ContentPiece[]
-  forecasts         Forecast[]
-  gapAnalyses       GapAnalysis[]
-  prompts           Prompt[]
-  scans             ScanRun[]
-  trendSignals      TrendSignal[]
+  id                    String                 @id @default(cuid())
+  userId                String
+  name                  String
+  domain                String?
+  description           String?
+  category              String?
+  competitors           String[]
+  status                String                 @default("active")
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  alerts                Alert[]
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  citations             Citation[]
+  citationEvidences     CitationEvidence[]
+  citationSources       CitationSource[]
+  contentPieces         ContentPiece[]
+  forecasts             Forecast[]
+  gapAnalyses           GapAnalysis[]
+  prompts               Prompt[]
+  scans                 ScanRun[]
+  trendSignals          TrendSignal[]
   recommendationFactors RecommendationFactor[]
 
   @@unique([userId, name])
@@ -491,23 +491,23 @@ model CitationEvidence {
 // 分析 AI 为什么推荐竞品，量化每个因子的影响力
 // ============================================
 model RecommendationFactor {
-  id          String   @id @default(cuid())
-  brandId     String
-  userId      String
-  platform    String
-  factor      String   // e.g. "GitHub 星数", "知乎热度", "文档质量"
-  category    String   // e.g. "social_proof", "content_quality", "technical", "community"
-  weight      Float    @default(0) // 该因子在推荐中的权重
-  impact      Float    @default(0) // 对排名的量化影响 (0-100)
-  mentions    Int      @default(0) // 被提及次数
-  trend       String   @default("stable") // rising, stable, declining
-  competitor  String?  // 竞品名称
-  suggestion  String?  // 改进建议
-  evidence    Json?    // 证据来源
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  brand       Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  brandId    String
+  userId     String
+  platform   String
+  factor     String // e.g. "GitHub 星数", "知乎热度", "文档质量"
+  category   String // e.g. "social_proof", "content_quality", "technical", "community"
+  weight     Float    @default(0) // 该因子在推荐中的权重
+  impact     Float    @default(0) // 对排名的量化影响 (0-100)
+  mentions   Int      @default(0) // 被提及次数
+  trend      String   @default("stable") // rising, stable, declining
+  competitor String? // 竞品名称
+  suggestion String? // 改进建议
+  evidence   Json? // 证据来源
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  brand      Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([brandId, platform, factor])
   @@index([brandId, impact])
@@ -550,4 +550,160 @@ enum QuotaType {
   GAP_ANALYSIS
   CONTENT_GENERATE
   REPORT_GENERATE
+}
+
+// =====================================================================
+// v2 (geo-core-v2-ocr) — Citation Intelligence + GEO Gap + Growth Agent
+// 见 docs/superpowers/specs/2026-06-19-geo-core-v2-ocr-design.md
+// 命名前缀 v2 避免与旧表 Citation / GapAnalysis 等混淆
+// =====================================================================
+
+model V2PromptLibrary {
+  id        String   @id @default(cuid())
+  industry  String // 'ocr' 等
+  text      String
+  category  String // 'comparison' | 'recommendation' | 'how-to' | ...
+  language  String   @default("zh")
+  source    String   @default("seed") // seed / manual / semi-auto
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  scanJobs        V2ScanJob[]
+  v2CitationEdges V2CitationEdge[]
+
+  @@unique([industry, text])
+  @@index([industry, category])
+}
+
+// 节点：要么是品牌 (kind=brand)，要么是引用源 (kind=source)
+model V2CitationNode {
+  id        String   @id @default(cuid())
+  kind      String // 'brand' | 'source'
+  name      String // 品牌规范名 / 来源 host
+  industry  String? // 'ocr'，brand 必填，source 可空
+  aliases   String[] // 别名归一
+  meta      Json? // 例如 source 的 type=website/github/doc/media/zhihu，brand 的 domain
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  outgoingEdges V2CitationEdge[] @relation("EdgeFrom")
+  incomingEdges V2CitationEdge[] @relation("EdgeTo")
+
+  @@unique([kind, industry, name])
+  @@index([kind, industry])
+}
+
+// 边：在 (promptId, channel, brandNode, sourceNode) 维度去重
+model V2CitationEdge {
+  id           String   @id @default(cuid())
+  promptId     String
+  channel      String // 'deepseek' | 'chatgpt'
+  brandNodeId  String // V2CitationNode kind=brand
+  sourceNodeId String? // V2CitationNode kind=source，nullable
+  sourceUrl    String? // 实际命中的 url，用于唯一索引去重
+  rank         Int // brand 在该回答里的排名
+  confidence   Float // 0..1
+  observedAt   DateTime @default(now())
+
+  prompt     V2PromptLibrary @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  brandNode  V2CitationNode  @relation("EdgeFrom", fields: [brandNodeId], references: [id])
+  sourceNode V2CitationNode? @relation("EdgeTo", fields: [sourceNodeId], references: [id])
+
+  @@unique([promptId, channel, brandNodeId, sourceUrl])
+  @@index([brandNodeId, observedAt])
+  @@index([promptId, channel])
+}
+
+// 当前快照：(brandNodeId, dimension) 唯一
+model V2BrandDimension {
+  id          String   @id @default(cuid())
+  brandNodeId String
+  dimension   String // 'github' | 'website' | 'zhihu' | 'media'
+  metric      Float // 项目数 / 索引页数 / 提及数
+  detail      Json?
+  stale       Boolean  @default(false)
+  collectedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([brandNodeId, dimension])
+  @@index([brandNodeId])
+}
+
+// 历史趋势
+model V2BrandDimensionSnapshot {
+  id          String   @id @default(cuid())
+  brandNodeId String
+  dimension   String
+  metric      Float
+  detail      Json?
+  stale       Boolean  @default(false)
+  collectedAt DateTime @default(now())
+
+  @@index([brandNodeId, dimension, collectedAt])
+}
+
+// Gap 报告：只插不改
+model V2GapReport {
+  id         String   @id @default(cuid())
+  brandId    String // 关联现有 Brand 表
+  industry   String
+  rows       Json // GapRow[]
+  narrative  String
+  snapshotAt DateTime @default(now())
+
+  @@index([brandId, snapshotAt])
+}
+
+// Growth 计划：只插不改
+model V2GrowthPlan {
+  id          String   @id @default(cuid())
+  brandId     String // 关联现有 Brand 表
+  industry    String
+  actions     Json // GrowthAction[] 长度 3
+  generatedAt DateTime @default(now())
+
+  @@index([brandId, generatedAt])
+}
+
+// LLM 链路任务
+model V2ScanJob {
+  id         String    @id @default(cuid())
+  brandId    String // 关联现有 Brand 表
+  promptId   String
+  channel    String // 'deepseek' | 'chatgpt'
+  status     String    @default("pending") // pending | running | done | failed
+  attempts   Int       @default(0)
+  priority   Int       @default(100)
+  error      String?
+  result     Json? // ExtractedCitation 快照
+  batchId    String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  startedAt  DateTime?
+  finishedAt DateTime?
+
+  prompt V2PromptLibrary @relation(fields: [promptId], references: [id])
+
+  @@unique([brandId, promptId, channel])
+  @@index([status, priority, createdAt])
+  @@index([batchId])
+}
+
+// 采集器任务（Phase 3 才会写入；这里先建表，留空跑）
+model V2CollectorRun {
+  id          String    @id @default(cuid())
+  brandNodeId String
+  dimension   String
+  status      String    @default("pending")
+  attempts    Int       @default(0)
+  priority    Int       @default(100)
+  error       String?
+  result      Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  startedAt   DateTime?
+  finishedAt  DateTime?
+
+  @@unique([brandNodeId, dimension])
+  @@index([status, priority, createdAt])
 }
