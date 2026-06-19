@@ -8,7 +8,8 @@
     "start": "next start -p 18200",
     "lint": "eslint",
     "db:push": "prisma db push",
-    "db:seed": "node prisma/seed.mjs"
+    "db:seed": "node prisma/seed.mjs",
+    "db:seed:v2": "tsx prisma/seed.v2.ts"
   },
   "dependencies": {
     "@alicloud/dysmsapi20170525": "^4.5.1",
@@ -42,6 +43,7 @@
     "eslint-config-next": "16.2.6",
     "prisma": "^7.8.0",
     "tailwindcss": "^4",
+    "tsx": "^4.22.4",
     "typescript": "^6.0.3"
   }
 }
