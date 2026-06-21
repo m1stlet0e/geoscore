@@ -55,8 +55,8 @@ export default async function ForecastPage({ searchParams }: { searchParams: Pro
   const predictedScore = latestForecast?.predictedScore ?? Math.min(95, currentScore + 8);
   const delta = predictedScore - currentScore;
   const drivers = (latestForecast?.drivers as Array<{ factor: string; impact: number }> | null) || [
-    { factor: 'Reddit 讨论增加', impact: 0.18 },
-    { factor: 'GitHub README 优化', impact: 0.12 },
+    { factor: '知乎 讨论增加', impact: 0.18 },
+    { factor: 'Gitee README 优化', impact: 0.12 },
     { factor: '行业媒体引用', impact: 0.09 },
     { factor: '竞品缺席率上升', impact: 0.06 },
     { factor: '官方文档 Schema 完善', impact: 0.04 },

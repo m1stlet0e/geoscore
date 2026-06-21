@@ -2,9 +2,13 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { chatCompletion } from '@/lib/deepseek';
 import { AI_PLATFORMS } from '@/lib/constants';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
+
+const DAILY_AUDIT_LIMIT = Number(process.env.PUBLIC_AUDIT_DAILY_LIMIT || 3);
+const BURST_AUDIT_LIMIT = Number(process.env.PUBLIC_AUDIT_BURST_LIMIT || 2);
 
 const Body = z.object({
   brandName: z.string().min(1).max(100),
@@ -57,6 +61,36 @@ function detectMention(text: string, brandName: string): { mentioned: boolean; s
 
 export async function POST(req: Request) {
   try {
+    const ip = getClientIp(req);
+
+    const burst = rateLimit(`public-audit-burst:${ip}`, {
+      maxRequests: BURST_AUDIT_LIMIT,
+      windowMs: 60_000,
+    });
+    if (!burst.allowed) {
+      return NextResponse.json(
+        { error: '请求过于频繁，请稍后再试' },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(Math.ceil(burst.resetIn / 1000)) },
+        }
+      );
+    }
+
+    const daily = rateLimit(`public-audit-daily:${ip}`, {
+      maxRequests: DAILY_AUDIT_LIMIT,
+      windowMs: 24 * 60 * 60 * 1000,
+    });
+    if (!daily.allowed) {
+      return NextResponse.json(
+        { error: '今日免费审计次数已用完，注册后可获得更多额度' },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(Math.ceil(daily.resetIn / 1000)) },
+        }
+      );
+    }
+
     const body = await req.json();
     const parsed = Body.safeParse(body);
     if (!parsed.success) {

@@ -86,7 +86,7 @@ function RegisterForm() {
             <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-50 px-3 py-1 text-[11px] text-indigo-600">
               30 秒接入 · 永久免费版
             </div>
-            <h1 className="mt-4 text-2xl font-semibold tracking-tight text-neutral-900">创建你的 GeoScore 账号</h1>
+            <h1 className="mt-4 text-2xl font-semibold tracking-tight text-neutral-900">创建你的 极排 账号</h1>
             <p className="mt-1.5 text-sm text-neutral-500">
               {planHint === 'enterprise'
                 ? '我们将为你开通 ENTERPRISE 试用,稍后销售会联系你。'
@@ -94,7 +94,7 @@ function RegisterForm() {
             </p>
           </div>
 
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={onSubmit} method="POST" className="space-y-4">
             <div>
               <label htmlFor="name" className="mb-1.5 block text-xs font-medium text-neutral-300">
                 姓名 / 品牌名(可选)

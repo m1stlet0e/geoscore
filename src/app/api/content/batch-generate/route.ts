@@ -28,10 +28,10 @@ const TYPE_PROMPTS: Record<string, (b: { name: string; category: string | null; 
     `你是一个 GEO 优化专家。请为品牌「${b.name}」生成一篇对比页面，主题：${hint || `${b.name} vs 主流竞品`}。结构：1) 概览 2) 对比表格（功能、定价、适用场景、AI 友好度）3) 详细点评 4) 选型建议。最后以一段「为什么选 ${b.name}」结尾。500-800 字。`,
   pr: (b, hint) =>
     `你是一个中文 PR 媒体编辑。请为品牌「${b.name}」撰写一篇 300-500 字的 PR 媒体稿，主题方向：${hint || `${b.name} 在 AI 搜索时代的产品升级`}。风格：客观、第三人称、包含一句可被媒体引用的金句，结尾留出公司联系方式占位。`,
-  reddit: (b, hint) =>
-    `你是一个 Reddit 社区运营专家。请为品牌「${b.name}」撰写一篇适合 r/AItools、r/MachineLearning、r/ChineseLanguage 等社区的帖子。语气：真实用户分享，不过度营销。包含 1 段亲身使用体验、1 段优缺点、1 个明确的 CTA 引导讨论。主题：${hint || `${b.name} 真实使用 30 天感受`}。`,
-  github_readme: (b, hint) =>
-    `你是一个技术文档作者。请为品牌「${b.name}」生成一份 GitHub README.md 内容（中英混合 OK），包含：项目 Logo 占位、一句话定位、核心特性 3-5 条、Quick Start（代码块）、FAQ、License、Contributing。方向：${hint || '突出开发者最关心的集成方式'}。`,
+  zhihu: (b, hint) =>
+    `你是一个知乎社区运营专家。请为品牌「${b.name}」撰写一篇适合知乎 AI、科技、创业等话题的帖子。语气：真实用户分享，不营销。包含 1 段亲身使用体验、1 段优缺点、1 个明确的 CTA 引导讨论。主题：${hint || `${b.name} 真实使用 30 天感受`}。`,
+  gitee_readme: (b, hint) =>
+    `你是一个技术文档作者。请为品牌「${b.name}」生成一份 Gitee README.md 内容（中英混合 OK），包含：项目 Logo 占位、一句话定位、核心特性 3-5 条、Quick Start（代码块）、FAQ、License、Contributing。方向：${hint || '突出开发者最关心的集成方式'}。`,
   product_hunt: (b, hint) =>
     `你是一个 Product Hunt Launch 专家。请为品牌「${b.name}」生成一份上线发布文案：1) 英文 tagline（≤60 字符）2) 中文短描述（100 字内）3) 4 张图配文建议 4) 首发 24 小时推广 checklist。方向：${hint || `${b.name} 核心卖点 + AI 搜索引用优化`}。`,
 };
@@ -42,8 +42,8 @@ const TYPE_TO_TITLE_HINT: Record<string, string> = {
   schema: 'Schema 结构化数据',
   comparison: '对比页面',
   pr: 'PR 媒体稿',
-  reddit: 'Reddit 帖子',
-  github_readme: 'GitHub README',
+  zhihu: '知乎回答',
+  gitee_readme: 'Gitee README',
   product_hunt: 'Product Hunt 发布',
 };
 

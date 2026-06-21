@@ -143,7 +143,7 @@ function parseSourcesFromText(text: string, platform: string, brand: { name: str
   const found: { url: string; title: string; domain: string; snippet: string }[] = [];
   if (!voice) return found;
   // Perplexity style: numbered refs [1] [2] [3]
-  if (platform === 'perplexity') {
+  if (platform === 'doubao') {
     const refs = text.match(/\[(\d+)\]/g) || [];
     const n = Math.min(refs.length, 5);
     for (let i = 0; i < n; i++) {
@@ -269,7 +269,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
             status: 'running',
             totalPrompts: pc,
             completedPrompts: 0,
-            platforms: ['chatgpt', 'gemini', 'claude', 'perplexity'],
+            platforms: ['wenxin', 'tongyi', 'kimi', 'doubao'],
             triggeredBy: 'cron',
           },
         });
@@ -359,7 +359,7 @@ async function executeOneScan(
       const start = Date.now();
       let responseText = '';
       try {
-        const voice = PLATFORM_VOICES[platform] ?? PLATFORM_VOICES.chatgpt;
+        const voice = PLATFORM_VOICES[platform] ?? PLATFORM_VOICES.wenxin;
         const compLine =
           competitors.length > 0
             ? `（可对比的竞品：${competitors.slice(0, 5).join('、')}）`
@@ -507,6 +507,7 @@ async function executeOneScan(
   try {
     const allScans = await prisma.promptScan.findMany({
       where: { scanRunId: scanId },
+      include: { prompt: { select: { text: true } } },
     });
     const totalScans = allScans.length;
     const mentionedCount = allScans.filter((s) => s.brandMentioned).length;
@@ -732,7 +733,7 @@ async function executeOneScan(
     // 7) GEO Gap Intelligence 2.0 — quantified impact + solutions
     try {
       const { gapIntelligenceEngine } = await import('@/lib/engines/gap-intelligence.engine');
-      const scanResults = promptScans.map(ps => ({
+      const scanResults = allScans.map(ps => ({
         platform: ps.platform,
         promptText: ps.prompt.text,
         answerText: ps.responseText || '',

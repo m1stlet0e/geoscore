@@ -90,11 +90,13 @@ interface Pagination {
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const PLATFORM_COLORS: Record<string, { bg: string; text: string; border: string; label: string }> = {
-  chatgpt: { bg: 'bg-emerald-500/15', text: 'text-emerald-300', border: 'border-emerald-500/30', label: 'ChatGPT' },
-  gemini: { bg: 'bg-blue-500/15', text: 'text-blue-300', border: 'border-blue-500/30', label: 'Gemini' },
-  claude: { bg: 'bg-purple-500/15', text: 'text-purple-300', border: 'border-purple-500/30', label: 'Claude' },
-  deepseek: { bg: 'bg-orange-500/15', text: 'text-orange-300', border: 'border-orange-500/30', label: 'DeepSeek' },
-  perplexity: { bg: 'bg-pink-500/15', text: 'text-pink-300', border: 'border-pink-500/30', label: 'Perplexity' },
+  wenxin: { bg: 'bg-blue-500/15', text: 'text-blue-600', border: 'border-blue-500/30', label: '文心一言' },
+  tongyi: { bg: 'bg-orange-500/15', text: 'text-orange-600', border: 'border-orange-500/30', label: '通义千问' },
+  kimi: { bg: 'bg-emerald-500/15', text: 'text-emerald-600', border: 'border-emerald-500/30', label: 'Kimi' },
+  deepseek: { bg: 'bg-indigo-500/15', text: 'text-indigo-600', border: 'border-indigo-500/30', label: 'DeepSeek' },
+  doubao: { bg: 'bg-pink-500/15', text: 'text-pink-600', border: 'border-pink-500/30', label: '豆包' },
+  zhipu: { bg: 'bg-teal-500/15', text: 'text-teal-600', border: 'border-teal-500/30', label: '智谱清言' },
+  yuanbao: { bg: 'bg-lime-500/15', text: 'text-lime-600', border: 'border-lime-500/30', label: '腾讯元宝' },
 };
 
 const STATUS_STYLES: Record<AnalysisStatus, { bg: string; text: string; label: string }> = {
@@ -129,7 +131,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: 'tracking', label: '改进跟踪' },
 ];
 
-const PLATFORMS = ['chatgpt', 'gemini', 'claude', 'deepseek', 'perplexity'];
+const PLATFORMS = ['chatgpt', 'gemini', 'claude', 'deepseek', 'perplexity', 'tongyi', 'wenxin', 'zhipu', 'kimi', 'doubao', 'yuanbao', 'mistral'];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -333,7 +335,7 @@ export default function GapsPage() {
         if (!res.ok) throw new Error('Failed to fetch analyses');
         const data = await res.json();
         const result = data.data || data;
-        setAnalyses((result.analyses ?? []).map((a: Analysis) => normalizeGapAnalysis(a) as Analysis));
+        setAnalyses((result.analyses ?? []).map((a: Record<string, unknown>) => normalizeGapAnalysis(a) as unknown as Analysis));
         setPagination(normalizePagination(result.pagination));
       } catch (err) {
         console.error('Error fetching gap analyses:', err);
@@ -350,7 +352,7 @@ export default function GapsPage() {
       const res = await fetch(`/api/gaps/${id}`);
       if (!res.ok) throw new Error('Failed to fetch detail');
       const data = await res.json();
-      setSelectedAnalysis(normalizeGapAnalysis(data.data ?? data) as Analysis);
+      setSelectedAnalysis(normalizeGapAnalysis(data.data ?? data) as unknown as Analysis);
       setActiveTab('detail');
     } catch (err) {
       console.error('Error fetching gap detail:', err);

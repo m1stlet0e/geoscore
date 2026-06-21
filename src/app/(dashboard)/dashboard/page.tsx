@@ -114,15 +114,19 @@ export default async function DashboardPage() {
     }),
   ]);
 
-  // Aggregate citation trend by day
+  // Aggregate citation trend by day (UTC+8 for China-local date grouping)
+  const CST_OFFSET_MS = 8 * 60 * 60 * 1000;
+  const toLocalDateKey = (date: Date) =>
+    new Date(date.getTime() + CST_OFFSET_MS).toISOString().slice(0, 10);
+
   const trendMap = new Map<string, number>();
   for (let i = 29; i >= 0; i--) {
     const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-    const key = d.toISOString().slice(0, 10);
+    const key = toLocalDateKey(d);
     trendMap.set(key, 0);
   }
   for (const c of promptScanByDay) {
-    const key = new Date(c.createdAt).toISOString().slice(0, 10);
+    const key = toLocalDateKey(new Date(c.createdAt));
     if (trendMap.has(key)) trendMap.set(key, trendMap.get(key)! + 1);
   }
   const trendData = Array.from(trendMap.entries()).map(([date, count]) => ({ date, count }));

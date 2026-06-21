@@ -37,6 +37,11 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "fill-all-data.ts",
+    "test-scan.ts",
+    "test-real-scan.ts",
+    "*.mjs",
+    "prisma/seed.comprehensive.ts"
   ]
 }

@@ -5,7 +5,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { chat, jsonChat, chatCompletion } from '@/lib/deepseek'
-import { billingService } from '@/lib/billing/billing.service'
+import { quotaService } from '@/lib/billing/quota.service'
 
 // ============================================
 // Types
@@ -146,10 +146,15 @@ export class ContentEngine {
   // ============================================
 
   async generateContent(request: ContentRequest): Promise<GeneratedContent> {
-    // 检查额度
-    const quotaCheck = await billingService.checkQuota(request.userId, 'CONTENT_GENERATE')
-    if (!quotaCheck.allowed) {
-      throw new Error(`额度不足，剩余 ${quotaCheck.remaining} 次`)
+    const canProceed = await quotaService.checkAndDeduct(
+      request.userId,
+      'CONTENT_GENERATE',
+      1,
+      undefined,
+      { brandId: request.brandId, type: request.type }
+    )
+    if (!canProceed) {
+      throw new Error('额度不足，请升级套餐')
     }
 
     // 获取品牌信息
@@ -223,15 +228,6 @@ export class ContentEngine {
         },
       },
     })
-
-    // 消费额度
-    await billingService.consumeQuota(
-      request.userId,
-      'CONTENT_GENERATE',
-      1,
-      `Generated ${request.type} content: ${title}`,
-      { contentId: content.id, type: request.type }
-    )
 
     return {
       contentId: content.id,

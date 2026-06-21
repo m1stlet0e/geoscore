@@ -6,6 +6,7 @@ import { Logo } from '@/components/Logo'
 import { Sparkles, ShieldCheck, Mail, Phone } from 'lucide-react'
 import { LoginForm } from './LoginForm'
 import { PhoneLoginForm } from './PhoneLoginForm'
+import { OneClickLogin } from './OneClickLogin'
 
 type LoginMethod = 'email' | 'phone'
 
@@ -26,9 +27,11 @@ export default function LoginPageClient() {
 
         <div className="surface-raised rounded-2xl p-7 shadow-2xl sm:p-8">
           <div className="mb-6 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">登录到 GeoScore</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">登录到 极排</h1>
             <p className="mt-1.5 text-sm text-neutral-500">继续监控你的 AI 可见性。</p>
           </div>
+
+          <OneClickLogin />
 
           {/* 登录方式切换 */}
           <div className="mb-6 flex rounded-lg bg-neutral-100 p-1">

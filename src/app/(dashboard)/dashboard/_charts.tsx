@@ -1,8 +1,8 @@
 'use client';
 
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -28,10 +28,10 @@ export function CitationTrendChart({ data }: { data: TrendPoint[] }) {
   return (
     <div className="h-[280px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+        <AreaChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="citationGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#6366f1" stopOpacity={0.4} />
+              <stop offset="0%" stopColor="#6366f1" stopOpacity={0.5} />
               <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
             </linearGradient>
           </defs>
@@ -43,6 +43,8 @@ export function CitationTrendChart({ data }: { data: TrendPoint[] }) {
             tickFormatter={(v) => v.slice(5)}
             interval="preserveStartEnd"
             minTickGap={24}
+            axisLine={false}
+            tickLine={false}
           />
           <YAxis
             stroke="#9ca3af"
@@ -51,6 +53,8 @@ export function CitationTrendChart({ data }: { data: TrendPoint[] }) {
             domain={[0, (dataMax: number) => Math.max(dataMax + 1, 5)]}
             tickCount={6}
             width={32}
+            axisLine={false}
+            tickLine={false}
           />
           <Tooltip
             contentStyle={{
@@ -60,20 +64,20 @@ export function CitationTrendChart({ data }: { data: TrendPoint[] }) {
               fontSize: 12,
               boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
             }}
-            labelStyle={{ color: '#374151' }}
-            formatter={(value: number) => [`${value} 次`, '提及']}
-            labelFormatter={(v) => `日期 ${v}`}
+            labelStyle={{ color: '#374151', fontWeight: 'bold', marginBottom: '4px' }}
+            formatter={(value: number) => [`${value} 次`, 'AI 提及']}
+            labelFormatter={(v) => `日期: ${v}`}
           />
-          <Line
+          <Area
             type="monotone"
             dataKey="count"
             stroke="#6366f1"
-            strokeWidth={2}
-            dot={false}
-            activeDot={{ r: 4, fill: '#6366f1' }}
+            strokeWidth={3}
+            fillOpacity={1}
             fill="url(#citationGradient)"
+            activeDot={{ r: 6, fill: '#6366f1', stroke: '#ffffff', strokeWidth: 2 }}
           />
-        </LineChart>
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );
@@ -91,9 +95,9 @@ export function PlatformDistributionChart({ data }: { data: PlatformPoint[] }) {
             nameKey="name"
             cx="50%"
             cy="50%"
-            innerRadius={55}
+            innerRadius={65}
             outerRadius={90}
-            paddingAngle={2}
+            paddingAngle={3}
             stroke="none"
           >
             {data.map((entry, i) => (
@@ -108,9 +112,9 @@ export function PlatformDistributionChart({ data }: { data: PlatformPoint[] }) {
               fontSize: 12,
               boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
             }}
-            labelStyle={{ color: '#374151' }}
+            itemStyle={{ color: '#1f2937', fontWeight: '500' }}
             formatter={(value: number, name: string) => [
-              `${value} (${((value / total) * 100).toFixed(1)}%)`,
+              `${value} 次 (${((value / total) * 100).toFixed(1)}%)`,
               name,
             ]}
           />
@@ -119,7 +123,7 @@ export function PlatformDistributionChart({ data }: { data: PlatformPoint[] }) {
             height={36}
             iconType="circle"
             iconSize={8}
-            wrapperStyle={{ fontSize: 11, color: '#6b7280' }}
+            wrapperStyle={{ fontSize: 12, color: '#4b5563', paddingTop: '10px' }}
           />
         </PieChart>
       </ResponsiveContainer>

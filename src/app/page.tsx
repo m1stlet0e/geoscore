@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { 
   ArrowRight, 
@@ -55,6 +56,8 @@ const PRESET_QUERIES = [
 ];
 
 export default function HomePage() {
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === "authenticated" && !!session?.user;
   const [brandName, setBrandName] = useState('');
   const [website, setWebsite] = useState('');
   const [query, setQuery] = useState('');
@@ -142,15 +145,26 @@ export default function HomePage() {
             <Link href="/pricing" className="transition hover:text-neutral-900">定价方案</Link>
           </nav>
           <div className="flex items-center gap-4">
-            <Link href="/login" className="hidden text-sm font-bold text-neutral-700 transition hover:text-neutral-900 sm:inline-flex">
-              登录
-            </Link>
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-6 py-2.5 text-sm font-bold text-white shadow-xl shadow-neutral-900/10 transition hover:bg-neutral-800 hover:-translate-y-0.5 active:translate-y-0"
-            >
-              免费开始 <ArrowRight className="h-4 w-4" />
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-xl shadow-indigo-600/20 transition hover:bg-indigo-700 hover:-translate-y-0.5 active:translate-y-0"
+              >
+                进入控制台 <ArrowRight className="h-4 w-4" />
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className="hidden text-sm font-bold text-neutral-700 transition hover:text-neutral-900 sm:inline-flex">
+                  登录
+                </Link>
+                <Link
+                  href="/register"
+                  className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-6 py-2.5 text-sm font-bold text-white shadow-xl shadow-neutral-900/10 transition hover:bg-neutral-800 hover:-translate-y-0.5 active:translate-y-0"
+                >
+                  免费开始 <ArrowRight className="h-4 w-4" />
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -180,7 +194,7 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-8 max-w-2xl text-xl font-medium leading-relaxed text-neutral-500 sm:text-2xl">
-              GeoScore 帮助企业监控、分析并优化品牌在 ChatGPT、Claude、Kimi 等 AI 引擎中的曝光度与推荐排名。
+              极排 帮助企业监控、分析并优化品牌在 文心一言、Kimi、Kimi 等 AI 引擎中的曝光度与推荐排名。
             </p>
 
             <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row">
@@ -255,7 +269,7 @@ export default function HomePage() {
                         required
                         value={brandName}
                         onChange={(e) => setBrandName(e.target.value)}
-                        placeholder="例如：GeoScore"
+                        placeholder="例如：极排"
                         className="w-full rounded-2xl border-2 border-neutral-100 bg-neutral-50 px-5 py-4 font-bold outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
                       />
                     </div>
@@ -606,7 +620,7 @@ export default function HomePage() {
                       <div className="inline-block rounded-2xl border-2 border-indigo-500 bg-indigo-50 p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <CheckCircle2 className="h-4 w-4 text-indigo-600" />
-                          <span className="text-sm font-black text-indigo-900">GeoScore 推荐</span>
+                          <span className="text-sm font-black text-indigo-900">极排 推荐</span>
                         </div>
                         <div className="h-3 w-32 rounded-full bg-indigo-200" />
                       </div>
@@ -706,7 +720,7 @@ export default function HomePage() {
           
           <div className="mt-20 flex flex-col items-center justify-between gap-6 border-t border-neutral-100 pt-8 sm:flex-row">
             <p className="text-sm font-bold text-neutral-400">
-              © {new Date().getFullYear()} GeoScore. All rights reserved.
+              © {new Date().getFullYear()} 极排. All rights reserved.
             </p>
             <div className="flex gap-8 text-sm font-bold text-neutral-400">
               <a href="#" className="hover:text-neutral-900 transition">隐私政策</a>

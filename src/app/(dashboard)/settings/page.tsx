@@ -1,5 +1,6 @@
-import { auth, signOut } from '@/auth';
+import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { PageHeader } from '@/components/PageHeader';
 import { prisma } from '@/lib/prisma';
 import { PLAN_LIMITS } from '@/lib/constants';
@@ -93,7 +94,7 @@ export default async function SettingsPage() {
           <h2 className="text-sm font-medium">AI 引擎</h2>
         </div>
         <p className="text-sm text-neutral-500">
-          GeoScore 由系统统一调度 DeepSeek / 7 大 AI 引擎,无需用户配置 API key。扫描频次由系统根据你的计划自动控制。
+          极排 由系统统一调度 DeepSeek / 7 大 AI 引擎,无需用户配置 API key。扫描频次由系统根据你的计划自动控制。
         </p>
       </section>
 
@@ -114,7 +115,13 @@ export default async function SettingsPage() {
         <form
           action={async () => {
             'use server';
-            await signOut({ redirect: true, callbackUrl: '/login' });
+            // 清除 JWT session cookie，然后重定向到登录页
+            const cookieStore = await cookies();
+            cookieStore.delete('next-auth.session-token');
+            cookieStore.delete('__Secure-next-auth.session-token');
+            cookieStore.delete('next-auth.csrf-token');
+            cookieStore.delete('__Host-next-auth.csrf-token');
+            redirect('/login');
           }}
         >
           <button

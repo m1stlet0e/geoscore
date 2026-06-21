@@ -158,7 +158,7 @@ export default async function BrandDetailPage({
           <EmptyState
             icon={<ListChecks className="h-5 w-5" />}
             title="还没有 Prompt"
-            description="点击「AI 生成 Prompts」让 GeoScore 自动生成 50 个最可能被用户问到的问题。"
+            description="点击「AI 生成 Prompts」让 极排 自动生成 50 个最可能被用户问到的问题。"
           />
         ) : (
           <div className="overflow-x-auto">

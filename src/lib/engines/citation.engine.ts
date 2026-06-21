@@ -138,6 +138,18 @@ const INTERNATIONAL_PLATFORMS = [
 ]
 
 // ============================================
+// 可见性分析结果（批量扫描用）
+// ============================================
+
+export interface AICitationResult {
+  score: number
+  isMentioned: boolean
+  sentiment: 'POSITIVE' | 'NEUTRAL' | 'NEGATIVE'
+  reasons: string[]
+  competitorsMentioned: string[]
+}
+
+// ============================================
 // Core Engine Class
 // ============================================
 
@@ -753,6 +765,190 @@ ${sourceList || '无引用来源'}
 
   getFactorDefinitions(): typeof RECOMMENDATION_FACTORS {
     return RECOMMENDATION_FACTORS
+  }
+
+  // ============================================
+  // 13. 批量可见性扫描（并发 + 局部容错）
+  // 适配现有 ScanRun / PromptScan / Citation 模型
+  // ============================================
+
+  async runScanRun(scanRunId: string): Promise<{
+    scanRunId: string
+    finalScore: number
+    mentionCount: number
+    totalPrompts: number
+  }> {
+    const scan = await prisma.scanRun.findUnique({
+      where: { id: scanRunId },
+      include: { brand: true },
+    })
+
+    if (!scan) throw new Error('ScanRun not found')
+
+    await prisma.scanRun.update({
+      where: { id: scanRunId },
+      data: { status: 'running' },
+    })
+
+    const prompts = await prisma.prompt.findMany({
+      where: { brandId: scan.brandId, isActive: true },
+      take: 30,
+      orderBy: { createdAt: 'asc' },
+    })
+
+    const platforms =
+      scan.platforms?.length > 0 ? scan.platforms : ['deepseek']
+
+    const keywords = [
+      scan.brand.category,
+      ...(scan.brand.competitors ?? []),
+    ].filter(Boolean) as string[]
+
+    const tasks = platforms.flatMap((platform) =>
+      prompts.map((prompt) => ({ platform, prompt }))
+    )
+
+    const total = tasks.length
+    let totalScore = 0
+    let mentionCount = 0
+    let processed = 0
+
+    const CONCURRENCY_LIMIT = 3
+    const sentimentMap: Record<string, string> = {
+      POSITIVE: 'positive',
+      NEUTRAL: 'neutral',
+      NEGATIVE: 'negative',
+    }
+
+    const failedResult: AICitationResult = {
+      score: 0,
+      isMentioned: false,
+      sentiment: 'NEUTRAL',
+      reasons: ['Analysis failed'],
+      competitorsMentioned: [],
+    }
+
+    for (let i = 0; i < tasks.length; i += CONCURRENCY_LIMIT) {
+      const chunk = tasks.slice(i, i + CONCURRENCY_LIMIT)
+
+      const chunkResults = await Promise.allSettled(
+        chunk.map(({ platform, prompt }) =>
+          this.analyzeSinglePrompt(
+            scan.brand.name,
+            keywords,
+            platform,
+            prompt.text
+          ).then((result) => ({ platform, prompt, result }))
+        )
+      )
+
+      for (let j = 0; j < chunkResults.length; j++) {
+        const item = chunkResults[j]
+        const { platform, prompt } = chunk[j]
+        processed++
+
+        if (item.status === 'fulfilled') {
+          const { result } = item.value
+          totalScore += result.score
+          if (result.isMentioned) mentionCount++
+
+          await prisma.promptScan.create({
+            data: {
+              scanRunId,
+              promptId: prompt.id,
+              platform,
+              responseText: result.reasons.join('; ').slice(0, 8000),
+              citedSources: result.competitorsMentioned.map((name) => ({
+                name,
+                type: 'competitor',
+              })),
+              brandMentioned: result.isMentioned,
+              brandRank: result.isMentioned ? 1 : null,
+              sentiment: sentimentMap[result.sentiment] ?? 'neutral',
+            },
+          })
+
+          if (result.isMentioned) {
+            await prisma.citation.create({
+              data: {
+                brandId: scan.brandId,
+                userId: scan.userId,
+                platform,
+                promptText: prompt.text,
+                answerText: result.reasons.join('\n'),
+                sources: [],
+                aiScore: result.score,
+                confidence: result.score / 100,
+              },
+            })
+          }
+        } else {
+          console.error('Prompt visibility analysis failed:', item.reason)
+          totalScore += failedResult.score
+
+          await prisma.promptScan.create({
+            data: {
+              scanRunId,
+              promptId: prompt.id,
+              platform,
+              responseText: failedResult.reasons.join('; '),
+              citedSources: [],
+              brandMentioned: false,
+              sentiment: 'neutral',
+            },
+          })
+        }
+      }
+
+      await prisma.scanRun.update({
+        where: { id: scanRunId },
+        data: { completedPrompts: processed, totalPrompts: total },
+      })
+    }
+
+    const finalScore = total > 0 ? Math.round(totalScore / total) : 0
+
+    await prisma.scanRun.update({
+      where: { id: scanRunId },
+      data: {
+        status: 'completed',
+        completedAt: new Date(),
+        completedPrompts: processed,
+        totalPrompts: total,
+      },
+    })
+
+    return {
+      scanRunId,
+      finalScore,
+      mentionCount,
+      totalPrompts: total,
+    }
+  }
+
+  private async analyzeSinglePrompt(
+    brandName: string,
+    keywords: string[],
+    platform: string,
+    prompt: string
+  ): Promise<AICitationResult> {
+    const systemPrompt = `你是一个专业的 GEO (Generative Engine Optimization) 评测专家。
+你需要模拟当前主流 AI 平台 (${platform}) 对用户提问的回答，并分析品牌 "${brandName}" 是否会被推荐。
+品牌核心业务标签: ${keywords.join(', ') || '未指定'}
+
+请返回严格的 JSON 格式：
+{
+  "score": <0-100的推荐概率分数>,
+  "isMentioned": <boolean, 是否会明确提及该品牌>,
+  "sentiment": <"POSITIVE" | "NEUTRAL" | "NEGATIVE">,
+  "reasons": ["<如果不推荐，指出具体原因，或如果推荐，指出胜出的优势>", ...],
+  "competitorsMentioned": ["<可能会被优先推荐的竞品名称>", ...]
+}`
+
+    return jsonChat<AICitationResult>([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: `用户提问：${prompt}` },
+    ])
   }
 }
 

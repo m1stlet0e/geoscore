@@ -46,7 +46,7 @@ export default async function InfluencePage() {
         <EmptyState
           icon={<Share2 className="h-5 w-5" />}
           title="影响力图谱暂未生成"
-          description="完成至少一次扫描后,GeoScore 会自动构建品牌 × 竞品 × 品类 × 子赛道的知识图谱。"
+          description="完成至少一次扫描后,极排 会自动构建品牌 × 竞品 × 品类 × 子赛道的知识图谱。"
           ctaLabel="前往监控中心"
           ctaHref="/monitor"
         />

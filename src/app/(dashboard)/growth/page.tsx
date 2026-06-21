@@ -38,7 +38,7 @@ export default async function GrowthPage({ searchParams }: { searchParams: Promi
     <div className="space-y-6">
       <PageHeader
         title="Growth Agent"
-        subtitle="基于缺口分析自动生成 8 种内容(博客/FAQ/Schema/对比/PR/Reddit/GitHub/Product Hunt),一键发布到 8 个渠道"
+        subtitle="基于缺口分析自动生成 8 种内容(博客/FAQ/Schema/对比/PR/知乎/Gitee/Product Hunt),一键发布到 8 个渠道"
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -110,7 +110,7 @@ export default async function GrowthPage({ searchParams }: { searchParams: Promi
           <div className="rounded-2xl border border-neutral-200 bg-neutral-100 p-12 text-center">
             <Sparkles className="mx-auto h-8 w-8 text-fuchsia-400" />
             <h3 className="mt-4 text-lg font-medium">还没有内容</h3>
-            <p className="mt-2 text-sm text-neutral-500">点击上方的内容类型卡片,让 AI 帮你写第一篇博客/FAQ/Reddit 帖子</p>
+            <p className="mt-2 text-sm text-neutral-500">点击上方的内容类型卡片,让 AI 帮你写第一篇博客/FAQ/知乎 帖子</p>
           </div>
         ) : (
           pieces.map((p) => {

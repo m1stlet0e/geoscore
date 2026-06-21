@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { signOut } from 'next-auth/react';
+import { usePathname, useRouter } from 'next/navigation';
+// 退出登录使用自定义 API，避免 next-auth signOut 的 cookie 冲突
 import {
   AlertTriangle,
   Bell,
@@ -20,6 +20,7 @@ import {
   ChevronRight,
   User,
   FileText,
+  X,
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { cn } from '@/lib/utils';
@@ -53,47 +54,69 @@ type SidebarProps = {
   plan?: Plan;
   userEmail?: string | null;
   userName?: string | null;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 };
 
 const planStyles: Record<Plan, { text: string; bg: string; label: string }> = {
-  FREE:       { text: 'text-neutral-500',     bg: 'bg-neutral-100',     label: '免费版' },
-  PRO:        { text: 'text-indigo-600',      bg: 'bg-indigo-50',       label: '专业版' },
-  GROWTH:     { text: 'text-violet-600',      bg: 'bg-violet-50',       label: '增长版' },
-  ENTERPRISE: { text: 'text-amber-600',       bg: 'bg-amber-50',        label: '企业版' },
+  FREE: { text: 'text-neutral-500', bg: 'bg-neutral-100', label: '免费版' },
+  PRO: { text: 'text-indigo-600', bg: 'bg-indigo-50', label: '专业版' },
+  GROWTH: { text: 'text-violet-600', bg: 'bg-violet-50', label: '增长版' },
+  ENTERPRISE: { text: 'text-amber-600', bg: 'bg-amber-50', label: '企业版' },
 };
 
-export function Sidebar({ plan = 'FREE', userEmail, userName }: SidebarProps) {
+function SidebarPanel({
+  plan = 'FREE',
+  userEmail,
+  userName,
+  onNavigate,
+  className,
+}: SidebarProps & { onNavigate?: () => void; className?: string }) {
   const pathname = usePathname();
+  const router = useRouter();
   const planStyle = planStyles[plan];
 
   return (
-    <aside
-      className="fixed inset-y-0 left-0 z-40 hidden w-[280px] flex-col border-r border-neutral-100 bg-white md:flex"
-      aria-label="主导航"
-    >
-      {/* Brand */}
-      <div className="flex h-20 items-center px-8">
-        <Link href="/dashboard" className="group flex items-center gap-3 transition-transform hover:scale-[1.02]">
+    <div className={cn('flex h-full flex-col bg-white', className)}>
+      <div className="flex h-20 items-center justify-between px-6 md:px-8">
+        <Link
+          href="/dashboard"
+          onClick={onNavigate}
+          className="group flex items-center gap-3 transition-transform hover:scale-[1.02]"
+        >
           <Logo size="md" />
           <div className="flex flex-col">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 leading-none">Console</span>
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600 leading-none">
+              Console
+            </span>
           </div>
         </Link>
+        {onNavigate && (
+          <button
+            type="button"
+            onClick={onNavigate}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200 text-neutral-500 md:hidden"
+            aria-label="关闭菜单"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        )}
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-4 py-6 custom-scrollbar">
-        <div className="mb-4 px-4 text-[10px] font-black uppercase tracking-[0.3em] text-neutral-400">
+        <div className="mb-4 px-4 text-xs font-black uppercase tracking-[0.3em] text-neutral-400">
           工作台面板
         </div>
         <ul className="space-y-1.5">
-          {NAV_ITEMS.map((item, index) => {
-            const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
+          {NAV_ITEMS.map((item) => {
+            const isActive =
+              pathname === item.href || pathname?.startsWith(item.href + '/');
             const Icon = item.icon;
             return (
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  onClick={onNavigate}
                   className={cn(
                     'group relative flex items-center gap-3 rounded-2xl px-4 py-3 text-sm transition-all duration-200',
                     isActive
@@ -104,7 +127,9 @@ export function Sidebar({ plan = 'FREE', userEmail, userName }: SidebarProps) {
                   <Icon
                     className={cn(
                       'h-4 w-4 shrink-0 transition-colors',
-                      isActive ? 'text-indigo-400' : 'text-neutral-400 group-hover:text-neutral-600'
+                      isActive
+                        ? 'text-indigo-400'
+                        : 'text-neutral-400 group-hover:text-neutral-600'
                     )}
                   />
                   <span className="flex-1 font-bold">{item.label}</span>
@@ -112,7 +137,7 @@ export function Sidebar({ plan = 'FREE', userEmail, userName }: SidebarProps) {
                     <ChevronRight className="h-3.5 w-3.5 text-neutral-500" />
                   ) : (
                     item.hint && (
-                      <span className="text-[9px] font-black uppercase tracking-widest opacity-0 transition-opacity group-hover:opacity-100">
+                      <span className="hidden text-[10px] font-black uppercase tracking-widest opacity-0 transition-opacity group-hover:opacity-100 md:inline">
                         {item.hint}
                       </span>
                     )
@@ -124,40 +149,101 @@ export function Sidebar({ plan = 'FREE', userEmail, userName }: SidebarProps) {
         </ul>
       </nav>
 
-      {/* Footer — plan + user + sign out */}
       <div className="p-6 space-y-4">
-        {/* User Card */}
         <div className="rounded-3xl border border-neutral-100 bg-neutral-50/50 p-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white shadow-sm border border-neutral-100">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-neutral-100 bg-white shadow-sm">
               <User className="h-5 w-5 text-neutral-400" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-black text-neutral-900">{userName ?? '已登录用户'}</div>
-              <div className={cn('inline-block rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-widest mt-1', planStyle.bg, planStyle.text)}>
+              <div className="truncate text-sm font-black text-neutral-900">
+                {userName ?? '已登录用户'}
+              </div>
+              {userEmail && (
+                <div className="truncate text-xs text-neutral-500">{userEmail}</div>
+              )}
+              <div
+                className={cn(
+                  'inline-block rounded-full px-2 py-0.5 text-xs font-black uppercase tracking-widest mt-1',
+                  planStyle.bg,
+                  planStyle.text
+                )}
+              >
                 {planStyle.label}
               </div>
             </div>
           </div>
-          
+
           <div className="flex gap-2">
             {plan === 'FREE' && (
               <Link
                 href="/pricing"
-                className="flex-1 rounded-xl bg-indigo-600 py-2 text-center text-[10px] font-black text-white transition hover:bg-indigo-700"
+                onClick={onNavigate}
+                className="flex-1 rounded-xl bg-indigo-600 py-2 text-center text-xs font-black text-white transition hover:bg-indigo-700"
               >
                 升级方案
               </Link>
             )}
             <button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="flex-1 rounded-xl border border-neutral-200 bg-white py-2 text-center text-[10px] font-black text-neutral-500 transition hover:bg-neutral-50 hover:text-neutral-900"
+              type="button"
+              onClick={async () => {
+              try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+              } catch (_) {
+                // 忽略，直接跳转
+              }
+              router.push('/');
+            }}
+              className="flex-1 rounded-xl border border-neutral-200 bg-white py-2 text-center text-xs font-black text-neutral-500 transition hover:bg-neutral-50 hover:text-neutral-900"
             >
               退出登录
             </button>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+export function Sidebar({
+  plan = 'FREE',
+  userEmail,
+  userName,
+  mobileOpen = false,
+  onMobileClose,
+}: SidebarProps) {
+  return (
+    <>
+      {/* Desktop */}
+      <aside
+        className="fixed inset-y-0 left-0 z-40 hidden w-[280px] flex-col border-r border-neutral-100 md:flex"
+        aria-label="主导航"
+      >
+        <SidebarPanel plan={plan} userEmail={userEmail} userName={userName} />
+      </aside>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-[60] md:hidden" role="dialog" aria-modal="true">
+          <button
+            type="button"
+            className="absolute inset-0 bg-neutral-900/40 backdrop-blur-sm"
+            onClick={onMobileClose}
+            aria-label="关闭导航遮罩"
+          />
+          <aside
+            className="absolute inset-y-0 left-0 w-[min(280px,88vw)] border-r border-neutral-100 shadow-2xl transition-transform"
+            aria-label="移动端导航"
+          >
+            <SidebarPanel
+              plan={plan}
+              userEmail={userEmail}
+              userName={userName}
+              onNavigate={onMobileClose}
+            />
+          </aside>
+        </div>
+      )}
 
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
@@ -174,7 +260,7 @@ export function Sidebar({ plan = 'FREE', userEmail, userName }: SidebarProps) {
           background: #e5e7eb;
         }
       `}</style>
-    </aside>
+    </>
   );
 }
 

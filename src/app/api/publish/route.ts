@@ -3,22 +3,18 @@
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/auth'
+import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { contentEngine } from '@/lib/engines/content.engine'
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.email) {
+    const session = await auth()
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } })
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
+    const userId = session.user.id as string
 
     const { searchParams } = new URL(request.url)
     const contentId = searchParams.get('contentId') || undefined
@@ -26,7 +22,7 @@ export async function GET(request: NextRequest) {
     const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20
 
-    const result = await contentEngine.getPublishJobs(user.id, contentId, status, page, limit)
+    const result = await contentEngine.getPublishJobs(userId, contentId, status, page, limit)
 
     return NextResponse.json({ success: true, data: result })
   } catch (error) {

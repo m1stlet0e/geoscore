@@ -13,7 +13,7 @@ const sizeMap = {
 };
 
 /**
- * GeoScore logo — abstract "G" / orbital ring mark.
+ * 极排 logo — abstract "G" / orbital ring mark.
  * Pure inline SVG (no external asset), scales to any size.
  */
 export function Logo({ className, showWordmark = true, size = 'md' }: LogoProps) {

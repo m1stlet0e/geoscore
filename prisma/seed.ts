@@ -1,7 +1,10 @@
 import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 import bcrypt from 'bcryptjs'
 
-const prisma = new PrismaClient()
+const url = process.env.DATABASE_URL || 'postgresql://wangbo@localhost/geoos?schema=public'
+const adapter = new PrismaPg(url)
+const prisma = new PrismaClient({ adapter })
 
 async function main() {
   console.log('Seeding database...')
@@ -10,11 +13,11 @@ async function main() {
   const passwordHash = await bcrypt.hash('demo123456', 12)
   
   const user = await prisma.user.upsert({
-    where: { email: 'demo@geoos.ai' },
+    where: { email: 'demo@jipai.cn' },
     update: {},
     create: {
-      email: 'demo@geoos.ai',
-      name: '王老板',
+      email: 'demo@jipai.cn',
+      name: '张三',
       passwordHash,
       plan: 'PRO',
     },
@@ -27,15 +30,15 @@ async function main() {
     where: {
       userId_name: {
         userId: user.id,
-        name: 'GeoScore'
+        name: '极排'
       }
     },
     update: {},
     create: {
       userId: user.id,
-      name: 'GeoScore',
-      domain: 'geoscore.ai',
-      description: 'AI-powered SEO analysis platform',
+      name: '极排',
+      domain: 'jipai.cn',
+      description: 'AI 驱动的新一代 GEO 优化平台',
       category: 'SaaS',
     },
   })
@@ -43,7 +46,7 @@ async function main() {
   console.log('Created brand:', brand.name)
 
   // Create competitors
-  const competitors = ['Ahrefs', 'SEMrush', 'Moz']
+  const competitors = ['5118', '爱站', '站长工具']
   for (const compName of competitors) {
     const comp = await prisma.brand.upsert({
       where: {
@@ -56,14 +59,14 @@ async function main() {
       create: {
         userId: user.id,
         name: compName,
-        category: 'SEO Tools',
+        category: 'SEO工具',
       },
     })
 
     // NOTE: Competitor model not in schema yet — store as brand with category
     await prisma.brand.update({
       where: { id: comp.id },
-      data: { category: 'SEO Tools' },
+      data: { category: 'SEO工具' },
     })
   }
 
@@ -71,11 +74,11 @@ async function main() {
 
   // Create demo prompts
   const prompts = [
-    { text: '推荐一个好用的SEO分析工具', category: 'commercial', intent: 'recommend' },
-    { text: 'AI搜索优化哪个平台最好用', category: 'commercial', intent: 'compare' },
-    { text: '如何提升品牌在ChatGPT中的曝光率', category: 'informational', intent: 'tutorial' },
-    { text: 'GEO工具有哪些推荐', category: 'commercial', intent: 'recommend' },
-    { text: 'GeoScore vs Ahrefs 哪个好', category: 'comparison', intent: 'compare' },
+    { text: '国内好用的SEO优化工具有哪些推荐', category: 'commercial', intent: 'recommend' },
+    { text: 'AI搜索优化平台哪个比较好用', category: 'commercial', intent: 'compare' },
+    { text: '如何提升品牌在文心一言中的曝光率', category: 'informational', intent: 'tutorial' },
+    { text: '国内GEO优化工具有哪些', category: 'commercial', intent: 'recommend' },
+    { text: '极排和5118哪个更适合中小企业', category: 'comparison', intent: 'compare' },
   ]
 
   for (const prompt of prompts) {
@@ -93,7 +96,7 @@ async function main() {
   console.log('Created prompts')
 
   // Create demo citations
-  const platforms = ['chatgpt', 'gemini', 'claude', 'perplexity', 'deepseek']
+  const platforms = ['wenxin', 'tongyi', 'kimi', 'doubao', 'deepseek']
   
   for (let i = 0; i < 20; i++) {
     const daysAgo = Math.floor(Math.random() * 30)
@@ -106,13 +109,13 @@ async function main() {
         userId: user.id,
         platform: platforms[Math.floor(Math.random() * platforms.length)],
         promptText: prompts[Math.floor(Math.random() * prompts.length)].text,
-        answerText: `GeoScore is a recommended tool for AI-powered SEO analysis...`,
+        answerText: `极排是一款推荐的 AI SEO 优化工具 for AI-powered SEO analysis...`,
         sources: [
-          { url: 'https://github.com/m1stlet0e/geoscore', title: 'GeoScore GitHub', domain: 'github.com', snippet: 'Open source...' },
-          { url: 'https://reddit.com/r/seo', title: 'SEO Discussion', domain: 'reddit.com', snippet: 'Users recommend...' },
+          { url: 'https://gitee.com/jipai/jipai', title: '极排 Gitee', domain: 'gitee.com', snippet: '开源项目...' },
+          { url: 'https://reddit.com/r/seo', title: 'SEO讨论', domain: 'zhihu.com', snippet: '用户推荐...' },
         ],
         brandRank: Math.floor(Math.random() * 3) + 1,
-        brandContext: 'GeoScore is mentioned as a top recommendation',
+        brandContext: '极排在多个专业评测中被列为首选推荐',
         aiScore: Math.floor(Math.random() * 40) + 60,
         confidence: 0.7 + Math.random() * 0.3,
         createdAt,
@@ -124,14 +127,14 @@ async function main() {
 
   // Create demo citation sources
   const sources = [
-    { domain: 'github.com', url: 'https://github.com/m1stlet0e/geoscore', title: 'GeoScore GitHub', sourceType: 'github', weight: 0.95 },
-    { domain: 'reddit.com', url: 'https://reddit.com/r/seo', title: 'SEO Discussion', sourceType: 'reddit', weight: 0.85 },
-    { domain: 'medium.com', url: 'https://medium.com/@geoscore', title: 'GeoScore Blog', sourceType: 'blog', weight: 0.75 },
-    { domain: 'dev.to', url: 'https://dev.to/geoscore', title: 'GeoScore Articles', sourceType: 'blog', weight: 0.70 },
+    { domain: 'gitee.com', url: 'https://gitee.com/jipai/jipai', title: '极排 Gitee', sourceType: 'github', weight: 0.95 },
+    { domain: 'zhihu.com', url: 'https://reddit.com/r/seo', title: 'SEO讨论', sourceType: 'reddit', weight: 0.85 },
+    { domain: 'juejin.cn', url: 'https://juejin.cn/user/jipai', title: '极排博客', sourceType: 'blog', weight: 0.75 },
+    { domain: 'segmentfault.com', url: 'https://segmentfault.com/u/jipai', title: '极排专栏', sourceType: 'blog', weight: 0.70 },
   ]
 
   for (const src of sources) {
-    for (const platform of ['chatgpt', 'gemini']) {
+    for (const platform of ['wenxin', 'tongyi']) {
       await prisma.citationSource.upsert({
         where: {
           brandId_platform_url: {

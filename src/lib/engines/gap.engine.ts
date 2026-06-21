@@ -233,7 +233,7 @@ ${competitorContext}
     page: number = 1,
     limit: number = 20
   ): Promise<{
-    analyses: any[]
+    analyses: Record<string, unknown>[]
     pagination: { page: number; limit: number; total: number; pages: number }
   }> {
     const where = { brandId, userId }
@@ -407,7 +407,7 @@ ${competitorContext}
   }
 
   // ============================================
-  // 8. 批量分析（多个 Prompt）
+  // 8. 批量分析（并发优化版）
   // ============================================
 
   async batchAnalyze(
@@ -415,23 +415,27 @@ ${competitorContext}
     userId: string,
     platform: string,
     promptTexts: string[],
-    competitorId?: string
+    competitorId?: string,
+    concurrency: number = 3
   ): Promise<GapAnalysisResult[]> {
     const results: GapAnalysisResult[] = []
+    const chunks: string[][] = []
 
-    for (const promptText of promptTexts) {
-      try {
-        const result = await this.analyzeGap(
-          brandId,
-          userId,
-          platform,
-          promptText,
-          competitorId
-        )
-        results.push(result)
-      } catch (error) {
-        console.error(`Failed to analyze gap for prompt: ${promptText}`, error)
-      }
+    for (let i = 0; i < promptTexts.length; i += concurrency) {
+      chunks.push(promptTexts.slice(i, i + concurrency))
+    }
+
+    for (const chunk of chunks) {
+      const chunkPromises = chunk.map(promptText =>
+        this.analyzeGap(brandId, userId, platform, promptText, competitorId)
+          .catch(error => {
+            console.error(`Failed to analyze gap for prompt: ${promptText}`, error)
+            return null
+          })
+      )
+
+      const chunkResults = await Promise.all(chunkPromises)
+      results.push(...(chunkResults.filter(r => r !== null) as GapAnalysisResult[]))
     }
 
     return results

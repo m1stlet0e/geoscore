@@ -22,6 +22,7 @@ import {
   FileBarChart,
 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
+import { UpgradeModal } from '../_components/UpgradeModal';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -171,6 +172,7 @@ export default function BillingPage() {
   const [cancelling, setCancelling] = useState(false);
   const [togglingAutoRenew, setTogglingAutoRenew] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   // ─── Fetchers ────────────────────────────────────────────────────────────
 
@@ -370,12 +372,19 @@ export default function BillingPage() {
 
             {/* Actions */}
             <div className="flex flex-wrap gap-2 sm:flex-col">
-              <Link
-                href="/pricing"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-400 hover:to-violet-400"
+              <button
+                type="button"
+                onClick={() => setUpgradeOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:bg-indigo-600"
               >
                 <ArrowUpRight className="h-4 w-4" />
                 升级套餐
+              </button>
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-600 transition hover:bg-neutral-50"
+              >
+                查看全部套餐
               </Link>
               {currentPlan !== 'FREE' && (
                 <button
@@ -591,6 +600,8 @@ export default function BillingPage() {
           </div>
         </div>
       )}
+
+      <UpgradeModal isOpen={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
     </div>
   );
 }

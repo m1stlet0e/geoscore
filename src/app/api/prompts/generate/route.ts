@@ -46,7 +46,7 @@ export async function POST(req: Request) {
 品牌描述：${brand.description ?? '未指定'}
 竞品：${competitors}
 
-请输出 ${count} 条用户可能向 ChatGPT / Perplexity / Gemini 等 AI 助手提问的中文 prompt。
+请输出 ${count} 条用户可能向 文心一言 / 通义千问 / Kimi 等国产 AI 助手提问的中文 prompt。
 要求：
 1. 覆盖以下类别：${categories}
 2. 至少 30% 包含竞品名或对比意图

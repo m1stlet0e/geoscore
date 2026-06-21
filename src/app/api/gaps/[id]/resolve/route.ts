@@ -12,7 +12,7 @@ const TYPE_IDS = CONTENT_TYPES.map((c) => c.id) as [string, ...string[]];
 const Body = z.object({
   brandId: z.string().min(1),
   promptText: z.string().min(2).max(500),
-  platform: z.string().optional().default('chatgpt'),
+  platform: z.string().optional().default('wenxin'),
   missingBrands: z.array(z.string()).optional().default([]),
   suggestedActions: z.array(z.string()).optional().default([]),
   contentType: z.enum(TYPE_IDS).optional().default('blog'),

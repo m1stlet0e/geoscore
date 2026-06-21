@@ -46,7 +46,7 @@ export async function POST(req: Request) {
       text: parsed.data.signalText.trim(),
       volume,
       growthPct,
-      platforms: ['chatgpt', 'perplexity'],
+      platforms: ['wenxin', 'doubao'],
     },
   });
 

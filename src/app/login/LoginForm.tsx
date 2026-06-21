@@ -1,9 +1,10 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export function LoginForm({ callbackUrl }: { callbackUrl: string }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,30 +17,39 @@ export function LoginForm({ callbackUrl }: { callbackUrl: string }) {
     const email = String(formData.get('email') ?? '');
     const password = String(formData.get('password') ?? '');
 
-    const res = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-      callbackUrl,
-    });
+    try {
+      const res = await fetch('/api/auth/email-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
 
-    if (res?.error) {
-      setError('邮箱或密码错误,请重试。');
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error ?? '邮箱或密码错误，请重试。');
+        setLoading(false);
+        return;
+      }
+
+      // 登录成功，跳转
+      router.push(callbackUrl);
+      router.refresh();
+    } catch {
+      setError('网络错误，请重试。');
       setLoading(false);
-    } else if (res?.url) {
-      window.location.href = res.url;
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} method="POST" className="space-y-4">
       {error ? (
         <div role="alert" className="rounded-lg border border-rose-500/30 bg-rose-50 px-3.5 py-2.5 text-sm text-rose-600">
           {error}
         </div>
       ) : null}
       <div>
-        <label htmlFor="email" className="mb-1.5 block text-xs font-medium text-neutral-300">
+        <label htmlFor="email" className="mb-1.5 block text-xs font-medium text-neutral-700">
           邮箱
         </label>
         <input
@@ -54,7 +64,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl: string }) {
       </div>
       <div>
         <div className="mb-1.5 flex items-center justify-between">
-          <label htmlFor="password" className="text-xs font-medium text-neutral-300">
+          <label htmlFor="password" className="text-xs font-medium text-neutral-700">
             密码
           </label>
           <a href="/forgot-password" className="text-xs text-indigo-500 hover:text-indigo-600">
@@ -75,7 +85,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl: string }) {
       <button
         type="submit"
         disabled={loading}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:from-indigo-400 hover:to-violet-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40 disabled:opacity-50"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:bg-indigo-600 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? '登录中...' : '登录'}
       </button>

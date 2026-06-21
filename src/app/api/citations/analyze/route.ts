@@ -4,25 +4,19 @@
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/auth'
+import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { citationEngine } from '@/lib/engines/citation.engine'
+import { quotaService } from '@/lib/billing/quota.service'
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.email) {
+    const session = await auth()
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
-    })
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
+    const userId = (session.user as { id: string }).id
 
     const body = await request.json()
     const { brandId, platform, prompt, answer, sources } = body
@@ -46,7 +40,7 @@ export async function POST(request: NextRequest) {
     const brand = await prisma.brand.findFirst({
       where: {
         id: brandId,
-        userId: user.id
+        userId: userId
       }
     })
 
@@ -57,10 +51,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const canProceed = await quotaService.checkAndDeduct(
+      userId,
+      'CITATION_ANALYSIS',
+      1,
+      undefined,
+      { brandId, platform, prompt }
+    )
+    if (!canProceed) {
+      return NextResponse.json(
+        { error: 'Citation 分析配额不足或会员已过期，请升级套餐' },
+        { status: 403 }
+      )
+    }
+
     // 分析推荐因素
     const result = await citationEngine.analyzeRecommendationFactors(
       brandId,
-      user.id,
+      userId,
       platform,
       prompt,
       answer,

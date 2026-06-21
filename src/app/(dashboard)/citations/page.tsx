@@ -117,30 +117,27 @@ const DOMESTIC_PLATFORMS = [
 ];
 
 const INTERNATIONAL_PLATFORMS = [
-  { key: 'chatgpt', label: 'ChatGPT', emoji: '🤖' },
-  { key: 'claude', label: 'Claude', emoji: '🧠' },
-  { key: 'gemini', label: 'Gemini', emoji: '✨' },
-  { key: 'perplexity', label: 'Perplexity', emoji: '🔍' },
+  { key: 'wenxin', label: '文心一言', emoji: '🤖' },
+  { key: 'kimi', label: 'Kimi', emoji: '🧠' },
+  { key: 'tongyi', label: '通义千问', emoji: '✨' },
+  { key: 'doubao', label: '豆包', emoji: '🔍' },
 ];
 
 const PLATFORM_COLORS: Record<string, string> = {
-  deepseek: '#6366f1',
+  wenxin: '#0ea5e9',
+  tongyi: '#ec4899',
   kimi: '#8b5cf6',
   doubao: '#a855f7',
+  deepseek: '#6366f1',
   yuanbao: '#f59e0b',
-  tongyi: '#ec4899',
   zhipu: '#14b8a6',
-  chatgpt: '#22c55e',
-  claude: '#f97316',
-  gemini: '#3b82f6',
-  perplexity: '#ef4444',
 };
 
 const SOURCE_TYPE_BADGE: Record<string, { bg: string; border: string; text: string }> = {
   github: { bg: 'bg-gray-500/15', border: 'border-gray-500/30', text: 'text-gray-300' },
   zhihu: { bg: 'bg-blue-500/15', border: 'border-blue-500/30', text: 'text-blue-300' },
   wechat: { bg: 'bg-green-500/15', border: 'border-green-500/30', text: 'text-green-300' },
-  blog: { bg: 'bg-purple-500/15', border: 'border-purple-500/30', text: 'text-purple-300' },
+  juejin: { bg: 'bg-blue-500/15', border: 'border-blue-500/30', text: 'text-blue-600' },
   docs: { bg: 'bg-indigo-50', border: 'border-indigo-500/30', text: 'text-indigo-500' },
   forum: { bg: 'bg-orange-500/15', border: 'border-orange-500/30', text: 'text-orange-300' },
 };
@@ -655,7 +652,7 @@ export default function CitationsIntelligencePage() {
               <textarea
                 value={analyzeSources}
                 onChange={(e) => setAnalyzeSources(e.target.value)}
-                placeholder="https://example.com/article&#10;https://github.com/repo"
+                placeholder="https://example.com/article&#10;https://gitee.com/repo"
                 rows={3}
                 className="w-full rounded-lg border border-neutral-300 bg-neutral-100 px-3 py-2 text-sm text-neutral-700 outline-none focus:border-indigo-500/50 placeholder:text-neutral-500 resize-none"
               />

@@ -4,8 +4,14 @@
 // ============================================
 
 import { prisma } from '@/lib/prisma'
-import { Plan, SubStatus, OrderStatus, PayStatus, QuotaType } from '@prisma/client'
+import { Plan, QuotaType } from '@prisma/client'
 import crypto from 'crypto'
+import {
+  checkQuota as quotaCheck,
+  tryConsumeQuota,
+  QuotaExceededError,
+  QuotaNotFoundError,
+} from '@/lib/services/quota.service'
 
 // ============================================
 // 套餐配置
@@ -137,43 +143,112 @@ export class BillingService {
   async handlePaymentCallback(
     orderNo: string,
     transactionId: string,
-    method: 'wechat' | 'alipay'
+    method: 'wechat' | 'alipay',
+    options?: {
+      amountInCents?: number
+      amountInYuan?: number
+      callbackData?: Record<string, unknown>
+    }
   ): Promise<boolean> {
     const order = await prisma.order.findUnique({
       where: { orderNo },
     })
 
-    if (!order || order.status !== 'PENDING') {
+    if (!order) {
+      console.error('[payment] order not found:', orderNo)
       return false
     }
 
-    // 更新订单状态
-    await prisma.order.update({
-      where: { id: order.id },
-      data: {
-        status: 'PAID',
-        paymentId: transactionId,
-        paidAt: new Date(),
-      },
-    })
+    // 幂等：已支付且流水号一致
+    if (order.status === 'PAID') {
+      if (order.paymentId === transactionId) return true
+      console.warn('[payment] duplicate callback for paid order:', orderNo)
+      return true
+    }
 
-    // 创建支付记录
-    await prisma.payment.create({
-      data: {
-        orderId: order.id,
-        method,
-        amount: order.amount,
-        currency: order.currency,
-        status: 'SUCCESS',
-        externalId: transactionId,
-        paidAt: new Date(),
-      },
-    })
+    if (order.status !== 'PENDING') {
+      console.error('[payment] order not payable:', orderNo, order.status)
+      return false
+    }
 
-    // 激活订阅
+    if (order.expiredAt && order.expiredAt < new Date()) {
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { status: 'CANCELLED' },
+      })
+      console.error('[payment] order expired:', orderNo)
+      return false
+    }
+
+    const orderAmountYuan = Number(order.amount)
+    if (options?.amountInCents !== undefined) {
+      const expectedCents = Math.round(orderAmountYuan * 100)
+      if (options.amountInCents !== expectedCents) {
+        console.error('[payment] amount mismatch cents:', orderNo, options.amountInCents, expectedCents)
+        return false
+      }
+    }
+    if (options?.amountInYuan !== undefined) {
+      if (Math.abs(options.amountInYuan - orderAmountYuan) > 0.01) {
+        console.error('[payment] amount mismatch yuan:', orderNo, options.amountInYuan, orderAmountYuan)
+        return false
+      }
+    }
+
+  // 防重复支付：同一流水号不可绑定到其他订单
+    const dupPayment = await prisma.payment.findFirst({
+      where: { externalId: transactionId, status: 'SUCCESS' },
+    })
+    if (dupPayment && dupPayment.orderId !== order.id) {
+      console.error('[payment] transaction already used:', transactionId)
+      return false
+    }
+
+    try {
+      await prisma.$transaction(async (tx) => {
+        const locked = await tx.order.updateMany({
+          where: { id: order.id, status: 'PENDING' },
+          data: {
+            status: 'PAID',
+            paymentId: transactionId,
+            paidAt: new Date(),
+          },
+        })
+
+        if (locked.count === 0) {
+          throw new Error('ORDER_ALREADY_PROCESSED')
+        }
+
+        await tx.payment.create({
+          data: {
+            orderId: order.id,
+            method,
+            amount: order.amount,
+            currency: order.currency,
+            status: 'SUCCESS',
+            externalId: transactionId,
+            callbackData: (options?.callbackData ?? undefined) as any,
+            paidAt: new Date(),
+          },
+        })
+
+        await tx.user.update({
+          where: { id: order.userId },
+          data: {
+            plan: order.plan,
+            planExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          },
+        })
+      })
+    } catch (error) {
+      if (error instanceof Error && error.message === 'ORDER_ALREADY_PROCESSED') {
+        const fresh = await prisma.order.findUnique({ where: { orderNo } })
+        return fresh?.status === 'PAID'
+      }
+      throw error
+    }
+
     await this.activateSubscription(order.userId, order.plan, order.id)
-
-    // 分配额度
     await this.allocateQuotas(order.userId, order.plan)
 
     return true
@@ -229,6 +304,12 @@ export class BillingService {
   // ============================================
   // 4. 分配额度
   // ============================================
+
+  async initializeUserQuotas(userId: string, plan: Plan = 'FREE'): Promise<void> {
+    const existing = await prisma.quota.count({ where: { userId } })
+    if (existing > 0) return
+    await this.allocateQuotas(userId, plan)
+  }
 
   private async allocateQuotas(userId: string, plan: Plan): Promise<void> {
     const config = PLAN_CONFIG[plan]
@@ -287,49 +368,23 @@ export class BillingService {
   // ============================================
 
   async checkQuota(userId: string, type: QuotaType): Promise<{ allowed: boolean; remaining: number }> {
-    const now = new Date()
-    const periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
-
-    const quota = await prisma.quota.findFirst({
-      where: {
-        userId,
-        type,
-        period: 'monthly',
-        periodStart,
-      },
-    })
-
-    if (!quota) return { allowed: false, remaining: 0 }
-    return { allowed: quota.used < quota.total, remaining: quota.total - quota.used }
+    return quotaCheck(userId, type)
   }
 
   // ============================================
-  // 6. 使用额度
+  // 6. 使用额度（原子扣减）
   // ============================================
 
   async useQuota(userId: string, type: QuotaType): Promise<boolean> {
-    const now = new Date()
-    const periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
-
-    const quota = await prisma.quota.findFirst({
-      where: {
-        userId,
-        type,
-        period: 'monthly',
-        periodStart,
-      },
-    })
-
-    if (!quota || quota.used >= quota.total) {
-      return false
+    try {
+      await tryConsumeQuota(userId, type, 1)
+      return true
+    } catch (error) {
+      if (error instanceof QuotaExceededError || error instanceof QuotaNotFoundError) {
+        return false
+      }
+      throw error
     }
-
-    await prisma.quota.update({
-      where: { id: quota.id },
-      data: { used: quota.used + 1 },
-    })
-
-    return true
   }
 
   // ============================================
@@ -422,34 +477,14 @@ export class BillingService {
   // 11. 消费额度
   // ============================================
 
-  async consumeQuota(userId: string, type: QuotaType, amount: number = 1, description?: string, meta?: Record<string, any>): Promise<void> {
-    const now = new Date()
-    const periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
-
-    const quota = await prisma.quota.findFirst({
-      where: {
-        userId,
-        type,
-        period: 'monthly',
-        periodStart,
-      },
-    })
-
-    if (!quota) {
-      throw new Error(`No quota found for user ${userId}, type ${type}`)
-    }
-
-    if (quota.used + amount > quota.total) {
-      throw new Error(`Quota exceeded: ${quota.used}/${quota.total}`)
-    }
-
-    await prisma.quota.update({
-      where: { id: quota.id },
-      data: {
-        used: quota.used + amount,
-        remaining: quota.total - (quota.used + amount),
-      },
-    })
+  async consumeQuota(
+    userId: string,
+    type: QuotaType,
+    amount: number = 1,
+    description?: string,
+    meta?: Record<string, unknown>
+  ): Promise<void> {
+    await tryConsumeQuota(userId, type, amount, description, meta as any)
   }
 }
 

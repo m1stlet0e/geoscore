@@ -22,7 +22,7 @@ const REASON_PATTERNS: { key: ReasonKey; patterns: RegExp[] }[] = [
   {
     key: '社区讨论',
     patterns: [
-      /reddit\.com/i,
+      /zhihu\.com/i,
       /zhihu\.com/i,
       /quora\.com/i,
       /stackoverflow\.com/i,
@@ -40,19 +40,19 @@ const REASON_PATTERNS: { key: ReasonKey; patterns: RegExp[] }[] = [
       /测评/,
       /hands[- ]on/i,
       /g2\.com/i,
-      /producthunt\.com/i,
+      /sspai\.com/i,
       /capterra/i,
     ],
   },
   {
     key: '代码示例',
     patterns: [
-      /github\.com/i,
-      /githubusercontent/i,
+      /gitee\.com/i,
+      /csdn\.net/i,
       /snippet/i,
       /code\s+sample/i,
       /代码示例/,
-      /github\s+readme/i,
+      /gitee\s+readme/i,
     ],
   },
   {

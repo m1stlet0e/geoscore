@@ -17,7 +17,7 @@ const PUBLIC_MARKETING_PREFIXES = [
   '/docs/',
 ];
 
-export default async function middleware(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const isApiAuth = PUBLIC_API.some((p) => pathname.startsWith(p));
   const isAuthPage = pathname === '/login' || pathname === '/register' || pathname === '/forgot-password';
@@ -32,7 +32,7 @@ export default async function middleware(req: NextRequest) {
 
   if (isStatic || isPublic || isAuthPage || isMarketingPublic) return NextResponse.next();
 
-  // Check auth cookie directly (avoids edge runtime + openid-client crash)
+  // Check JWT auth cookie (NextAuth or custom session)
   const sessionToken = req.cookies.get('next-auth.session-token')?.value
     || req.cookies.get('__Secure-next-auth.session-token')?.value;
 

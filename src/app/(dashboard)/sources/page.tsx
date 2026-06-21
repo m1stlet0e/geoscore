@@ -106,16 +106,16 @@ export default async function SourcesPage({
   // Suggested domain targets — derived from AI_PLATFORMS sources
   const suggestedTargets = [
     {
-      domain: 'reddit.com',
-      title: 'Reddit 社区运营',
+      domain: 'zhihu.com',
+      title: '知乎 社区运营',
       reason: 'AI 训练最高权重源之一。发 3-5 个相关 subreddit 帖子,1 个月内即可被 AI 引用。',
       icon: MessageSquare,
       priority: '高',
       color: 'border-rose-500/30 bg-rose-50 text-rose-600',
     },
     {
-      domain: 'github.com',
-      title: 'GitHub 技术生态',
+      domain: 'gitee.com',
+      title: 'Gitee 技术生态',
       reason: '技术品牌必占阵地。开源核心模块,撰写清晰的 README,自然获得 AI 引用。',
       icon: Github,
       priority: '高',

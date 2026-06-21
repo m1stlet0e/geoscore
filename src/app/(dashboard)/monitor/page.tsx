@@ -177,7 +177,7 @@ export default async function MonitorPage() {
           <EmptyState
             icon={<Globe className="h-5 w-5" />}
             title="还没有添加任何品牌"
-            description="从右上角新建一个扫描,GeoScore 会引导你创建第一个品牌。"
+            description="从右上角新建一个扫描,极排 会引导你创建第一个品牌。"
           />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

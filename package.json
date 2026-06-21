@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 18200",
-    "build": "prisma generate && prisma db push --accept-data-loss && next build",
+    "build": "prisma generate && prisma db push && next build",
     "start": "next start -p 18200",
     "lint": "eslint",
     "db:push": "prisma db push",
@@ -12,6 +12,7 @@
     "db:seed:v2": "tsx prisma/seed.v2.ts"
   },
   "dependencies": {
+    "@alicloud/dypnsapi20170525": "^2.0.0",
     "@alicloud/dysmsapi20170525": "^4.5.1",
     "@alicloud/openapi-client": "^0.4.15",
     "@auth/core": "^0.37.4",
@@ -25,7 +26,9 @@
     "lucide-react": "^0.475.0",
     "next": "16.2.6",
     "next-auth": "^4.24.14",
+    "openai": "^6.44.0",
     "pg": "^8.21.0",
+    "qrcode.react": "^4.2.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^2.15.0",

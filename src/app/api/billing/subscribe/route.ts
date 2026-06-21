@@ -1,20 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/auth'
+import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { billingService } from '@/lib/billing/billing.service'
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.email) {
+    const session = await auth()
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } })
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
+    const userId = session.user.id as string
 
     const body = await request.json()
     const { plan, paymentMethod } = body as { plan: 'FREE' | 'PRO' | 'GROWTH' | 'ENTERPRISE'; paymentMethod: 'wechat' | 'alipay' }
@@ -27,7 +23,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid payment method' }, { status: 400 })
     }
 
-    const result = await billingService.createOrder(user.id, plan, paymentMethod)
+    const result = await billingService.createOrder(userId, plan, paymentMethod)
     return NextResponse.json(result)
   } catch (error) {
     console.error('Error creating subscription:', error)

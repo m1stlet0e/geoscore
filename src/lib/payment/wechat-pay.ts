@@ -140,29 +140,40 @@ export class WechatPay {
     }
   }
 
-  // 验签
-  verifySignature(timestamp: string, nonce: string, body: string, signature: string, serial: string): boolean {
-    const message = `${timestamp}\n${nonce}\n${body}\n`
-    const verify = crypto.createVerify('RSA-SHA256')
-    verify.update(message)
-    // 需要支付宝公钥来验证，这里简化处理
-    return true
+  // 验签（使用微信平台公钥）
+  verifySignature(
+    timestamp: string,
+    nonce: string,
+    body: string,
+    signature: string,
+    wechatPlatformCert: string
+  ): boolean {
+    try {
+      const message = `${timestamp}\n${nonce}\n${body}\n`
+      const verify = crypto.createVerify('RSA-SHA256')
+      verify.update(message)
+      return verify.verify(wechatPlatformCert, signature, 'base64')
+    } catch (error) {
+      console.error('WeChat Pay signature verification failed:', error)
+      return false
+    }
   }
 
-  // 解密回调数据
+  // 解密回调数据（微信 V3：ciphertext 为 base64，末 16 字节为 auth tag）
   decryptNotification(ciphertext: string, nonce: string, associated_data: string): any {
+    const encrypted = Buffer.from(ciphertext, 'base64')
+    const authTag = encrypted.subarray(encrypted.length - 16)
+    const data = encrypted.subarray(0, encrypted.length - 16)
+
     const decipher = crypto.createDecipheriv(
       'aes-256-gcm',
       Buffer.from(this.config.apiV3Key),
       Buffer.from(nonce)
     )
-    
-    const authTag = Buffer.from(ciphertext.slice(-16))
-    const data = Buffer.from(ciphertext.slice(0, -16), 'base64')
-    
+
     decipher.setAuthTag(authTag)
     decipher.setAAD(Buffer.from(associated_data))
-    
+
     const decrypted = Buffer.concat([decipher.update(data), decipher.final()])
     return JSON.parse(decrypted.toString())
   }

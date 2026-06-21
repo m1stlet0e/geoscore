@@ -11,11 +11,16 @@ model User {
   id                    String                 @id @default(cuid())
   email                 String?                @unique
   phone                 String?                @unique
+  phoneVerified         Boolean                @default(false)
+  emailVerified         Boolean                @default(false)
+  wechatOpenId          String?                @unique
   name                  String?
   passwordHash          String?
   image                 String?
   plan                  Plan                   @default(FREE)
   planExpiresAt         DateTime?
+  onboardingStep        String                 @default("not_started")
+  onboardingCompletedAt DateTime?
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   accounts              Account[]
@@ -158,10 +163,16 @@ model Session {
 
 model VerificationToken {
   identifier String
+  channel    String   @default("email")
+  purpose    String   @default("login")
   token      String   @unique
   expires    DateTime
+  attempts   Int      @default(0)
+  consumed   Boolean  @default(false)
+  createdAt  DateTime @default(now())
 
-  @@unique([identifier, token])
+  @@unique([identifier, channel, purpose])
+  @@index([expires])
 }
 
 model Brand {

@@ -10,7 +10,7 @@ import { PrismaPg } from '@prisma/adapter-pg'
 import { industries } from '../src/lib/v2/industries'
 
 const url = process.env.DATABASE_URL || 'postgresql://wangbo@localhost/geoos?schema=public'
-const adapter = new PrismaPg({ connectionString: url })
+const adapter = new PrismaPg(url)
 const prisma = new PrismaClient({ adapter })
 
 async function seedIndustry(industrySlug: string) {

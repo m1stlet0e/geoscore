@@ -5,6 +5,7 @@ import { TrendingUp, ArrowUpRight, Sparkles, Plus } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { prisma } from '@/lib/prisma';
 import { cn } from '@/lib/utils';
+import { RadarInsightPanel } from './_components/RadarInsightPanel';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,6 +60,9 @@ export default async function RadarPage({ searchParams }: { searchParams: Promis
           <Plus className="h-3 w-3" /> 追踪新信号
         </Link>
       </div>
+
+      {/* AI 维度雷达（品牌 vs 行业基准） */}
+      <RadarInsightPanel brandId={activeBrand?.id} brandName={activeBrand?.name} />
 
       {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

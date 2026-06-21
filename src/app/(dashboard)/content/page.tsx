@@ -82,8 +82,8 @@ const CONTENT_TYPES = [
   { key: 'USE_CASE', icon: '💡', label: '用例场景', desc: '实际应用案例' },
   { key: 'SCHEMA', icon: '🔧', label: 'Schema', desc: '结构化数据标记' },
   { key: 'BLOG_POST', icon: '📝', label: '博客文章', desc: 'SEO 博客内容' },
-  { key: 'REDDIT_POST', icon: '📱', label: 'Reddit', desc: 'Reddit 帖子' },
-  { key: 'GITHUB_README', icon: '🐙', label: 'GitHub', desc: 'GitHub README' },
+  { key: 'REDDIT_POST', icon: '📱', label: '知乎', desc: '知乎 帖子' },
+  { key: 'GITHUB_README', icon: '🐙', label: 'Gitee', desc: 'Gitee README' },
   { key: 'ZHIHU_ANSWER', icon: '💬', label: '知乎回答', desc: '知乎问题回答' },
   { key: 'WECHAT_ARTICLE', icon: '📱', label: '微信公众号', desc: '公众号文章' },
   { key: 'MEDIA_PITCH', icon: '📰', label: '媒体稿件', desc: '新闻稿/PR' },
@@ -115,8 +115,8 @@ function getPublishStatusBadge(status: string) {
 const PUBLISH_CHANNELS: { key: PublishChannel; label: string; icon: string }[] = [
   { key: 'wordpress', label: 'WordPress', icon: '🌐' },
   { key: 'notion', label: 'Notion', icon: '📓' },
-  { key: 'reddit', label: 'Reddit', icon: '📱' },
-  { key: 'github', label: 'GitHub', icon: '🐙' },
+  { key: 'reddit', label: '知乎', icon: '📱' },
+  { key: 'github', label: 'Gitee', icon: '🐙' },
   { key: 'zhihu', label: '知乎', icon: '💬' },
   { key: 'wechat', label: '微信公众号', icon: '📱' },
 ];
