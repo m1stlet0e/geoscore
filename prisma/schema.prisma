@@ -1,0 +1,400 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PromptCategory {
+  DISCOVERY
+  PROBLEM
+  COMPARISON
+  PURCHASE
+  BRANDED
+}
+
+enum ScanStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum Sentiment {
+  POSITIVE
+  NEUTRAL
+  MIXED
+  NEGATIVE
+}
+
+enum RiskLevel {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CLOSED
+  REFUNDED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELED
+}
+
+enum LedgerType {
+  GRANT
+  CONSUME
+  REFUND
+  ADJUST
+}
+
+model User {
+  id                  String         @id @default(cuid())
+  name                String
+  email               String         @unique
+  emailVerified       Boolean        @default(false)
+  image               String?
+  phoneNumber         String?        @unique
+  phoneNumberVerified Boolean        @default(false)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  accounts            Account[]
+  sessions            Session[]
+  brands              Brand[]
+  orders              Order[]
+  subscriptions       Subscription[]
+  quotaAccount        QuotaAccount?
+  quotaLedgers        QuotaLedger[]
+  smsChallenges       SmsChallenge[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+model SmsChallenge {
+  id          String    @id @default(cuid())
+  phoneNumber String
+  codeHash    String
+  ipAddress   String
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([phoneNumber, createdAt])
+  @@index([ipAddress, createdAt])
+}
+
+model Brand {
+  id              String           @id @default(cuid())
+  name            String
+  website         String
+  industry        String
+  product         String
+  targetAudience  String
+  ownerId         String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  owner           User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  aliases         BrandAlias[]
+  competitors     Competitor[]
+  prompts         Prompt[]
+  scans           Scan[]
+  scoreSnapshots  ScoreSnapshot[]
+  riskFindings    RiskFinding[]
+  recommendations Recommendation[]
+
+  @@unique([ownerId, name])
+  @@index([ownerId])
+}
+
+model BrandAlias {
+  id      String @id @default(cuid())
+  value   String
+  brandId String
+  brand   Brand  @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, value])
+}
+
+model Competitor {
+  id      String  @id @default(cuid())
+  name    String
+  website String?
+  brandId String
+  brand   Brand   @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, name])
+}
+
+model Prompt {
+  id        String          @id @default(cuid())
+  brandId   String
+  category  PromptCategory
+  active    Boolean         @default(true)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  brand     Brand           @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  versions  PromptVersion[]
+
+  @@index([brandId, active])
+}
+
+model PromptVersion {
+  id           String        @id @default(cuid())
+  promptId     String
+  version      Int
+  text         String
+  weight       Float         @default(1)
+  createdAt    DateTime      @default(now())
+  prompt       Prompt        @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  observations Observation[]
+
+  @@unique([promptId, version])
+}
+
+model Scan {
+  id             String         @id @default(cuid())
+  brandId        String
+  status         ScanStatus     @default(PENDING)
+  providerIds    Json
+  requestedCount Int
+  errorMessage   String?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime       @default(now())
+  brand          Brand          @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  observations   Observation[]
+  scoreSnapshot  ScoreSnapshot?
+
+  @@index([brandId, createdAt])
+}
+
+model Observation {
+  id              String        @id @default(cuid())
+  scanId          String
+  promptVersionId String
+  platformId      String
+  modelId         String
+  requestId       String?
+  rawResponse     String
+  rawMetadata     Json?
+  latencyMs       Int?
+  createdAt       DateTime      @default(now())
+  scan            Scan          @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  promptVersion   PromptVersion @relation(fields: [promptVersionId], references: [id], onDelete: Restrict)
+  mentions        Mention[]
+  citations       Citation[]
+
+  @@unique([scanId, promptVersionId, platformId, modelId])
+  @@index([scanId])
+}
+
+model Mention {
+  id                     String      @id @default(cuid())
+  observationId          String
+  brandName              String
+  isTarget               Boolean
+  position               Int?
+  recommendationStrength Float       @default(0)
+  sentiment              Sentiment   @default(NEUTRAL)
+  evidence               String
+  observation            Observation @relation(fields: [observationId], references: [id], onDelete: Cascade)
+
+  @@index([observationId, isTarget])
+}
+
+model Citation {
+  id            String      @id @default(cuid())
+  observationId String
+  url           String
+  domain        String
+  title         String?
+  sourceQuality Float
+  isOfficial    Boolean     @default(false)
+  observation   Observation @relation(fields: [observationId], references: [id], onDelete: Cascade)
+
+  @@unique([observationId, url])
+}
+
+model ScoreSnapshot {
+  id                  String    @id @default(cuid())
+  brandId             String
+  scanId              String    @unique
+  algorithmVersion    String
+  score               Float
+  mentionScore        Float
+  recommendationScore Float
+  shareOfVoiceScore   Float
+  citationScore       Float
+  sentimentScore      Float
+  confidenceScore     Float
+  isProvisional       Boolean
+  riskLevel           RiskLevel @default(INFO)
+  createdAt           DateTime  @default(now())
+  brand               Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  scan                Scan      @relation(fields: [scanId], references: [id], onDelete: Cascade)
+
+  @@index([brandId, createdAt])
+}
+
+model RiskFinding {
+  id          String    @id @default(cuid())
+  brandId     String
+  level       RiskLevel
+  title       String
+  description String
+  evidence    String
+  resolvedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  brand       Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId, resolvedAt])
+}
+
+model Recommendation {
+  id         String   @id @default(cuid())
+  brandId    String
+  title      String
+  finding    String
+  action     String
+  evidence   String
+  impact     Int
+  confidence Int
+  effort     Int
+  createdAt  DateTime @default(now())
+  brand      Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId, createdAt])
+}
+
+model Plan {
+  id               String         @id @default(cuid())
+  code             String         @unique
+  name             String
+  priceCents       Int
+  monthlyResponses Int
+  maxBrands        Int
+  active           Boolean        @default(true)
+  subscriptions    Subscription[]
+  orders           Order[]
+}
+
+model Order {
+  id              String         @id @default(cuid())
+  orderNo         String         @unique
+  provider        String
+  providerOrderId String?        @unique
+  status          OrderStatus    @default(PENDING)
+  amountCents     Int
+  paidAt          DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  userId          String
+  planId          String
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan            Plan           @relation(fields: [planId], references: [id], onDelete: Restrict)
+  paymentEvents   PaymentEvent[]
+
+  @@index([userId, createdAt])
+}
+
+model PaymentEvent {
+  id              String   @id @default(cuid())
+  provider        String
+  providerEventId String
+  orderId         String
+  payload         Json
+  createdAt       DateTime @default(now())
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerEventId])
+}
+
+model Subscription {
+  id        String             @id @default(cuid())
+  status    SubscriptionStatus @default(ACTIVE)
+  startsAt  DateTime
+  endsAt    DateTime
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  userId    String
+  planId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan      Plan               @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@index([userId, status, endsAt])
+}
+
+model QuotaAccount {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  balance   Int      @default(0)
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model QuotaLedger {
+  id             String     @id @default(cuid())
+  userId         String
+  type           LedgerType
+  amount         Int
+  balanceAfter   Int
+  referenceType  String
+  referenceId    String
+  idempotencyKey String     @unique
+  createdAt      DateTime   @default(now())
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
