@@ -227,6 +227,7 @@ model Observation {
   platformId      String
   modelId         String
   requestId       String?
+  runIndex        Int             @default(1)
   rawResponse     String
   rawMetadata     Json?
   latencyMs       Int?
@@ -236,7 +237,7 @@ model Observation {
   mentions        Mention[]
   citations       Citation[]
 
-  @@unique([scanId, promptVersionId, platformId, modelId])
+  @@unique([scanId, promptVersionId, platformId, modelId, runIndex])
   @@index([scanId])
 }
 

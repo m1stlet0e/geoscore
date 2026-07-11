@@ -246,6 +246,7 @@ export const ObservationScalarFieldEnum = {
   platformId: 'platformId',
   modelId: 'modelId',
   requestId: 'requestId',
+  runIndex: 'runIndex',
   rawResponse: 'rawResponse',
   rawMetadata: 'rawMetadata',
   latencyMs: 'latencyMs',

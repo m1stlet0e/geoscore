@@ -27,10 +27,12 @@ export type AggregateObservation = {
 }
 
 export type ObservationAvgAggregateOutputType = {
+  runIndex: number | null
   latencyMs: number | null
 }
 
 export type ObservationSumAggregateOutputType = {
+  runIndex: number | null
   latencyMs: number | null
 }
 
@@ -41,6 +43,7 @@ export type ObservationMinAggregateOutputType = {
   platformId: string | null
   modelId: string | null
   requestId: string | null
+  runIndex: number | null
   rawResponse: string | null
   latencyMs: number | null
   createdAt: Date | null
@@ -53,6 +56,7 @@ export type ObservationMaxAggregateOutputType = {
   platformId: string | null
   modelId: string | null
   requestId: string | null
+  runIndex: number | null
   rawResponse: string | null
   latencyMs: number | null
   createdAt: Date | null
@@ -65,6 +69,7 @@ export type ObservationCountAggregateOutputType = {
   platformId: number
   modelId: number
   requestId: number
+  runIndex: number
   rawResponse: number
   rawMetadata: number
   latencyMs: number
@@ -74,10 +79,12 @@ export type ObservationCountAggregateOutputType = {
 
 
 export type ObservationAvgAggregateInputType = {
+  runIndex?: true
   latencyMs?: true
 }
 
 export type ObservationSumAggregateInputType = {
+  runIndex?: true
   latencyMs?: true
 }
 
@@ -88,6 +95,7 @@ export type ObservationMinAggregateInputType = {
   platformId?: true
   modelId?: true
   requestId?: true
+  runIndex?: true
   rawResponse?: true
   latencyMs?: true
   createdAt?: true
@@ -100,6 +108,7 @@ export type ObservationMaxAggregateInputType = {
   platformId?: true
   modelId?: true
   requestId?: true
+  runIndex?: true
   rawResponse?: true
   latencyMs?: true
   createdAt?: true
@@ -112,6 +121,7 @@ export type ObservationCountAggregateInputType = {
   platformId?: true
   modelId?: true
   requestId?: true
+  runIndex?: true
   rawResponse?: true
   rawMetadata?: true
   latencyMs?: true
@@ -212,6 +222,7 @@ export type ObservationGroupByOutputType = {
   platformId: string
   modelId: string
   requestId: string | null
+  runIndex: number
   rawResponse: string
   rawMetadata: runtime.JsonValue | null
   latencyMs: number | null
@@ -248,6 +259,7 @@ export type ObservationWhereInput = {
   platformId?: Prisma.StringFilter<"Observation"> | string
   modelId?: Prisma.StringFilter<"Observation"> | string
   requestId?: Prisma.StringNullableFilter<"Observation"> | string | null
+  runIndex?: Prisma.IntFilter<"Observation"> | number
   rawResponse?: Prisma.StringFilter<"Observation"> | string
   rawMetadata?: Prisma.JsonNullableFilter<"Observation">
   latencyMs?: Prisma.IntNullableFilter<"Observation"> | number | null
@@ -265,6 +277,7 @@ export type ObservationOrderByWithRelationInput = {
   platformId?: Prisma.SortOrder
   modelId?: Prisma.SortOrder
   requestId?: Prisma.SortOrderInput | Prisma.SortOrder
+  runIndex?: Prisma.SortOrder
   rawResponse?: Prisma.SortOrder
   rawMetadata?: Prisma.SortOrderInput | Prisma.SortOrder
   latencyMs?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -277,7 +290,7 @@ export type ObservationOrderByWithRelationInput = {
 
 export type ObservationWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  scanId_promptVersionId_platformId_modelId?: Prisma.ObservationScanIdPromptVersionIdPlatformIdModelIdCompoundUniqueInput
+  scanId_promptVersionId_platformId_modelId_runIndex?: Prisma.ObservationScanIdPromptVersionIdPlatformIdModelIdRunIndexCompoundUniqueInput
   AND?: Prisma.ObservationWhereInput | Prisma.ObservationWhereInput[]
   OR?: Prisma.ObservationWhereInput[]
   NOT?: Prisma.ObservationWhereInput | Prisma.ObservationWhereInput[]
@@ -286,6 +299,7 @@ export type ObservationWhereUniqueInput = Prisma.AtLeast<{
   platformId?: Prisma.StringFilter<"Observation"> | string
   modelId?: Prisma.StringFilter<"Observation"> | string
   requestId?: Prisma.StringNullableFilter<"Observation"> | string | null
+  runIndex?: Prisma.IntFilter<"Observation"> | number
   rawResponse?: Prisma.StringFilter<"Observation"> | string
   rawMetadata?: Prisma.JsonNullableFilter<"Observation">
   latencyMs?: Prisma.IntNullableFilter<"Observation"> | number | null
@@ -294,7 +308,7 @@ export type ObservationWhereUniqueInput = Prisma.AtLeast<{
   promptVersion?: Prisma.XOR<Prisma.PromptVersionScalarRelationFilter, Prisma.PromptVersionWhereInput>
   mentions?: Prisma.MentionListRelationFilter
   citations?: Prisma.CitationListRelationFilter
-}, "id" | "scanId_promptVersionId_platformId_modelId">
+}, "id" | "scanId_promptVersionId_platformId_modelId_runIndex">
 
 export type ObservationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -303,6 +317,7 @@ export type ObservationOrderByWithAggregationInput = {
   platformId?: Prisma.SortOrder
   modelId?: Prisma.SortOrder
   requestId?: Prisma.SortOrderInput | Prisma.SortOrder
+  runIndex?: Prisma.SortOrder
   rawResponse?: Prisma.SortOrder
   rawMetadata?: Prisma.SortOrderInput | Prisma.SortOrder
   latencyMs?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -324,6 +339,7 @@ export type ObservationScalarWhereWithAggregatesInput = {
   platformId?: Prisma.StringWithAggregatesFilter<"Observation"> | string
   modelId?: Prisma.StringWithAggregatesFilter<"Observation"> | string
   requestId?: Prisma.StringNullableWithAggregatesFilter<"Observation"> | string | null
+  runIndex?: Prisma.IntWithAggregatesFilter<"Observation"> | number
   rawResponse?: Prisma.StringWithAggregatesFilter<"Observation"> | string
   rawMetadata?: Prisma.JsonNullableWithAggregatesFilter<"Observation">
   latencyMs?: Prisma.IntNullableWithAggregatesFilter<"Observation"> | number | null
@@ -335,6 +351,7 @@ export type ObservationCreateInput = {
   platformId: string
   modelId: string
   requestId?: string | null
+  runIndex?: number
   rawResponse: string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: number | null
@@ -352,6 +369,7 @@ export type ObservationUncheckedCreateInput = {
   platformId: string
   modelId: string
   requestId?: string | null
+  runIndex?: number
   rawResponse: string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: number | null
@@ -365,6 +383,7 @@ export type ObservationUpdateInput = {
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   modelId?: Prisma.StringFieldUpdateOperationsInput | string
   requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runIndex?: Prisma.IntFieldUpdateOperationsInput | number
   rawResponse?: Prisma.StringFieldUpdateOperationsInput | string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -382,6 +401,7 @@ export type ObservationUncheckedUpdateInput = {
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   modelId?: Prisma.StringFieldUpdateOperationsInput | string
   requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runIndex?: Prisma.IntFieldUpdateOperationsInput | number
   rawResponse?: Prisma.StringFieldUpdateOperationsInput | string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -397,6 +417,7 @@ export type ObservationCreateManyInput = {
   platformId: string
   modelId: string
   requestId?: string | null
+  runIndex?: number
   rawResponse: string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: number | null
@@ -408,6 +429,7 @@ export type ObservationUpdateManyMutationInput = {
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   modelId?: Prisma.StringFieldUpdateOperationsInput | string
   requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runIndex?: Prisma.IntFieldUpdateOperationsInput | number
   rawResponse?: Prisma.StringFieldUpdateOperationsInput | string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -421,6 +443,7 @@ export type ObservationUncheckedUpdateManyInput = {
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   modelId?: Prisma.StringFieldUpdateOperationsInput | string
   requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runIndex?: Prisma.IntFieldUpdateOperationsInput | number
   rawResponse?: Prisma.StringFieldUpdateOperationsInput | string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -437,11 +460,12 @@ export type ObservationOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type ObservationScanIdPromptVersionIdPlatformIdModelIdCompoundUniqueInput = {
+export type ObservationScanIdPromptVersionIdPlatformIdModelIdRunIndexCompoundUniqueInput = {
   scanId: string
   promptVersionId: string
   platformId: string
   modelId: string
+  runIndex: number
 }
 
 export type ObservationCountOrderByAggregateInput = {
@@ -451,6 +475,7 @@ export type ObservationCountOrderByAggregateInput = {
   platformId?: Prisma.SortOrder
   modelId?: Prisma.SortOrder
   requestId?: Prisma.SortOrder
+  runIndex?: Prisma.SortOrder
   rawResponse?: Prisma.SortOrder
   rawMetadata?: Prisma.SortOrder
   latencyMs?: Prisma.SortOrder
@@ -458,6 +483,7 @@ export type ObservationCountOrderByAggregateInput = {
 }
 
 export type ObservationAvgOrderByAggregateInput = {
+  runIndex?: Prisma.SortOrder
   latencyMs?: Prisma.SortOrder
 }
 
@@ -468,6 +494,7 @@ export type ObservationMaxOrderByAggregateInput = {
   platformId?: Prisma.SortOrder
   modelId?: Prisma.SortOrder
   requestId?: Prisma.SortOrder
+  runIndex?: Prisma.SortOrder
   rawResponse?: Prisma.SortOrder
   latencyMs?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -480,12 +507,14 @@ export type ObservationMinOrderByAggregateInput = {
   platformId?: Prisma.SortOrder
   modelId?: Prisma.SortOrder
   requestId?: Prisma.SortOrder
+  runIndex?: Prisma.SortOrder
   rawResponse?: Prisma.SortOrder
   latencyMs?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type ObservationSumOrderByAggregateInput = {
+  runIndex?: Prisma.SortOrder
   latencyMs?: Prisma.SortOrder
 }
 
@@ -619,6 +648,7 @@ export type ObservationCreateWithoutPromptVersionInput = {
   platformId: string
   modelId: string
   requestId?: string | null
+  runIndex?: number
   rawResponse: string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: number | null
@@ -634,6 +664,7 @@ export type ObservationUncheckedCreateWithoutPromptVersionInput = {
   platformId: string
   modelId: string
   requestId?: string | null
+  runIndex?: number
   rawResponse: string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: number | null
@@ -678,6 +709,7 @@ export type ObservationScalarWhereInput = {
   platformId?: Prisma.StringFilter<"Observation"> | string
   modelId?: Prisma.StringFilter<"Observation"> | string
   requestId?: Prisma.StringNullableFilter<"Observation"> | string | null
+  runIndex?: Prisma.IntFilter<"Observation"> | number
   rawResponse?: Prisma.StringFilter<"Observation"> | string
   rawMetadata?: Prisma.JsonNullableFilter<"Observation">
   latencyMs?: Prisma.IntNullableFilter<"Observation"> | number | null
@@ -689,6 +721,7 @@ export type ObservationCreateWithoutScanInput = {
   platformId: string
   modelId: string
   requestId?: string | null
+  runIndex?: number
   rawResponse: string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: number | null
@@ -704,6 +737,7 @@ export type ObservationUncheckedCreateWithoutScanInput = {
   platformId: string
   modelId: string
   requestId?: string | null
+  runIndex?: number
   rawResponse: string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: number | null
@@ -743,6 +777,7 @@ export type ObservationCreateWithoutMentionsInput = {
   platformId: string
   modelId: string
   requestId?: string | null
+  runIndex?: number
   rawResponse: string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: number | null
@@ -759,6 +794,7 @@ export type ObservationUncheckedCreateWithoutMentionsInput = {
   platformId: string
   modelId: string
   requestId?: string | null
+  runIndex?: number
   rawResponse: string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: number | null
@@ -787,6 +823,7 @@ export type ObservationUpdateWithoutMentionsInput = {
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   modelId?: Prisma.StringFieldUpdateOperationsInput | string
   requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runIndex?: Prisma.IntFieldUpdateOperationsInput | number
   rawResponse?: Prisma.StringFieldUpdateOperationsInput | string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -803,6 +840,7 @@ export type ObservationUncheckedUpdateWithoutMentionsInput = {
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   modelId?: Prisma.StringFieldUpdateOperationsInput | string
   requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runIndex?: Prisma.IntFieldUpdateOperationsInput | number
   rawResponse?: Prisma.StringFieldUpdateOperationsInput | string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -815,6 +853,7 @@ export type ObservationCreateWithoutCitationsInput = {
   platformId: string
   modelId: string
   requestId?: string | null
+  runIndex?: number
   rawResponse: string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: number | null
@@ -831,6 +870,7 @@ export type ObservationUncheckedCreateWithoutCitationsInput = {
   platformId: string
   modelId: string
   requestId?: string | null
+  runIndex?: number
   rawResponse: string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: number | null
@@ -859,6 +899,7 @@ export type ObservationUpdateWithoutCitationsInput = {
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   modelId?: Prisma.StringFieldUpdateOperationsInput | string
   requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runIndex?: Prisma.IntFieldUpdateOperationsInput | number
   rawResponse?: Prisma.StringFieldUpdateOperationsInput | string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -875,6 +916,7 @@ export type ObservationUncheckedUpdateWithoutCitationsInput = {
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   modelId?: Prisma.StringFieldUpdateOperationsInput | string
   requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runIndex?: Prisma.IntFieldUpdateOperationsInput | number
   rawResponse?: Prisma.StringFieldUpdateOperationsInput | string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -888,6 +930,7 @@ export type ObservationCreateManyPromptVersionInput = {
   platformId: string
   modelId: string
   requestId?: string | null
+  runIndex?: number
   rawResponse: string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: number | null
@@ -899,6 +942,7 @@ export type ObservationUpdateWithoutPromptVersionInput = {
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   modelId?: Prisma.StringFieldUpdateOperationsInput | string
   requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runIndex?: Prisma.IntFieldUpdateOperationsInput | number
   rawResponse?: Prisma.StringFieldUpdateOperationsInput | string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -914,6 +958,7 @@ export type ObservationUncheckedUpdateWithoutPromptVersionInput = {
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   modelId?: Prisma.StringFieldUpdateOperationsInput | string
   requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runIndex?: Prisma.IntFieldUpdateOperationsInput | number
   rawResponse?: Prisma.StringFieldUpdateOperationsInput | string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -928,6 +973,7 @@ export type ObservationUncheckedUpdateManyWithoutPromptVersionInput = {
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   modelId?: Prisma.StringFieldUpdateOperationsInput | string
   requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runIndex?: Prisma.IntFieldUpdateOperationsInput | number
   rawResponse?: Prisma.StringFieldUpdateOperationsInput | string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -940,6 +986,7 @@ export type ObservationCreateManyScanInput = {
   platformId: string
   modelId: string
   requestId?: string | null
+  runIndex?: number
   rawResponse: string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: number | null
@@ -951,6 +998,7 @@ export type ObservationUpdateWithoutScanInput = {
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   modelId?: Prisma.StringFieldUpdateOperationsInput | string
   requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runIndex?: Prisma.IntFieldUpdateOperationsInput | number
   rawResponse?: Prisma.StringFieldUpdateOperationsInput | string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -966,6 +1014,7 @@ export type ObservationUncheckedUpdateWithoutScanInput = {
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   modelId?: Prisma.StringFieldUpdateOperationsInput | string
   requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runIndex?: Prisma.IntFieldUpdateOperationsInput | number
   rawResponse?: Prisma.StringFieldUpdateOperationsInput | string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -980,6 +1029,7 @@ export type ObservationUncheckedUpdateManyWithoutScanInput = {
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   modelId?: Prisma.StringFieldUpdateOperationsInput | string
   requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runIndex?: Prisma.IntFieldUpdateOperationsInput | number
   rawResponse?: Prisma.StringFieldUpdateOperationsInput | string
   rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   latencyMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1033,6 +1083,7 @@ export type ObservationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   platformId?: boolean
   modelId?: boolean
   requestId?: boolean
+  runIndex?: boolean
   rawResponse?: boolean
   rawMetadata?: boolean
   latencyMs?: boolean
@@ -1051,6 +1102,7 @@ export type ObservationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   platformId?: boolean
   modelId?: boolean
   requestId?: boolean
+  runIndex?: boolean
   rawResponse?: boolean
   rawMetadata?: boolean
   latencyMs?: boolean
@@ -1066,6 +1118,7 @@ export type ObservationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   platformId?: boolean
   modelId?: boolean
   requestId?: boolean
+  runIndex?: boolean
   rawResponse?: boolean
   rawMetadata?: boolean
   latencyMs?: boolean
@@ -1081,13 +1134,14 @@ export type ObservationSelectScalar = {
   platformId?: boolean
   modelId?: boolean
   requestId?: boolean
+  runIndex?: boolean
   rawResponse?: boolean
   rawMetadata?: boolean
   latencyMs?: boolean
   createdAt?: boolean
 }
 
-export type ObservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "scanId" | "promptVersionId" | "platformId" | "modelId" | "requestId" | "rawResponse" | "rawMetadata" | "latencyMs" | "createdAt", ExtArgs["result"]["observation"]>
+export type ObservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "scanId" | "promptVersionId" | "platformId" | "modelId" | "requestId" | "runIndex" | "rawResponse" | "rawMetadata" | "latencyMs" | "createdAt", ExtArgs["result"]["observation"]>
 export type ObservationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   scan?: boolean | Prisma.ScanDefaultArgs<ExtArgs>
   promptVersion?: boolean | Prisma.PromptVersionDefaultArgs<ExtArgs>
@@ -1119,6 +1173,7 @@ export type $ObservationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     platformId: string
     modelId: string
     requestId: string | null
+    runIndex: number
     rawResponse: string
     rawMetadata: runtime.JsonValue | null
     latencyMs: number | null
@@ -1556,6 +1611,7 @@ export interface ObservationFieldRefs {
   readonly platformId: Prisma.FieldRef<"Observation", 'String'>
   readonly modelId: Prisma.FieldRef<"Observation", 'String'>
   readonly requestId: Prisma.FieldRef<"Observation", 'String'>
+  readonly runIndex: Prisma.FieldRef<"Observation", 'Int'>
   readonly rawResponse: Prisma.FieldRef<"Observation", 'String'>
   readonly rawMetadata: Prisma.FieldRef<"Observation", 'Json'>
   readonly latencyMs: Prisma.FieldRef<"Observation", 'Int'>
