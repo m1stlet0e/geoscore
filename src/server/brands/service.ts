@@ -81,3 +81,34 @@ export async function deleteBrandForUser(userId: string, brandId: string) {
   const result = await db.brand.deleteMany({ where: { id: brandId, ownerId: userId } });
   return result.count === 1;
 }
+
+export async function updatePromptForUser(
+  userId: string,
+  promptId: string,
+  input: { text?: string; active?: boolean },
+) {
+  const prompt = await db.prompt.findFirst({
+    where: { id: promptId, brand: { ownerId: userId } },
+    include: { versions: { orderBy: { version: "desc" }, take: 1 } },
+  });
+  if (!prompt) throw new Error("问题不存在");
+  const current = prompt.versions[0];
+  const nextText = input.text?.trim();
+  if (nextText && nextText !== current?.text) {
+    await db.promptVersion.create({
+      data: {
+        promptId,
+        version: (current?.version ?? 0) + 1,
+        text: nextText,
+        weight: current?.weight ?? 1,
+      },
+    });
+  }
+  if (typeof input.active === "boolean" && input.active !== prompt.active) {
+    await db.prompt.update({ where: { id: promptId }, data: { active: input.active } });
+  }
+  return db.prompt.findUniqueOrThrow({
+    where: { id: promptId },
+    include: { versions: { orderBy: { version: "desc" } } },
+  });
+}

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { db } from "@/lib/db";
-import { createBrandForUser, getBrandForUser, normalizeWebsite } from "./service";
+import { createBrandForUser, getBrandForUser, normalizeWebsite, updatePromptForUser } from "./service";
 
 const userIds: string[] = [];
 
@@ -51,5 +51,18 @@ describe("品牌服务", () => {
       competitors: [],
     });
     await expect(getBrandForUser(stranger.id, brand.id)).resolves.toBeNull();
+  });
+
+  it("修改问题时保留历史版本且其他用户不能修改", async () => {
+    const owner = await createUser("prompt-owner");
+    const stranger = await createUser("prompt-stranger");
+    const brand = await createBrandForUser(owner.id, {
+      name: "问题版本品牌", website: "prompt.example.cn", industry: "企业服务", product: "测试产品", targetAudience: "企业客户", aliases: [], competitors: [],
+    });
+    const promptId = brand.prompts[0].id;
+    await expect(updatePromptForUser(stranger.id, promptId, { text: "越权修改" })).rejects.toThrow("问题不存在");
+    const updated = await updatePromptForUser(owner.id, promptId, { text: "新的监测问题？" });
+    expect(updated.versions).toHaveLength(2);
+    expect(updated.versions[0].text).toBe("新的监测问题？");
   });
 });

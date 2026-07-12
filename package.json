@@ -2,6 +2,9 @@
   "name": "geoscore",
   "version": "0.1.0",
   "private": true,
+  "overrides": {
+    "postcss": "8.5.16"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -28,7 +31,7 @@
     "dotenv": "^17.4.2",
     "lucide-react": "^1.24.0",
     "next": "16.2.10",
-    "pg": "^8.22.0",
+    "pg": "^8.16.3",
     "qrcode": "^1.5.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -42,7 +45,7 @@
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20",
-    "@types/pg": "^8.20.0",
+    "@types/pg": "^8.16.0",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -55,5 +58,9 @@
     "tsx": "^4.23.0",
     "typescript": "^5",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "postcss": "8.5.16",
+    "@hono/node-server": "1.19.13"
   }
 }

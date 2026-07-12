@@ -4,8 +4,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { StartScanButton } from "@/components/scans/start-scan-button";
-
-const categoryNames = { DISCOVERY: "品类发现", PROBLEM: "痛点解决", COMPARISON: "对比选择", PURCHASE: "购买决策", BRANDED: "品牌健康" };
+import { PromptEditor } from "@/components/brands/prompt-editor";
 
 export default async function BrandDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -15,7 +14,7 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ id
     where: { id, ownerId: session.user.id },
     include: {
       aliases: true, competitors: true,
-      prompts: { where: { active: true }, orderBy: { createdAt: "asc" }, include: { versions: { orderBy: { version: "desc" }, take: 1 } } },
+      prompts: { orderBy: { createdAt: "asc" }, include: { versions: { orderBy: { version: "desc" }, take: 1 } } },
       scans: { where: { status: "COMPLETED" }, orderBy: { completedAt: "desc" }, take: 1, include: { scoreSnapshot: true } },
     },
   });
@@ -26,6 +25,6 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ id
     <header><div><p className="eyebrow">{brand.industry}</p><h1>{brand.name}</h1><p>{brand.product} · 面向{brand.targetAudience}</p></div><StartScanButton brandId={brand.id} /></header>
     {latest?.scoreSnapshot && <Link className="latest-score" href={`/dashboard/scans/${latest.id}`}><span>最新 GeoScore</span><strong>{latest.scoreSnapshot.score.toFixed(0)}</strong><small>查看完整报告 →</small></Link>}
     <section className="brand-meta"><article><span>官网</span><a href={brand.website} target="_blank">{brand.website}</a></article><article><span>品牌别名</span><p>{brand.aliases.map((item) => item.value).join("、") || "暂无"}</p></article><article><span>主要竞品</span><p>{brand.competitors.map((item) => item.name).join("、") || "暂无"}</p></article></section>
-    <section className="prompt-section"><div><p className="eyebrow">监测问题</p><h2>AI 用户可能会这样问</h2><p>这些问题不包含你的品牌名，因此更能反映自然可见度。</p></div><ol>{brand.prompts.map((prompt, index) => <li key={prompt.id}><span>{String(index + 1).padStart(2, "0")}</span><div><small>{categoryNames[prompt.category]}</small><p>{prompt.versions[0]?.text}</p></div><b>×{prompt.versions[0]?.weight}</b></li>)}</ol></section>
+    <section className="prompt-section"><div><p className="eyebrow">监测问题</p><h2>AI 用户可能会这样问</h2><p>这些问题不包含你的品牌名，因此更能反映自然可见度。扫描前可以编辑或停用。</p></div><PromptEditor prompts={brand.prompts.map((prompt) => ({ id: prompt.id, category: prompt.category, active: prompt.active, text: prompt.versions[0]?.text ?? "", weight: prompt.versions[0]?.weight ?? 1 }))} /></section>
   </main>;
 }

@@ -77,7 +77,7 @@ export default function Home() {
         <Link href="/register" className="primary-button">创建品牌报告 <ArrowRight size={18} /></Link>
       </section>
 
-      <footer><span>© 2026 GeoScore</span><span>评分有证据，增长有方向。</span></footer>
+      <footer><span>© 2026 GeoScore</span><span className="footer-links"><Link href="/privacy">隐私政策</Link><Link href="/terms">服务协议</Link></span><span>评分有证据，增长有方向。</span></footer>
     </main>
   );
 }

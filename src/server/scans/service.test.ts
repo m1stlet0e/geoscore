@@ -27,6 +27,7 @@ describe("扫描服务", () => {
     expect(completed.status).toBe("COMPLETED");
     expect(completed.observations).toHaveLength(10);
     expect(completed.scoreSnapshot?.score).toBeGreaterThanOrEqual(0);
+    expect(await db.recommendation.count({ where: { brandId: brand.id } })).toBeGreaterThan(0);
     const quota = await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } });
     expect(quota.balance).toBe(20);
   });
@@ -38,5 +39,20 @@ describe("扫描服务", () => {
       name: "低额度品牌", website: "low.example.cn", industry: "企业服务", product: "客户管理软件", targetAudience: "中小企业", aliases: [], competitors: [],
     });
     await expect(createScanForUser(user.id, brand.id, ["mock"])).rejects.toThrow("额度不足");
+  });
+
+  it("并发创建扫描时额度不会被超扣", async () => {
+    const user = await createReadyUser();
+    await db.quotaAccount.update({ where: { userId: user.id }, data: { balance: 10 } });
+    const brand = await createBrandForUser(user.id, {
+      name: "并发品牌", website: "concurrent.example.cn", industry: "企业服务", product: "监测软件", targetAudience: "品牌团队", aliases: [], competitors: [],
+    });
+    const results = await Promise.allSettled([
+      createScanForUser(user.id, brand.id, ["mock"]),
+      createScanForUser(user.id, brand.id, ["mock"]),
+    ]);
+    expect(results.filter((item) => item.status === "fulfilled")).toHaveLength(1);
+    expect(results.filter((item) => item.status === "rejected")).toHaveLength(1);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance).toBe(0);
   });
 });
