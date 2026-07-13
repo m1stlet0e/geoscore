@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "GeoScore - AI 品牌可见度评分平台",
-  description: "检测品牌在主流 AI 回答中的提及、推荐、引用和竞品表现。",
+  title: "GeoScore - AI 推荐增长行动平台",
+  description: "定位 AI 没有推荐品牌的原因，生成问题级增长实验，并由用户手动发起同配置复测。",
 };
 
 export default function RootLayout({
