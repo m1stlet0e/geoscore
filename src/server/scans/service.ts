@@ -1,13 +1,46 @@
 import { calculateComponents, calculateConfidence, calculateGeoScore, SCORING_VERSION, type ParsedObservation } from "@/domain/scoring/calculate";
+import { buildOpportunities, type OpportunitySample } from "@/domain/opportunities/build-opportunities";
 import { db } from "@/lib/db";
 import { getAiProvider, listAiProviders, type AiProviderEnvironment } from "@/server/ai";
+
+export type CreateScanOptions = {
+  repeatCount?: number;
+  env?: AiProviderEnvironment;
+};
+
+export type RepeatConsistencySample = {
+  promptVersionId: string;
+  platformId: string;
+  targetMentioned: boolean;
+};
+
+export function calculateRepeatConsistency(samples: RepeatConsistencySample[]) {
+  if (!samples.length) return 0;
+  const groups = new Map<string, boolean[]>();
+  for (const sample of samples) {
+    const key = `${sample.promptVersionId}\u0000${sample.platformId}`;
+    const outcomes = groups.get(key) ?? [];
+    outcomes.push(sample.targetMentioned);
+    groups.set(key, outcomes);
+  }
+  const consistencyTotal = [...groups.values()].reduce((sum, outcomes) => {
+    const mentionedCount = outcomes.filter(Boolean).length;
+    return sum + Math.max(mentionedCount, outcomes.length - mentionedCount) / outcomes.length;
+  }, 0);
+  return consistencyTotal / groups.size;
+}
 
 export async function createScanForUser(
   userId: string,
   brandId: string,
   platformIds: string[],
-  env: AiProviderEnvironment = process.env,
+  options: CreateScanOptions = {},
 ) {
+  const repeatCount = options.repeatCount ?? 1;
+  if (!Number.isInteger(repeatCount) || repeatCount < 1 || repeatCount > 3) {
+    throw new Error("重复采样次数必须是 1 到 3 之间的整数");
+  }
+  const env = options.env ?? process.env;
   const brand = await db.brand.findFirst({
     where: { id: brandId, ownerId: userId },
     include: { prompts: { where: { active: true } } },
@@ -23,14 +56,14 @@ export async function createScanForUser(
   }));
   if (dataModes.size > 1) throw new Error("一次扫描不能混合真实与模拟 AI 平台");
   const dataMode = [...dataModes][0];
-  const requestedCount = brand.prompts.length * platformIds.length;
+  const requestedCount = brand.prompts.length * platformIds.length * repeatCount;
   if (!requestedCount) throw new Error("品牌没有可扫描的问题");
 
   return db.$transaction(async (tx) => {
     const quota = await tx.quotaAccount.findUnique({ where: { userId } });
     if (!quota || quota.balance < requestedCount) throw new Error(`额度不足，本次需要 ${requestedCount} 次`);
     const scan = await tx.scan.create({
-      data: { brandId, providerIds: platformIds, requestedCount, dataMode },
+      data: { brandId, providerIds: platformIds, requestedCount, repeatCount, dataMode },
     });
     const debited = await tx.quotaAccount.updateMany({
       where: { userId, balance: { gte: requestedCount } },
@@ -80,6 +113,8 @@ export async function executeScanForUser(userId: string, scanId: string) {
   await db.scan.update({ where: { id: scan.id }, data: { status: "RUNNING", startedAt: new Date(), errorMessage: null } });
 
   const scoring: ParsedObservation[] = [];
+  const repeatSignals: RepeatConsistencySample[] = [];
+  const opportunitySamples: OpportunitySample[] = [];
   const criticalEvidence: string[] = [];
   try {
     for (const prompt of scan.brand.prompts) {
@@ -87,33 +122,63 @@ export async function executeScanForUser(userId: string, scanId: string) {
       if (!version) continue;
       for (const platformId of platformIds) {
         const provider = getAiProvider(platformId);
-        const answer = await provider.query({
-          prompt: version.text,
-          brand: { name: scan.brand.name, website: scan.brand.website, aliases: scan.brand.aliases.map((item) => item.value) },
-          competitors: scan.brand.competitors.map((item) => item.name),
-        });
-        const target = answer.mentions.find((item) => item.isTarget);
-        const officialCitation = answer.citations.find((item) => item.isOfficial);
-        if (/已倒闭|停止运营|诈骗|违法|被查处/.test(answer.rawResponse)) criticalEvidence.push(answer.rawResponse);
-        await db.observation.create({
-          data: {
-            scanId: scan.id, promptVersionId: version.id, platformId: answer.platformId, modelId: answer.modelId,
-            requestId: answer.requestId, rawResponse: answer.rawResponse, latencyMs: answer.latencyMs, runIndex: 1,
-            mentions: { create: answer.mentions }, citations: { create: answer.citations },
-          },
-        });
-        scoring.push({
-          weight: version.weight, platformId, targetMentioned: Boolean(target),
-          recommendationStrength: target?.recommendationStrength ?? 0, position: target?.position,
-          competitorMentions: answer.mentions.filter((item) => !item.isTarget).length,
-          trackedCompetitorCount: scan.brand.competitors.length,
-          targetCitationQuality: officialCitation?.sourceQuality ?? null,
-          sentiment: target?.sentiment ?? null,
-        });
+        for (let runIndex = 1; runIndex <= scan.repeatCount; runIndex += 1) {
+          const answer = await provider.query({
+            prompt: version.text,
+            brand: { name: scan.brand.name, website: scan.brand.website, aliases: scan.brand.aliases.map((item) => item.value) },
+            competitors: scan.brand.competitors.map((item) => item.name),
+          });
+          const target = answer.mentions.find((item) => item.isTarget);
+          const competitorMentions = answer.mentions.filter((item) => !item.isTarget);
+          const officialCitation = answer.citations.find((item) => item.isOfficial);
+          if (/已倒闭|停止运营|诈骗|违法|被查处/.test(answer.rawResponse)) criticalEvidence.push(answer.rawResponse);
+          await db.observation.create({
+            data: {
+              scanId: scan.id, promptVersionId: version.id, platformId: answer.platformId, modelId: answer.modelId,
+              requestId: answer.requestId, rawResponse: answer.rawResponse, latencyMs: answer.latencyMs, runIndex,
+              mentions: { create: answer.mentions }, citations: { create: answer.citations },
+            },
+          });
+          scoring.push({
+            weight: version.weight, platformId, targetMentioned: Boolean(target),
+            recommendationStrength: target?.recommendationStrength ?? 0, position: target?.position,
+            competitorMentions: answer.mentions.filter((item) => !item.isTarget).length,
+            trackedCompetitorCount: scan.brand.competitors.length,
+            targetCitationQuality: officialCitation?.sourceQuality ?? null,
+            sentiment: target?.sentiment ?? null,
+          });
+          repeatSignals.push({
+            promptVersionId: version.id,
+            platformId,
+            targetMentioned: Boolean(target),
+          });
+          opportunitySamples.push({
+            brandName: scan.brand.name,
+            promptVersionId: version.id,
+            promptText: version.text,
+            promptCategory: prompt.category,
+            promptWeight: version.weight,
+            platformId: answer.platformId,
+            rawResponse: answer.rawResponse,
+            targetMentioned: Boolean(target),
+            targetPosition: target?.position ?? null,
+            targetRecommendationStrength: target?.recommendationStrength ?? 0,
+            competitorNames: competitorMentions.map((item) => item.brandName),
+            competitorPositions: competitorMentions.map((item) => item.position),
+            competitorRecommendationStrengths: competitorMentions.map(
+              (item) => item.recommendationStrength,
+            ),
+            hasOfficialCitation: Boolean(officialCitation),
+          });
+        }
       }
     }
     const components = calculateComponents(scoring);
-    const confidence = calculateConfidence({ sampleCount: scoring.length, platformCount: new Set(scoring.map((item) => item.platformId)).size, repeatConsistency: 1 });
+    const confidence = calculateConfidence({
+      sampleCount: scoring.length,
+      platformCount: new Set(scoring.map((item) => item.platformId)).size,
+      repeatConsistency: calculateRepeatConsistency(repeatSignals),
+    });
     const total = calculateGeoScore({ ...components, confidenceScore: confidence.score, hasCriticalRisk: criticalEvidence.length > 0 });
     await db.scoreSnapshot.create({
       data: {
@@ -124,10 +189,20 @@ export async function executeScanForUser(userId: string, scanId: string) {
     if (criticalEvidence.length) {
       await db.riskFinding.create({
         data: {
-          brandId: scan.brandId, level: "CRITICAL", title: "AI 回答包含高风险品牌描述",
+          brandId: scan.brandId, scanId: scan.id, level: "CRITICAL", title: "AI 回答包含高风险品牌描述",
           description: "监测回答中出现倒闭、违法或诈骗等可能严重影响品牌信任的描述，请尽快核查事实并处理信息源。",
           evidence: criticalEvidence.slice(0, 3).join("\n\n"),
         },
+      });
+    }
+    const opportunities = buildOpportunities(opportunitySamples);
+    if (opportunities.length) {
+      await db.opportunity.createMany({
+        data: opportunities.map((opportunity) => ({
+          brandId: scan.brandId,
+          scanId: scan.id,
+          ...opportunity,
+        })),
       });
     }
     const recommendations = [
@@ -151,7 +226,7 @@ export async function executeScanForUser(userId: string, scanId: string) {
       },
     ].sort((left, right) => left.score - right.score).slice(0, 3);
     await db.recommendation.createMany({ data: recommendations.map((item) => ({
-      brandId: scan.brandId, title: item.title, finding: item.finding, action: item.action,
+      brandId: scan.brandId, scanId: scan.id, title: item.title, finding: item.finding, action: item.action,
       evidence: item.evidence, impact: item.impact, confidence: item.confidence, effort: item.effort,
     })) });
     await db.scan.update({ where: { id: scan.id }, data: { status: "COMPLETED", completedAt: new Date() } });
