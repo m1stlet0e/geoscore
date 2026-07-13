@@ -16,6 +16,88 @@ export type RepeatConsistencySample = {
   targetMentioned: boolean;
 };
 
+export type ScanExecutionConfig = {
+  promptVersionIds: string[];
+  providerIds: string[];
+  repeatCount: number;
+};
+
+function asUniqueStringArray(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value.filter((item): item is string => (
+    typeof item === "string" && item.length > 0
+  )))];
+}
+
+function hasSameStringSet(left: string[], right: string[]) {
+  return left.length === right.length
+    && left.every((item) => right.includes(item));
+}
+
+export function scanExecutionConfigMatches(
+  scan: { promptVersionIds: unknown; providerIds: unknown; repeatCount: number },
+  expected: ScanExecutionConfig,
+) {
+  return scan.repeatCount === expected.repeatCount
+    && hasSameStringSet(asUniqueStringArray(scan.promptVersionIds), expected.promptVersionIds)
+    && hasSameStringSet(asUniqueStringArray(scan.providerIds), expected.providerIds);
+}
+
+async function loadVerificationBaselineConfig(
+  verificationExperimentId: string,
+  brandId: string,
+): Promise<ScanExecutionConfig> {
+  const verificationExperiment = await db.optimizationExperiment.findFirst({
+    where: { id: verificationExperimentId, brandId },
+    select: {
+      status: true,
+      baselineScan: {
+        select: {
+          id: true,
+          brandId: true,
+          status: true,
+          promptVersionIds: true,
+          providerIds: true,
+          repeatCount: true,
+        },
+      },
+    },
+  });
+  if (!verificationExperiment) throw new Error("验证实验不存在或不属于当前品牌");
+  if (verificationExperiment.status !== "VERIFYING") {
+    throw new Error("只有验证中的实验可以创建复扫");
+  }
+  if (
+    verificationExperiment.baselineScan.brandId !== brandId
+    || verificationExperiment.baselineScan.status !== "COMPLETED"
+  ) {
+    throw new Error("验证实验的基线扫描必须已完成且属于当前品牌");
+  }
+
+  let promptVersionIds = asUniqueStringArray(
+    verificationExperiment.baselineScan.promptVersionIds,
+  );
+  if (!promptVersionIds.length) {
+    const historicalObservations = await db.observation.findMany({
+      where: { scanId: verificationExperiment.baselineScan.id },
+      select: { promptVersionId: true },
+      orderBy: { createdAt: "asc" },
+    });
+    promptVersionIds = [...new Set(
+      historicalObservations.map((item) => item.promptVersionId),
+    )];
+  }
+  if (!promptVersionIds.length) throw new Error("基线扫描缺少固定问题版本");
+  const providerIds = asUniqueStringArray(verificationExperiment.baselineScan.providerIds);
+  if (!providerIds.length) throw new Error("基线扫描缺少 AI 平台");
+
+  return {
+    promptVersionIds,
+    providerIds,
+    repeatCount: verificationExperiment.baselineScan.repeatCount,
+  };
+}
+
 export function calculateRepeatConsistency(samples: RepeatConsistencySample[]) {
   if (!samples.length) return 0;
   const groups = new Map<string, boolean[]>();
@@ -67,6 +149,12 @@ export async function createScanForUser(
   }));
   if (dataModes.size > 1) throw new Error("一次扫描不能混合真实与模拟 AI 平台");
   const dataMode = [...dataModes][0];
+  const verificationBaselineConfig = options.verificationExperimentId
+    ? await loadVerificationBaselineConfig(options.verificationExperimentId, brandId)
+    : null;
+  if (verificationBaselineConfig && options.promptVersionIds === undefined) {
+    throw new Error("验证扫描必须完整复用基线配置");
+  }
   const promptVersionIds = options.promptVersionIds === undefined
     ? brand.prompts.flatMap((prompt) => prompt.versions[0]?.id ?? [])
     : [...new Set(options.promptVersionIds.map((id) => id.trim()).filter(Boolean))];
@@ -82,15 +170,11 @@ export async function createScanForUser(
       throw new Error("固定问题版本不属于当前品牌");
     }
   }
-  if (options.verificationExperimentId) {
-    const verificationExperiment = await db.optimizationExperiment.findFirst({
-      where: { id: options.verificationExperimentId, brandId },
-      select: { id: true, status: true },
-    });
-    if (!verificationExperiment) throw new Error("验证实验不存在或不属于当前品牌");
-    if (verificationExperiment.status !== "VERIFYING") {
-      throw new Error("只有验证中的实验可以创建复扫");
-    }
+  if (verificationBaselineConfig && !scanExecutionConfigMatches(
+    { promptVersionIds, providerIds: platformIds, repeatCount },
+    verificationBaselineConfig,
+  )) {
+    throw new Error("验证扫描必须完整复用基线配置");
   }
   const requestedCount = promptVersionIds.length * platformIds.length * repeatCount;
   if (!requestedCount) throw new Error("品牌没有可扫描的问题");

@@ -1,6 +1,10 @@
 import { db } from "@/lib/db";
 import { calculateExperimentResult } from "@/domain/experiments/calculate-experiment-result";
-import { createScanForUser, executeScanForUser } from "@/server/scans/service";
+import {
+  createScanForUser,
+  executeScanForUser,
+  scanExecutionConfigMatches,
+} from "@/server/scans/service";
 
 export type ExperimentServiceErrorCode =
   | "NOT_FOUND"
@@ -250,7 +254,7 @@ export async function verifyExperimentForUser(
       throw new ExperimentServiceError("基线扫描缺少 AI 平台", "CONFLICT");
     }
 
-    let followUpScan = await db.scan.findFirst({
+    const completedVerificationScans = await db.scan.findMany({
       where: {
         brandId: experiment.brandId,
         verificationExperimentId: experiment.id,
@@ -259,6 +263,13 @@ export async function verifyExperimentForUser(
       orderBy: { completedAt: "desc" },
       include: { scoreSnapshot: true },
     });
+    let followUpScan = completedVerificationScans.find((scan) => (
+      scanExecutionConfigMatches(scan, {
+        promptVersionIds,
+        providerIds,
+        repeatCount: experiment.baselineScan.repeatCount,
+      })
+    ));
     if (!followUpScan) {
       const verificationScan = await createScanForUser(
         userId,

@@ -352,6 +352,71 @@ describe("实验服务", () => {
       .toBe(balanceBeforeRecovery);
   });
 
+  it.each([
+    "问题版本",
+    "AI 平台",
+    "重复次数",
+  ])("不复用%s与基线不一致的已完成验证扫描", async (mismatch) => {
+    const { user, baselineScan, opportunity } = await createBaselineFixture();
+    const draft = await createExperimentForUser(user.id, opportunity.id);
+    const active = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "发布用于验证错误扫描隔离能力的行动计划",
+    });
+    await db.optimizationExperiment.update({
+      where: { id: active.id },
+      data: { status: "VERIFYING" },
+    });
+    const mismatchedScan = await createScanForUser(
+      user.id,
+      opportunity.brandId,
+      baselineScan.providerIds as string[],
+      {
+        repeatCount: baselineScan.repeatCount,
+        promptVersionIds: baselineScan.promptVersionIds as string[],
+        verificationExperimentId: active.id,
+      },
+    );
+    await executeScanForUser(user.id, mismatchedScan.id);
+    if (mismatch === "问题版本") {
+      await db.scan.update({
+        where: { id: mismatchedScan.id },
+        data: {
+          promptVersionIds: (baselineScan.promptVersionIds as string[]).slice(0, -1),
+        },
+      });
+    }
+    if (mismatch === "AI 平台") {
+      await db.scan.update({
+        where: { id: mismatchedScan.id },
+        data: { providerIds: ["deepseek"] },
+      });
+    }
+    if (mismatch === "重复次数") {
+      await db.scan.update({
+        where: { id: mismatchedScan.id },
+        data: { repeatCount: baselineScan.repeatCount + 1 },
+      });
+    }
+    await db.optimizationExperiment.update({
+      where: { id: active.id },
+      data: { status: "ACTIVE" },
+    });
+
+    const result = await verifyExperimentForUser(user.id, active.id);
+    const followUp = await db.scan.findUniqueOrThrow({
+      where: { id: result.followUpScanId! },
+    });
+
+    expect(result.followUpScanId).not.toBe(mismatchedScan.id);
+    expect(new Set(followUp.promptVersionIds as string[]))
+      .toEqual(new Set(baselineScan.promptVersionIds as string[]));
+    expect(followUp.providerIds).toEqual(baselineScan.providerIds);
+    expect(followUp.repeatCount).toBe(baselineScan.repeatCount);
+    expect(await db.scan.count({
+      where: { verificationExperimentId: active.id },
+    })).toBe(2);
+  });
+
   it("DRAFT 与 VERIFYING 状态拒绝复扫", async () => {
     const { user, opportunity } = await createBaselineFixture();
     const draft = await createExperimentForUser(user.id, opportunity.id);

@@ -20,6 +20,73 @@ async function createReadyUser(balance = 30) {
   return user;
 }
 
+async function createVerifyingExperimentFixture() {
+  const user = await createReadyUser(500);
+  const brand = await createBrandForUser(user.id, {
+    name: `验证配置品牌-${randomUUID()}`,
+    website: "verification-config.example.cn",
+    industry: "企业服务",
+    product: "品牌监测软件",
+    targetAudience: "品牌团队",
+    aliases: [],
+    competitors: [],
+  });
+  const originalVersionId = brand.prompts[0].versions[0].id;
+  const updatedPrompt = await updatePromptForUser(user.id, brand.prompts[0].id, {
+    text: "验证扫描必须固定使用的新版问题",
+    active: true,
+  });
+  const promptVersionIds = brand.prompts.map((prompt, index) => (
+    index === 0 ? updatedPrompt.versions[0].id : prompt.versions[0].id
+  ));
+  const baselineScan = await db.scan.create({
+    data: {
+      brandId: brand.id,
+      status: "COMPLETED",
+      providerIds: ["mock"],
+      promptVersionIds,
+      requestedCount: promptVersionIds.length * 2,
+      repeatCount: 2,
+      dataMode: "SIMULATED",
+      completedAt: new Date(),
+    },
+  });
+  const opportunity = await db.opportunity.create({
+    data: {
+      brandId: brand.id,
+      scanId: baselineScan.id,
+      promptVersionId: promptVersionIds[0],
+      platformId: "mock",
+      type: "MENTION_GAP",
+      priority: 80,
+      title: "验证配置机会",
+      summary: "验证配置摘要",
+      evidence: "验证配置证据",
+      recommendedAction: "发布一篇完整的官网验证内容",
+      targetContentType: "官网指南",
+    },
+  });
+  const experiment = await db.optimizationExperiment.create({
+    data: {
+      brandId: brand.id,
+      opportunityId: opportunity.id,
+      baselineScanId: baselineScan.id,
+      title: "验证配置实验",
+      hypothesis: "验证扫描必须严格复用基线配置",
+      actionPlan: "发布一篇完整的官网验证内容",
+      status: "VERIFYING",
+    },
+  });
+  return {
+    user,
+    brand,
+    baselineScan,
+    experiment,
+    promptVersionIds,
+    originalVersionId,
+  };
+}
+
 describe("扫描服务", () => {
   it("按问题版本和平台计算目标提及结果的一致率", () => {
     expect(calculateRepeatConsistency([
@@ -190,6 +257,116 @@ describe("扫描服务", () => {
     expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
       .toBe(50);
     expect(await db.scan.count({ where: { brandId: brand.id } })).toBe(1);
+  });
+
+  it.each([
+    "省略问题版本",
+    "缺少基线版本",
+    "增加同品牌版本",
+    "替换为同品牌旧版本",
+    "篡改平台",
+    "篡改重复次数",
+  ])("验证扫描%s时拒绝且不扣额度、不创建扫描", async (scenario) => {
+    const fixture = await createVerifyingExperimentFixture();
+    const balanceBefore = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: fixture.user.id },
+    })).balance;
+    const options: Parameters<typeof createScanForUser>[3] = {
+      repeatCount: fixture.baselineScan.repeatCount,
+      promptVersionIds: fixture.promptVersionIds,
+      verificationExperimentId: fixture.experiment.id,
+    };
+    let platformIds = fixture.baselineScan.providerIds as string[];
+
+    if (scenario === "省略问题版本") delete options.promptVersionIds;
+    if (scenario === "缺少基线版本") {
+      options.promptVersionIds = fixture.promptVersionIds.slice(0, -1);
+    }
+    if (scenario === "增加同品牌版本") {
+      options.promptVersionIds = [...fixture.promptVersionIds, fixture.originalVersionId];
+    }
+    if (scenario === "替换为同品牌旧版本") {
+      options.promptVersionIds = [
+        fixture.originalVersionId,
+        ...fixture.promptVersionIds.slice(1),
+      ];
+    }
+    if (scenario === "篡改平台") platformIds = ["deepseek"];
+    if (scenario === "篡改重复次数") options.repeatCount = 1;
+
+    await expect(createScanForUser(
+      fixture.user.id,
+      fixture.brand.id,
+      platformIds,
+      {
+        ...options,
+        env: scenario === "篡改平台"
+          ? { AI_PROVIDER: "mock", DEEPSEEK_API_KEY: "test-key" }
+          : { AI_PROVIDER: "mock" },
+      },
+    )).rejects.toThrow("验证扫描必须完整复用基线配置");
+
+    expect(await db.scan.count({ where: { brandId: fixture.brand.id } })).toBe(1);
+    expect((await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: fixture.user.id },
+    })).balance).toBe(balanceBefore);
+  });
+
+  it("验证实验的基线扫描未完成时拒绝且不扣额度、不创建扫描", async () => {
+    const fixture = await createVerifyingExperimentFixture();
+    await db.scan.update({
+      where: { id: fixture.baselineScan.id },
+      data: { status: "PENDING", completedAt: null },
+    });
+    const balanceBefore = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: fixture.user.id },
+    })).balance;
+
+    await expect(createScanForUser(
+      fixture.user.id,
+      fixture.brand.id,
+      fixture.baselineScan.providerIds as string[],
+      {
+        repeatCount: fixture.baselineScan.repeatCount,
+        promptVersionIds: fixture.promptVersionIds,
+        verificationExperimentId: fixture.experiment.id,
+        env: { AI_PROVIDER: "mock" },
+      },
+    )).rejects.toThrow("验证实验的基线扫描必须已完成且属于当前品牌");
+
+    expect(await db.scan.count({ where: { brandId: fixture.brand.id } })).toBe(1);
+    expect((await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: fixture.user.id },
+    })).balance).toBe(balanceBefore);
+  });
+
+  it("验证扫描参数与已完成基线完全一致时创建并按基线配置扣额度", async () => {
+    const fixture = await createVerifyingExperimentFixture();
+    const balanceBefore = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: fixture.user.id },
+    })).balance;
+
+    const verificationScan = await createScanForUser(
+      fixture.user.id,
+      fixture.brand.id,
+      fixture.baselineScan.providerIds as string[],
+      {
+        repeatCount: fixture.baselineScan.repeatCount,
+        promptVersionIds: [...fixture.promptVersionIds].reverse(),
+        verificationExperimentId: fixture.experiment.id,
+        env: { AI_PROVIDER: "mock" },
+      },
+    );
+
+    expect(new Set(verificationScan.promptVersionIds as string[]))
+      .toEqual(new Set(fixture.promptVersionIds));
+    expect(verificationScan.providerIds).toEqual(fixture.baselineScan.providerIds);
+    expect(verificationScan.repeatCount).toBe(fixture.baselineScan.repeatCount);
+    expect(verificationScan.verificationExperimentId).toBe(fixture.experiment.id);
+    expect(verificationScan.requestedCount).toBe(fixture.baselineScan.requestedCount);
+    expect((await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: fixture.user.id },
+    })).balance).toBe(balanceBefore - fixture.baselineScan.requestedCount);
   });
 
   it("重复选择同一 AI 平台时在创建扫描和扣额度前拒绝", async () => {
