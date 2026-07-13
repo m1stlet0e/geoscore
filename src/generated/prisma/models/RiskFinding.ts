@@ -27,6 +27,7 @@ export type AggregateRiskFinding = {
 export type RiskFindingMinAggregateOutputType = {
   id: string | null
   brandId: string | null
+  scanId: string | null
   level: $Enums.RiskLevel | null
   title: string | null
   description: string | null
@@ -38,6 +39,7 @@ export type RiskFindingMinAggregateOutputType = {
 export type RiskFindingMaxAggregateOutputType = {
   id: string | null
   brandId: string | null
+  scanId: string | null
   level: $Enums.RiskLevel | null
   title: string | null
   description: string | null
@@ -49,6 +51,7 @@ export type RiskFindingMaxAggregateOutputType = {
 export type RiskFindingCountAggregateOutputType = {
   id: number
   brandId: number
+  scanId: number
   level: number
   title: number
   description: number
@@ -62,6 +65,7 @@ export type RiskFindingCountAggregateOutputType = {
 export type RiskFindingMinAggregateInputType = {
   id?: true
   brandId?: true
+  scanId?: true
   level?: true
   title?: true
   description?: true
@@ -73,6 +77,7 @@ export type RiskFindingMinAggregateInputType = {
 export type RiskFindingMaxAggregateInputType = {
   id?: true
   brandId?: true
+  scanId?: true
   level?: true
   title?: true
   description?: true
@@ -84,6 +89,7 @@ export type RiskFindingMaxAggregateInputType = {
 export type RiskFindingCountAggregateInputType = {
   id?: true
   brandId?: true
+  scanId?: true
   level?: true
   title?: true
   description?: true
@@ -168,6 +174,7 @@ export type RiskFindingGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 export type RiskFindingGroupByOutputType = {
   id: string
   brandId: string
+  scanId: string | null
   level: $Enums.RiskLevel
   title: string
   description: string
@@ -200,6 +207,7 @@ export type RiskFindingWhereInput = {
   NOT?: Prisma.RiskFindingWhereInput | Prisma.RiskFindingWhereInput[]
   id?: Prisma.StringFilter<"RiskFinding"> | string
   brandId?: Prisma.StringFilter<"RiskFinding"> | string
+  scanId?: Prisma.StringNullableFilter<"RiskFinding"> | string | null
   level?: Prisma.EnumRiskLevelFilter<"RiskFinding"> | $Enums.RiskLevel
   title?: Prisma.StringFilter<"RiskFinding"> | string
   description?: Prisma.StringFilter<"RiskFinding"> | string
@@ -207,11 +215,13 @@ export type RiskFindingWhereInput = {
   resolvedAt?: Prisma.DateTimeNullableFilter<"RiskFinding"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"RiskFinding"> | Date | string
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
+  scan?: Prisma.XOR<Prisma.ScanNullableScalarRelationFilter, Prisma.ScanWhereInput> | null
 }
 
 export type RiskFindingOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  scanId?: Prisma.SortOrderInput | Prisma.SortOrder
   level?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -219,6 +229,7 @@ export type RiskFindingOrderByWithRelationInput = {
   resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   brand?: Prisma.BrandOrderByWithRelationInput
+  scan?: Prisma.ScanOrderByWithRelationInput
 }
 
 export type RiskFindingWhereUniqueInput = Prisma.AtLeast<{
@@ -227,6 +238,7 @@ export type RiskFindingWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.RiskFindingWhereInput[]
   NOT?: Prisma.RiskFindingWhereInput | Prisma.RiskFindingWhereInput[]
   brandId?: Prisma.StringFilter<"RiskFinding"> | string
+  scanId?: Prisma.StringNullableFilter<"RiskFinding"> | string | null
   level?: Prisma.EnumRiskLevelFilter<"RiskFinding"> | $Enums.RiskLevel
   title?: Prisma.StringFilter<"RiskFinding"> | string
   description?: Prisma.StringFilter<"RiskFinding"> | string
@@ -234,11 +246,13 @@ export type RiskFindingWhereUniqueInput = Prisma.AtLeast<{
   resolvedAt?: Prisma.DateTimeNullableFilter<"RiskFinding"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"RiskFinding"> | Date | string
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
+  scan?: Prisma.XOR<Prisma.ScanNullableScalarRelationFilter, Prisma.ScanWhereInput> | null
 }, "id">
 
 export type RiskFindingOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  scanId?: Prisma.SortOrderInput | Prisma.SortOrder
   level?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -256,6 +270,7 @@ export type RiskFindingScalarWhereWithAggregatesInput = {
   NOT?: Prisma.RiskFindingScalarWhereWithAggregatesInput | Prisma.RiskFindingScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"RiskFinding"> | string
   brandId?: Prisma.StringWithAggregatesFilter<"RiskFinding"> | string
+  scanId?: Prisma.StringNullableWithAggregatesFilter<"RiskFinding"> | string | null
   level?: Prisma.EnumRiskLevelWithAggregatesFilter<"RiskFinding"> | $Enums.RiskLevel
   title?: Prisma.StringWithAggregatesFilter<"RiskFinding"> | string
   description?: Prisma.StringWithAggregatesFilter<"RiskFinding"> | string
@@ -273,11 +288,13 @@ export type RiskFindingCreateInput = {
   resolvedAt?: Date | string | null
   createdAt?: Date | string
   brand: Prisma.BrandCreateNestedOneWithoutRiskFindingsInput
+  scan?: Prisma.ScanCreateNestedOneWithoutRiskFindingsInput
 }
 
 export type RiskFindingUncheckedCreateInput = {
   id?: string
   brandId: string
+  scanId?: string | null
   level: $Enums.RiskLevel
   title: string
   description: string
@@ -295,11 +312,13 @@ export type RiskFindingUpdateInput = {
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   brand?: Prisma.BrandUpdateOneRequiredWithoutRiskFindingsNestedInput
+  scan?: Prisma.ScanUpdateOneWithoutRiskFindingsNestedInput
 }
 
 export type RiskFindingUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
+  scanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   level?: Prisma.EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
@@ -311,6 +330,7 @@ export type RiskFindingUncheckedUpdateInput = {
 export type RiskFindingCreateManyInput = {
   id?: string
   brandId: string
+  scanId?: string | null
   level: $Enums.RiskLevel
   title: string
   description: string
@@ -332,6 +352,7 @@ export type RiskFindingUpdateManyMutationInput = {
 export type RiskFindingUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
+  scanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   level?: Prisma.EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
@@ -353,6 +374,7 @@ export type RiskFindingOrderByRelationAggregateInput = {
 export type RiskFindingCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  scanId?: Prisma.SortOrder
   level?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -364,6 +386,7 @@ export type RiskFindingCountOrderByAggregateInput = {
 export type RiskFindingMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  scanId?: Prisma.SortOrder
   level?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -375,6 +398,7 @@ export type RiskFindingMaxOrderByAggregateInput = {
 export type RiskFindingMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  scanId?: Prisma.SortOrder
   level?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -425,6 +449,48 @@ export type RiskFindingUncheckedUpdateManyWithoutBrandNestedInput = {
   deleteMany?: Prisma.RiskFindingScalarWhereInput | Prisma.RiskFindingScalarWhereInput[]
 }
 
+export type RiskFindingCreateNestedManyWithoutScanInput = {
+  create?: Prisma.XOR<Prisma.RiskFindingCreateWithoutScanInput, Prisma.RiskFindingUncheckedCreateWithoutScanInput> | Prisma.RiskFindingCreateWithoutScanInput[] | Prisma.RiskFindingUncheckedCreateWithoutScanInput[]
+  connectOrCreate?: Prisma.RiskFindingCreateOrConnectWithoutScanInput | Prisma.RiskFindingCreateOrConnectWithoutScanInput[]
+  createMany?: Prisma.RiskFindingCreateManyScanInputEnvelope
+  connect?: Prisma.RiskFindingWhereUniqueInput | Prisma.RiskFindingWhereUniqueInput[]
+}
+
+export type RiskFindingUncheckedCreateNestedManyWithoutScanInput = {
+  create?: Prisma.XOR<Prisma.RiskFindingCreateWithoutScanInput, Prisma.RiskFindingUncheckedCreateWithoutScanInput> | Prisma.RiskFindingCreateWithoutScanInput[] | Prisma.RiskFindingUncheckedCreateWithoutScanInput[]
+  connectOrCreate?: Prisma.RiskFindingCreateOrConnectWithoutScanInput | Prisma.RiskFindingCreateOrConnectWithoutScanInput[]
+  createMany?: Prisma.RiskFindingCreateManyScanInputEnvelope
+  connect?: Prisma.RiskFindingWhereUniqueInput | Prisma.RiskFindingWhereUniqueInput[]
+}
+
+export type RiskFindingUpdateManyWithoutScanNestedInput = {
+  create?: Prisma.XOR<Prisma.RiskFindingCreateWithoutScanInput, Prisma.RiskFindingUncheckedCreateWithoutScanInput> | Prisma.RiskFindingCreateWithoutScanInput[] | Prisma.RiskFindingUncheckedCreateWithoutScanInput[]
+  connectOrCreate?: Prisma.RiskFindingCreateOrConnectWithoutScanInput | Prisma.RiskFindingCreateOrConnectWithoutScanInput[]
+  upsert?: Prisma.RiskFindingUpsertWithWhereUniqueWithoutScanInput | Prisma.RiskFindingUpsertWithWhereUniqueWithoutScanInput[]
+  createMany?: Prisma.RiskFindingCreateManyScanInputEnvelope
+  set?: Prisma.RiskFindingWhereUniqueInput | Prisma.RiskFindingWhereUniqueInput[]
+  disconnect?: Prisma.RiskFindingWhereUniqueInput | Prisma.RiskFindingWhereUniqueInput[]
+  delete?: Prisma.RiskFindingWhereUniqueInput | Prisma.RiskFindingWhereUniqueInput[]
+  connect?: Prisma.RiskFindingWhereUniqueInput | Prisma.RiskFindingWhereUniqueInput[]
+  update?: Prisma.RiskFindingUpdateWithWhereUniqueWithoutScanInput | Prisma.RiskFindingUpdateWithWhereUniqueWithoutScanInput[]
+  updateMany?: Prisma.RiskFindingUpdateManyWithWhereWithoutScanInput | Prisma.RiskFindingUpdateManyWithWhereWithoutScanInput[]
+  deleteMany?: Prisma.RiskFindingScalarWhereInput | Prisma.RiskFindingScalarWhereInput[]
+}
+
+export type RiskFindingUncheckedUpdateManyWithoutScanNestedInput = {
+  create?: Prisma.XOR<Prisma.RiskFindingCreateWithoutScanInput, Prisma.RiskFindingUncheckedCreateWithoutScanInput> | Prisma.RiskFindingCreateWithoutScanInput[] | Prisma.RiskFindingUncheckedCreateWithoutScanInput[]
+  connectOrCreate?: Prisma.RiskFindingCreateOrConnectWithoutScanInput | Prisma.RiskFindingCreateOrConnectWithoutScanInput[]
+  upsert?: Prisma.RiskFindingUpsertWithWhereUniqueWithoutScanInput | Prisma.RiskFindingUpsertWithWhereUniqueWithoutScanInput[]
+  createMany?: Prisma.RiskFindingCreateManyScanInputEnvelope
+  set?: Prisma.RiskFindingWhereUniqueInput | Prisma.RiskFindingWhereUniqueInput[]
+  disconnect?: Prisma.RiskFindingWhereUniqueInput | Prisma.RiskFindingWhereUniqueInput[]
+  delete?: Prisma.RiskFindingWhereUniqueInput | Prisma.RiskFindingWhereUniqueInput[]
+  connect?: Prisma.RiskFindingWhereUniqueInput | Prisma.RiskFindingWhereUniqueInput[]
+  update?: Prisma.RiskFindingUpdateWithWhereUniqueWithoutScanInput | Prisma.RiskFindingUpdateWithWhereUniqueWithoutScanInput[]
+  updateMany?: Prisma.RiskFindingUpdateManyWithWhereWithoutScanInput | Prisma.RiskFindingUpdateManyWithWhereWithoutScanInput[]
+  deleteMany?: Prisma.RiskFindingScalarWhereInput | Prisma.RiskFindingScalarWhereInput[]
+}
+
 export type RiskFindingCreateWithoutBrandInput = {
   id?: string
   level: $Enums.RiskLevel
@@ -433,10 +499,12 @@ export type RiskFindingCreateWithoutBrandInput = {
   evidence: string
   resolvedAt?: Date | string | null
   createdAt?: Date | string
+  scan?: Prisma.ScanCreateNestedOneWithoutRiskFindingsInput
 }
 
 export type RiskFindingUncheckedCreateWithoutBrandInput = {
   id?: string
+  scanId?: string | null
   level: $Enums.RiskLevel
   title: string
   description: string
@@ -477,6 +545,7 @@ export type RiskFindingScalarWhereInput = {
   NOT?: Prisma.RiskFindingScalarWhereInput | Prisma.RiskFindingScalarWhereInput[]
   id?: Prisma.StringFilter<"RiskFinding"> | string
   brandId?: Prisma.StringFilter<"RiskFinding"> | string
+  scanId?: Prisma.StringNullableFilter<"RiskFinding"> | string | null
   level?: Prisma.EnumRiskLevelFilter<"RiskFinding"> | $Enums.RiskLevel
   title?: Prisma.StringFilter<"RiskFinding"> | string
   description?: Prisma.StringFilter<"RiskFinding"> | string
@@ -485,8 +554,56 @@ export type RiskFindingScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"RiskFinding"> | Date | string
 }
 
+export type RiskFindingCreateWithoutScanInput = {
+  id?: string
+  level: $Enums.RiskLevel
+  title: string
+  description: string
+  evidence: string
+  resolvedAt?: Date | string | null
+  createdAt?: Date | string
+  brand: Prisma.BrandCreateNestedOneWithoutRiskFindingsInput
+}
+
+export type RiskFindingUncheckedCreateWithoutScanInput = {
+  id?: string
+  level: $Enums.RiskLevel
+  title: string
+  description: string
+  evidence: string
+  resolvedAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type RiskFindingCreateOrConnectWithoutScanInput = {
+  where: Prisma.RiskFindingWhereUniqueInput
+  create: Prisma.XOR<Prisma.RiskFindingCreateWithoutScanInput, Prisma.RiskFindingUncheckedCreateWithoutScanInput>
+}
+
+export type RiskFindingCreateManyScanInputEnvelope = {
+  data: Prisma.RiskFindingCreateManyScanInput | Prisma.RiskFindingCreateManyScanInput[]
+  skipDuplicates?: boolean
+}
+
+export type RiskFindingUpsertWithWhereUniqueWithoutScanInput = {
+  where: Prisma.RiskFindingWhereUniqueInput
+  update: Prisma.XOR<Prisma.RiskFindingUpdateWithoutScanInput, Prisma.RiskFindingUncheckedUpdateWithoutScanInput>
+  create: Prisma.XOR<Prisma.RiskFindingCreateWithoutScanInput, Prisma.RiskFindingUncheckedCreateWithoutScanInput>
+}
+
+export type RiskFindingUpdateWithWhereUniqueWithoutScanInput = {
+  where: Prisma.RiskFindingWhereUniqueInput
+  data: Prisma.XOR<Prisma.RiskFindingUpdateWithoutScanInput, Prisma.RiskFindingUncheckedUpdateWithoutScanInput>
+}
+
+export type RiskFindingUpdateManyWithWhereWithoutScanInput = {
+  where: Prisma.RiskFindingScalarWhereInput
+  data: Prisma.XOR<Prisma.RiskFindingUpdateManyMutationInput, Prisma.RiskFindingUncheckedUpdateManyWithoutScanInput>
+}
+
 export type RiskFindingCreateManyBrandInput = {
   id?: string
+  scanId?: string | null
   level: $Enums.RiskLevel
   title: string
   description: string
@@ -503,10 +620,12 @@ export type RiskFindingUpdateWithoutBrandInput = {
   evidence?: Prisma.StringFieldUpdateOperationsInput | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  scan?: Prisma.ScanUpdateOneWithoutRiskFindingsNestedInput
 }
 
 export type RiskFindingUncheckedUpdateWithoutBrandInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  scanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   level?: Prisma.EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
@@ -516,6 +635,48 @@ export type RiskFindingUncheckedUpdateWithoutBrandInput = {
 }
 
 export type RiskFindingUncheckedUpdateManyWithoutBrandInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  scanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  evidence?: Prisma.StringFieldUpdateOperationsInput | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type RiskFindingCreateManyScanInput = {
+  id?: string
+  level: $Enums.RiskLevel
+  title: string
+  description: string
+  evidence: string
+  resolvedAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type RiskFindingUpdateWithoutScanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  level?: Prisma.EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  evidence?: Prisma.StringFieldUpdateOperationsInput | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  brand?: Prisma.BrandUpdateOneRequiredWithoutRiskFindingsNestedInput
+}
+
+export type RiskFindingUncheckedUpdateWithoutScanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  level?: Prisma.EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  evidence?: Prisma.StringFieldUpdateOperationsInput | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type RiskFindingUncheckedUpdateManyWithoutScanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   level?: Prisma.EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -530,6 +691,7 @@ export type RiskFindingUncheckedUpdateManyWithoutBrandInput = {
 export type RiskFindingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   brandId?: boolean
+  scanId?: boolean
   level?: boolean
   title?: boolean
   description?: boolean
@@ -537,11 +699,13 @@ export type RiskFindingSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   resolvedAt?: boolean
   createdAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  scan?: boolean | Prisma.RiskFinding$scanArgs<ExtArgs>
 }, ExtArgs["result"]["riskFinding"]>
 
 export type RiskFindingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   brandId?: boolean
+  scanId?: boolean
   level?: boolean
   title?: boolean
   description?: boolean
@@ -549,11 +713,13 @@ export type RiskFindingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   resolvedAt?: boolean
   createdAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  scan?: boolean | Prisma.RiskFinding$scanArgs<ExtArgs>
 }, ExtArgs["result"]["riskFinding"]>
 
 export type RiskFindingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   brandId?: boolean
+  scanId?: boolean
   level?: boolean
   title?: boolean
   description?: boolean
@@ -561,11 +727,13 @@ export type RiskFindingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   resolvedAt?: boolean
   createdAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  scan?: boolean | Prisma.RiskFinding$scanArgs<ExtArgs>
 }, ExtArgs["result"]["riskFinding"]>
 
 export type RiskFindingSelectScalar = {
   id?: boolean
   brandId?: boolean
+  scanId?: boolean
   level?: boolean
   title?: boolean
   description?: boolean
@@ -574,25 +742,30 @@ export type RiskFindingSelectScalar = {
   createdAt?: boolean
 }
 
-export type RiskFindingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brandId" | "level" | "title" | "description" | "evidence" | "resolvedAt" | "createdAt", ExtArgs["result"]["riskFinding"]>
+export type RiskFindingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brandId" | "scanId" | "level" | "title" | "description" | "evidence" | "resolvedAt" | "createdAt", ExtArgs["result"]["riskFinding"]>
 export type RiskFindingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  scan?: boolean | Prisma.RiskFinding$scanArgs<ExtArgs>
 }
 export type RiskFindingIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  scan?: boolean | Prisma.RiskFinding$scanArgs<ExtArgs>
 }
 export type RiskFindingIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  scan?: boolean | Prisma.RiskFinding$scanArgs<ExtArgs>
 }
 
 export type $RiskFindingPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "RiskFinding"
   objects: {
     brand: Prisma.$BrandPayload<ExtArgs>
+    scan: Prisma.$ScanPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     brandId: string
+    scanId: string | null
     level: $Enums.RiskLevel
     title: string
     description: string
@@ -994,6 +1167,7 @@ readonly fields: RiskFindingFieldRefs;
 export interface Prisma__RiskFindingClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   brand<T extends Prisma.BrandDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BrandDefaultArgs<ExtArgs>>): Prisma.Prisma__BrandClient<runtime.Types.Result.GetResult<Prisma.$BrandPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  scan<T extends Prisma.RiskFinding$scanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RiskFinding$scanArgs<ExtArgs>>): Prisma.Prisma__ScanClient<runtime.Types.Result.GetResult<Prisma.$ScanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1025,6 +1199,7 @@ export interface Prisma__RiskFindingClient<T, Null = never, ExtArgs extends runt
 export interface RiskFindingFieldRefs {
   readonly id: Prisma.FieldRef<"RiskFinding", 'String'>
   readonly brandId: Prisma.FieldRef<"RiskFinding", 'String'>
+  readonly scanId: Prisma.FieldRef<"RiskFinding", 'String'>
   readonly level: Prisma.FieldRef<"RiskFinding", 'RiskLevel'>
   readonly title: Prisma.FieldRef<"RiskFinding", 'String'>
   readonly description: Prisma.FieldRef<"RiskFinding", 'String'>
@@ -1429,6 +1604,25 @@ export type RiskFindingDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many RiskFindings to delete.
    */
   limit?: number
+}
+
+/**
+ * RiskFinding.scan
+ */
+export type RiskFinding$scanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Scan
+   */
+  select?: Prisma.ScanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Scan
+   */
+  omit?: Prisma.ScanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScanInclude<ExtArgs> | null
+  where?: Prisma.ScanWhereInput
 }
 
 /**

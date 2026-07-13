@@ -17,7 +17,7 @@ export const PLAN_CATALOG: Record<PlanCode, PlanDefinition> = {
     priceCents: 0,
     monthlyResponses: 30,
     maxBrands: 1,
-    features: ["1 个品牌", "30 次 AI 回答", "初步可见度报告"],
+    features: ["1 个品牌", "初步可见度报告", "问题级抢位机会"],
   },
   STARTER: {
     code: "STARTER",
@@ -25,7 +25,7 @@ export const PLAN_CATALOG: Record<PlanCode, PlanDefinition> = {
     priceCents: 9900,
     monthlyResponses: 500,
     maxBrands: 1,
-    features: ["每周监测", "竞品对比", "完整原始证据"],
+    features: ["1 个品牌", "问题级抢位机会", "增长实验与手动同配置复测"],
   },
   PRO: {
     code: "PRO",
@@ -33,7 +33,7 @@ export const PLAN_CATALOG: Record<PlanCode, PlanDefinition> = {
     priceCents: 29900,
     monthlyResponses: 2500,
     maxBrands: 3,
-    features: ["3 个品牌", "引用分析", "优化建议与趋势"],
+    features: ["3 个品牌", "扫描历史与趋势对比", "引用分析与实验归因"],
   },
   BUSINESS: {
     code: "BUSINESS",
@@ -41,7 +41,7 @@ export const PLAN_CATALOG: Record<PlanCode, PlanDefinition> = {
     priceCents: 89900,
     monthlyResponses: 10000,
     maxBrands: 10,
-    features: ["10 个品牌", "高频监测", "团队与报告导出"],
+    features: ["10 个品牌", "多品牌增长工作台", "跨品牌机会队列与实验归因"],
   },
 };
 

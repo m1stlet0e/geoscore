@@ -30,6 +30,45 @@ export const ScanStatus = {
 export type ScanStatus = (typeof ScanStatus)[keyof typeof ScanStatus]
 
 
+export const ScanDataMode = {
+  REAL: 'REAL',
+  SIMULATED: 'SIMULATED'
+} as const
+
+export type ScanDataMode = (typeof ScanDataMode)[keyof typeof ScanDataMode]
+
+
+export const OpportunityType = {
+  MENTION_GAP: 'MENTION_GAP',
+  COMPETITOR_ADVANTAGE: 'COMPETITOR_ADVANTAGE',
+  CITATION_GAP: 'CITATION_GAP',
+  BRAND_RISK: 'BRAND_RISK'
+} as const
+
+export type OpportunityType = (typeof OpportunityType)[keyof typeof OpportunityType]
+
+
+export const OpportunityStatus = {
+  OPEN: 'OPEN',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  DISMISSED: 'DISMISSED'
+} as const
+
+export type OpportunityStatus = (typeof OpportunityStatus)[keyof typeof OpportunityStatus]
+
+
+export const ExperimentStatus = {
+  DRAFT: 'DRAFT',
+  ACTIVE: 'ACTIVE',
+  VERIFYING: 'VERIFYING',
+  VERIFIED: 'VERIFIED',
+  INCONCLUSIVE: 'INCONCLUSIVE'
+} as const
+
+export type ExperimentStatus = (typeof ExperimentStatus)[keyof typeof ExperimentStatus]
+
+
 export const Sentiment = {
   POSITIVE: 'POSITIVE',
   NEUTRAL: 'NEUTRAL',

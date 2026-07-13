@@ -607,14 +607,6 @@ export type ObservationUncheckedUpdateManyWithoutScanNestedInput = {
   deleteMany?: Prisma.ObservationScalarWhereInput | Prisma.ObservationScalarWhereInput[]
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type ObservationCreateNestedOneWithoutMentionsInput = {
   create?: Prisma.XOR<Prisma.ObservationCreateWithoutMentionsInput, Prisma.ObservationUncheckedCreateWithoutMentionsInput>
   connectOrCreate?: Prisma.ObservationCreateOrConnectWithoutMentionsInput

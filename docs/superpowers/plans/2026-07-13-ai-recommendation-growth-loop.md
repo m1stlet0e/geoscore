@@ -220,7 +220,10 @@ git commit -m "feat: 构建推荐增长行动工作台"
 - [ ] **Step 1: 写结果导向套餐的失败测试**
 
 ```ts
-expect(PLAN_CATALOG.PRO.features).toEqual(expect.arrayContaining(["抢位机会与增长实验", "发布后自动复测"]));
+expect(PLAN_CATALOG.STARTER.features).toEqual(expect.arrayContaining([
+  "问题级抢位机会",
+  "增长实验与手动同配置复测",
+]));
 ```
 
 - [ ] **Step 2: 运行测试并确认旧套餐文案不满足要求**
@@ -230,19 +233,19 @@ Expected: FAIL。
 
 - [ ] **Step 3: 重写首页和套餐价值表达**
 
-首页主标题改为“把 AI 没有推荐你的原因，变成可以执行和验证的增长任务”，重点展示抢位机会、行动实验和复测证据。价格继续使用当前可支付金额，但外部卖点从回答次数切换为品牌数、监测频率、实验与历史。
+首页主标题改为“把 AI 没有推荐你的原因，变成可以执行和验证的增长任务”，重点展示抢位机会、行动实验和复测证据。价格继续使用当前可支付金额，但外部卖点从回答次数切换为品牌数、问题级抢位机会、增长实验、扫描历史与实验归因；回答额度只作为次级容量说明。
 
 - [ ] **Step 4: 扩展 Playwright 全链路**
 
-覆盖注册登录、创建品牌、模拟扫描、查看机会、创建实验、填写目标 URL、标记发布、复扫验证和查看结果；断言所有模拟数据都有清晰标签。
+覆盖注册登录、创建品牌、模拟扫描、查看机会、创建实验、填写目标 URL、标记发布、用户点击发起同配置复扫、查看结果和核对额度流水；断言所有模拟数据都有清晰标签。模拟实验可立即手动验证，真实实验需要等待观察窗口，但两者都不得由系统自动发起。
 
 - [ ] **Step 5: 更新产品与验收文档**
 
-记录真实/模拟边界、增长实验状态、正式评分门槛、付费价值和本地演示步骤。
+记录真实/模拟边界、增长实验状态、正式评分门槛、付费价值和完整本地演示步骤；明确 V1 不包含自动调度、发布后自动复测、团队协作和报告导出。
 
 - [ ] **Step 6: 运行完整验证**
 
-Run: `npm test && npm run typecheck && npm run lint && npm run build && npm run test:e2e`
+Run: `npm test && npm run typecheck && npm run lint && npm run build && PLAYWRIGHT_PORT=18202 npm run test:e2e`
 Expected: 所有命令退出码为 0。
 
 - [ ] **Step 7: 提交**
@@ -265,7 +268,7 @@ Expected: 所有迁移已应用，数据库结构为最新。
 
 - [ ] **Step 2: 运行交付前完整验证并保存输出证据**
 
-Run: `npm test && npm run typecheck && npm run lint && npm run build && npm run test:e2e`
+Run: `npm test && npm run typecheck && npm run lint && npm run build && PLAYWRIGHT_PORT=18202 npm run test:e2e`
 Expected: 全部退出码为 0。
 
 - [ ] **Step 3: 合并功能分支回 `main`**
@@ -284,4 +287,3 @@ Expected: 全部退出码为 0。
 
 Run: `npm run dev -- -p 18200`
 Expected: 首页、登录页、控制台、品牌页、扫描报告和实验页均可访问；完整模拟闭环可操作；手机号测试验证码为 `888888`。
-

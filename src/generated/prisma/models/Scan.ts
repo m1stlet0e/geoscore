@@ -28,10 +28,14 @@ export type AggregateScan = {
 
 export type ScanAvgAggregateOutputType = {
   requestedCount: number | null
+  repeatCount: number | null
+  verificationActionRevision: number | null
 }
 
 export type ScanSumAggregateOutputType = {
   requestedCount: number | null
+  repeatCount: number | null
+  verificationActionRevision: number | null
 }
 
 export type ScanMinAggregateOutputType = {
@@ -39,6 +43,14 @@ export type ScanMinAggregateOutputType = {
   brandId: string | null
   status: $Enums.ScanStatus | null
   requestedCount: number | null
+  repeatCount: number | null
+  dataMode: $Enums.ScanDataMode | null
+  creationKey: string | null
+  verificationExperimentId: string | null
+  executionLeaseToken: string | null
+  executionLeaseExpiresAt: Date | null
+  verificationAttemptToken: string | null
+  verificationActionRevision: number | null
   errorMessage: string | null
   startedAt: Date | null
   completedAt: Date | null
@@ -50,6 +62,14 @@ export type ScanMaxAggregateOutputType = {
   brandId: string | null
   status: $Enums.ScanStatus | null
   requestedCount: number | null
+  repeatCount: number | null
+  dataMode: $Enums.ScanDataMode | null
+  creationKey: string | null
+  verificationExperimentId: string | null
+  executionLeaseToken: string | null
+  executionLeaseExpiresAt: Date | null
+  verificationAttemptToken: string | null
+  verificationActionRevision: number | null
   errorMessage: string | null
   startedAt: Date | null
   completedAt: Date | null
@@ -61,7 +81,16 @@ export type ScanCountAggregateOutputType = {
   brandId: number
   status: number
   providerIds: number
+  promptVersionIds: number
   requestedCount: number
+  repeatCount: number
+  dataMode: number
+  creationKey: number
+  verificationExperimentId: number
+  executionLeaseToken: number
+  executionLeaseExpiresAt: number
+  verificationAttemptToken: number
+  verificationActionRevision: number
   errorMessage: number
   startedAt: number
   completedAt: number
@@ -72,10 +101,14 @@ export type ScanCountAggregateOutputType = {
 
 export type ScanAvgAggregateInputType = {
   requestedCount?: true
+  repeatCount?: true
+  verificationActionRevision?: true
 }
 
 export type ScanSumAggregateInputType = {
   requestedCount?: true
+  repeatCount?: true
+  verificationActionRevision?: true
 }
 
 export type ScanMinAggregateInputType = {
@@ -83,6 +116,14 @@ export type ScanMinAggregateInputType = {
   brandId?: true
   status?: true
   requestedCount?: true
+  repeatCount?: true
+  dataMode?: true
+  creationKey?: true
+  verificationExperimentId?: true
+  executionLeaseToken?: true
+  executionLeaseExpiresAt?: true
+  verificationAttemptToken?: true
+  verificationActionRevision?: true
   errorMessage?: true
   startedAt?: true
   completedAt?: true
@@ -94,6 +135,14 @@ export type ScanMaxAggregateInputType = {
   brandId?: true
   status?: true
   requestedCount?: true
+  repeatCount?: true
+  dataMode?: true
+  creationKey?: true
+  verificationExperimentId?: true
+  executionLeaseToken?: true
+  executionLeaseExpiresAt?: true
+  verificationAttemptToken?: true
+  verificationActionRevision?: true
   errorMessage?: true
   startedAt?: true
   completedAt?: true
@@ -105,7 +154,16 @@ export type ScanCountAggregateInputType = {
   brandId?: true
   status?: true
   providerIds?: true
+  promptVersionIds?: true
   requestedCount?: true
+  repeatCount?: true
+  dataMode?: true
+  creationKey?: true
+  verificationExperimentId?: true
+  executionLeaseToken?: true
+  executionLeaseExpiresAt?: true
+  verificationAttemptToken?: true
+  verificationActionRevision?: true
   errorMessage?: true
   startedAt?: true
   completedAt?: true
@@ -204,7 +262,16 @@ export type ScanGroupByOutputType = {
   brandId: string
   status: $Enums.ScanStatus
   providerIds: runtime.JsonValue
+  promptVersionIds: runtime.JsonValue | null
   requestedCount: number
+  repeatCount: number
+  dataMode: $Enums.ScanDataMode
+  creationKey: string | null
+  verificationExperimentId: string | null
+  executionLeaseToken: string | null
+  executionLeaseExpiresAt: Date | null
+  verificationAttemptToken: string | null
+  verificationActionRevision: number | null
   errorMessage: string | null
   startedAt: Date | null
   completedAt: Date | null
@@ -239,14 +306,29 @@ export type ScanWhereInput = {
   brandId?: Prisma.StringFilter<"Scan"> | string
   status?: Prisma.EnumScanStatusFilter<"Scan"> | $Enums.ScanStatus
   providerIds?: Prisma.JsonFilter<"Scan">
+  promptVersionIds?: Prisma.JsonNullableFilter<"Scan">
   requestedCount?: Prisma.IntFilter<"Scan"> | number
+  repeatCount?: Prisma.IntFilter<"Scan"> | number
+  dataMode?: Prisma.EnumScanDataModeFilter<"Scan"> | $Enums.ScanDataMode
+  creationKey?: Prisma.StringNullableFilter<"Scan"> | string | null
+  verificationExperimentId?: Prisma.StringNullableFilter<"Scan"> | string | null
+  executionLeaseToken?: Prisma.StringNullableFilter<"Scan"> | string | null
+  executionLeaseExpiresAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
+  verificationAttemptToken?: Prisma.StringNullableFilter<"Scan"> | string | null
+  verificationActionRevision?: Prisma.IntNullableFilter<"Scan"> | number | null
   errorMessage?: Prisma.StringNullableFilter<"Scan"> | string | null
   startedAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Scan"> | Date | string
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
+  verificationExperiment?: Prisma.XOR<Prisma.OptimizationExperimentNullableScalarRelationFilter, Prisma.OptimizationExperimentWhereInput> | null
+  baselineExperiments?: Prisma.OptimizationExperimentListRelationFilter
+  followUpExperiment?: Prisma.XOR<Prisma.OptimizationExperimentNullableScalarRelationFilter, Prisma.OptimizationExperimentWhereInput> | null
   observations?: Prisma.ObservationListRelationFilter
   scoreSnapshot?: Prisma.XOR<Prisma.ScoreSnapshotNullableScalarRelationFilter, Prisma.ScoreSnapshotWhereInput> | null
+  opportunities?: Prisma.OpportunityListRelationFilter
+  riskFindings?: Prisma.RiskFindingListRelationFilter
+  recommendations?: Prisma.RecommendationListRelationFilter
 }
 
 export type ScanOrderByWithRelationInput = {
@@ -254,40 +336,81 @@ export type ScanOrderByWithRelationInput = {
   brandId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerIds?: Prisma.SortOrder
+  promptVersionIds?: Prisma.SortOrderInput | Prisma.SortOrder
   requestedCount?: Prisma.SortOrder
+  repeatCount?: Prisma.SortOrder
+  dataMode?: Prisma.SortOrder
+  creationKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationExperimentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  executionLeaseToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  executionLeaseExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationAttemptToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationActionRevision?: Prisma.SortOrderInput | Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   brand?: Prisma.BrandOrderByWithRelationInput
+  verificationExperiment?: Prisma.OptimizationExperimentOrderByWithRelationInput
+  baselineExperiments?: Prisma.OptimizationExperimentOrderByRelationAggregateInput
+  followUpExperiment?: Prisma.OptimizationExperimentOrderByWithRelationInput
   observations?: Prisma.ObservationOrderByRelationAggregateInput
   scoreSnapshot?: Prisma.ScoreSnapshotOrderByWithRelationInput
+  opportunities?: Prisma.OpportunityOrderByRelationAggregateInput
+  riskFindings?: Prisma.RiskFindingOrderByRelationAggregateInput
+  recommendations?: Prisma.RecommendationOrderByRelationAggregateInput
 }
 
 export type ScanWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  id_brandId?: Prisma.ScanIdBrandIdCompoundUniqueInput
+  brandId_creationKey?: Prisma.ScanBrandIdCreationKeyCompoundUniqueInput
   AND?: Prisma.ScanWhereInput | Prisma.ScanWhereInput[]
   OR?: Prisma.ScanWhereInput[]
   NOT?: Prisma.ScanWhereInput | Prisma.ScanWhereInput[]
   brandId?: Prisma.StringFilter<"Scan"> | string
   status?: Prisma.EnumScanStatusFilter<"Scan"> | $Enums.ScanStatus
   providerIds?: Prisma.JsonFilter<"Scan">
+  promptVersionIds?: Prisma.JsonNullableFilter<"Scan">
   requestedCount?: Prisma.IntFilter<"Scan"> | number
+  repeatCount?: Prisma.IntFilter<"Scan"> | number
+  dataMode?: Prisma.EnumScanDataModeFilter<"Scan"> | $Enums.ScanDataMode
+  creationKey?: Prisma.StringNullableFilter<"Scan"> | string | null
+  verificationExperimentId?: Prisma.StringNullableFilter<"Scan"> | string | null
+  executionLeaseToken?: Prisma.StringNullableFilter<"Scan"> | string | null
+  executionLeaseExpiresAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
+  verificationAttemptToken?: Prisma.StringNullableFilter<"Scan"> | string | null
+  verificationActionRevision?: Prisma.IntNullableFilter<"Scan"> | number | null
   errorMessage?: Prisma.StringNullableFilter<"Scan"> | string | null
   startedAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Scan"> | Date | string
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
+  verificationExperiment?: Prisma.XOR<Prisma.OptimizationExperimentNullableScalarRelationFilter, Prisma.OptimizationExperimentWhereInput> | null
+  baselineExperiments?: Prisma.OptimizationExperimentListRelationFilter
+  followUpExperiment?: Prisma.XOR<Prisma.OptimizationExperimentNullableScalarRelationFilter, Prisma.OptimizationExperimentWhereInput> | null
   observations?: Prisma.ObservationListRelationFilter
   scoreSnapshot?: Prisma.XOR<Prisma.ScoreSnapshotNullableScalarRelationFilter, Prisma.ScoreSnapshotWhereInput> | null
-}, "id">
+  opportunities?: Prisma.OpportunityListRelationFilter
+  riskFindings?: Prisma.RiskFindingListRelationFilter
+  recommendations?: Prisma.RecommendationListRelationFilter
+}, "id" | "id_brandId" | "brandId_creationKey">
 
 export type ScanOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerIds?: Prisma.SortOrder
+  promptVersionIds?: Prisma.SortOrderInput | Prisma.SortOrder
   requestedCount?: Prisma.SortOrder
+  repeatCount?: Prisma.SortOrder
+  dataMode?: Prisma.SortOrder
+  creationKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationExperimentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  executionLeaseToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  executionLeaseExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationAttemptToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationActionRevision?: Prisma.SortOrderInput | Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -307,7 +430,16 @@ export type ScanScalarWhereWithAggregatesInput = {
   brandId?: Prisma.StringWithAggregatesFilter<"Scan"> | string
   status?: Prisma.EnumScanStatusWithAggregatesFilter<"Scan"> | $Enums.ScanStatus
   providerIds?: Prisma.JsonWithAggregatesFilter<"Scan">
+  promptVersionIds?: Prisma.JsonNullableWithAggregatesFilter<"Scan">
   requestedCount?: Prisma.IntWithAggregatesFilter<"Scan"> | number
+  repeatCount?: Prisma.IntWithAggregatesFilter<"Scan"> | number
+  dataMode?: Prisma.EnumScanDataModeWithAggregatesFilter<"Scan"> | $Enums.ScanDataMode
+  creationKey?: Prisma.StringNullableWithAggregatesFilter<"Scan"> | string | null
+  verificationExperimentId?: Prisma.StringNullableWithAggregatesFilter<"Scan"> | string | null
+  executionLeaseToken?: Prisma.StringNullableWithAggregatesFilter<"Scan"> | string | null
+  executionLeaseExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Scan"> | Date | string | null
+  verificationAttemptToken?: Prisma.StringNullableWithAggregatesFilter<"Scan"> | string | null
+  verificationActionRevision?: Prisma.IntNullableWithAggregatesFilter<"Scan"> | number | null
   errorMessage?: Prisma.StringNullableWithAggregatesFilter<"Scan"> | string | null
   startedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Scan"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Scan"> | Date | string | null
@@ -318,14 +450,28 @@ export type ScanCreateInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   brand: Prisma.BrandCreateNestedOneWithoutScansInput
+  verificationExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutVerificationScansInput
+  baselineExperiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutFollowUpScanInput
   observations?: Prisma.ObservationCreateNestedManyWithoutScanInput
   scoreSnapshot?: Prisma.ScoreSnapshotCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutScanInput
 }
 
 export type ScanUncheckedCreateInput = {
@@ -333,27 +479,55 @@ export type ScanUncheckedCreateInput = {
   brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedCreateNestedOneWithoutFollowUpScanInput
   observations?: Prisma.ObservationUncheckedCreateNestedManyWithoutScanInput
   scoreSnapshot?: Prisma.ScoreSnapshotUncheckedCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutScanInput
 }
 
 export type ScanUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   brand?: Prisma.BrandUpdateOneRequiredWithoutScansNestedInput
+  verificationExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutVerificationScansNestedInput
+  baselineExperiments?: Prisma.OptimizationExperimentUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutFollowUpScanNestedInput
   observations?: Prisma.ObservationUpdateManyWithoutScanNestedInput
   scoreSnapshot?: Prisma.ScoreSnapshotUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutScanNestedInput
 }
 
 export type ScanUncheckedUpdateInput = {
@@ -361,13 +535,27 @@ export type ScanUncheckedUpdateInput = {
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedUpdateOneWithoutFollowUpScanNestedInput
   observations?: Prisma.ObservationUncheckedUpdateManyWithoutScanNestedInput
   scoreSnapshot?: Prisma.ScoreSnapshotUncheckedUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutScanNestedInput
 }
 
 export type ScanCreateManyInput = {
@@ -375,7 +563,16 @@ export type ScanCreateManyInput = {
   brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -386,7 +583,15 @@ export type ScanUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -398,7 +603,16 @@ export type ScanUncheckedUpdateManyInput = {
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -415,12 +629,31 @@ export type ScanOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type ScanIdBrandIdCompoundUniqueInput = {
+  id: string
+  brandId: string
+}
+
+export type ScanBrandIdCreationKeyCompoundUniqueInput = {
+  brandId: string
+  creationKey: string
+}
+
 export type ScanCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerIds?: Prisma.SortOrder
+  promptVersionIds?: Prisma.SortOrder
   requestedCount?: Prisma.SortOrder
+  repeatCount?: Prisma.SortOrder
+  dataMode?: Prisma.SortOrder
+  creationKey?: Prisma.SortOrder
+  verificationExperimentId?: Prisma.SortOrder
+  executionLeaseToken?: Prisma.SortOrder
+  executionLeaseExpiresAt?: Prisma.SortOrder
+  verificationAttemptToken?: Prisma.SortOrder
+  verificationActionRevision?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
@@ -429,6 +662,8 @@ export type ScanCountOrderByAggregateInput = {
 
 export type ScanAvgOrderByAggregateInput = {
   requestedCount?: Prisma.SortOrder
+  repeatCount?: Prisma.SortOrder
+  verificationActionRevision?: Prisma.SortOrder
 }
 
 export type ScanMaxOrderByAggregateInput = {
@@ -436,6 +671,14 @@ export type ScanMaxOrderByAggregateInput = {
   brandId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   requestedCount?: Prisma.SortOrder
+  repeatCount?: Prisma.SortOrder
+  dataMode?: Prisma.SortOrder
+  creationKey?: Prisma.SortOrder
+  verificationExperimentId?: Prisma.SortOrder
+  executionLeaseToken?: Prisma.SortOrder
+  executionLeaseExpiresAt?: Prisma.SortOrder
+  verificationAttemptToken?: Prisma.SortOrder
+  verificationActionRevision?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
@@ -447,6 +690,14 @@ export type ScanMinOrderByAggregateInput = {
   brandId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   requestedCount?: Prisma.SortOrder
+  repeatCount?: Prisma.SortOrder
+  dataMode?: Prisma.SortOrder
+  creationKey?: Prisma.SortOrder
+  verificationExperimentId?: Prisma.SortOrder
+  executionLeaseToken?: Prisma.SortOrder
+  executionLeaseExpiresAt?: Prisma.SortOrder
+  verificationAttemptToken?: Prisma.SortOrder
+  verificationActionRevision?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
@@ -455,11 +706,18 @@ export type ScanMinOrderByAggregateInput = {
 
 export type ScanSumOrderByAggregateInput = {
   requestedCount?: Prisma.SortOrder
+  repeatCount?: Prisma.SortOrder
+  verificationActionRevision?: Prisma.SortOrder
 }
 
 export type ScanScalarRelationFilter = {
   is?: Prisma.ScanWhereInput
   isNot?: Prisma.ScanWhereInput
+}
+
+export type ScanNullableScalarRelationFilter = {
+  is?: Prisma.ScanWhereInput | null
+  isNot?: Prisma.ScanWhereInput | null
 }
 
 export type ScanCreateNestedManyWithoutBrandInput = {
@@ -508,6 +766,104 @@ export type EnumScanStatusFieldUpdateOperationsInput = {
   set?: $Enums.ScanStatus
 }
 
+export type EnumScanDataModeFieldUpdateOperationsInput = {
+  set?: $Enums.ScanDataMode
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type ScanCreateNestedOneWithoutOpportunitiesInput = {
+  create?: Prisma.XOR<Prisma.ScanCreateWithoutOpportunitiesInput, Prisma.ScanUncheckedCreateWithoutOpportunitiesInput>
+  connectOrCreate?: Prisma.ScanCreateOrConnectWithoutOpportunitiesInput
+  connect?: Prisma.ScanWhereUniqueInput
+}
+
+export type ScanUpdateOneRequiredWithoutOpportunitiesNestedInput = {
+  create?: Prisma.XOR<Prisma.ScanCreateWithoutOpportunitiesInput, Prisma.ScanUncheckedCreateWithoutOpportunitiesInput>
+  connectOrCreate?: Prisma.ScanCreateOrConnectWithoutOpportunitiesInput
+  upsert?: Prisma.ScanUpsertWithoutOpportunitiesInput
+  connect?: Prisma.ScanWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ScanUpdateToOneWithWhereWithoutOpportunitiesInput, Prisma.ScanUpdateWithoutOpportunitiesInput>, Prisma.ScanUncheckedUpdateWithoutOpportunitiesInput>
+}
+
+export type ScanCreateNestedOneWithoutBaselineExperimentsInput = {
+  create?: Prisma.XOR<Prisma.ScanCreateWithoutBaselineExperimentsInput, Prisma.ScanUncheckedCreateWithoutBaselineExperimentsInput>
+  connectOrCreate?: Prisma.ScanCreateOrConnectWithoutBaselineExperimentsInput
+  connect?: Prisma.ScanWhereUniqueInput
+}
+
+export type ScanCreateNestedOneWithoutFollowUpExperimentInput = {
+  create?: Prisma.XOR<Prisma.ScanCreateWithoutFollowUpExperimentInput, Prisma.ScanUncheckedCreateWithoutFollowUpExperimentInput>
+  connectOrCreate?: Prisma.ScanCreateOrConnectWithoutFollowUpExperimentInput
+  connect?: Prisma.ScanWhereUniqueInput
+}
+
+export type ScanCreateNestedManyWithoutVerificationExperimentInput = {
+  create?: Prisma.XOR<Prisma.ScanCreateWithoutVerificationExperimentInput, Prisma.ScanUncheckedCreateWithoutVerificationExperimentInput> | Prisma.ScanCreateWithoutVerificationExperimentInput[] | Prisma.ScanUncheckedCreateWithoutVerificationExperimentInput[]
+  connectOrCreate?: Prisma.ScanCreateOrConnectWithoutVerificationExperimentInput | Prisma.ScanCreateOrConnectWithoutVerificationExperimentInput[]
+  createMany?: Prisma.ScanCreateManyVerificationExperimentInputEnvelope
+  connect?: Prisma.ScanWhereUniqueInput | Prisma.ScanWhereUniqueInput[]
+}
+
+export type ScanUncheckedCreateNestedManyWithoutVerificationExperimentInput = {
+  create?: Prisma.XOR<Prisma.ScanCreateWithoutVerificationExperimentInput, Prisma.ScanUncheckedCreateWithoutVerificationExperimentInput> | Prisma.ScanCreateWithoutVerificationExperimentInput[] | Prisma.ScanUncheckedCreateWithoutVerificationExperimentInput[]
+  connectOrCreate?: Prisma.ScanCreateOrConnectWithoutVerificationExperimentInput | Prisma.ScanCreateOrConnectWithoutVerificationExperimentInput[]
+  createMany?: Prisma.ScanCreateManyVerificationExperimentInputEnvelope
+  connect?: Prisma.ScanWhereUniqueInput | Prisma.ScanWhereUniqueInput[]
+}
+
+export type ScanUpdateOneRequiredWithoutBaselineExperimentsNestedInput = {
+  create?: Prisma.XOR<Prisma.ScanCreateWithoutBaselineExperimentsInput, Prisma.ScanUncheckedCreateWithoutBaselineExperimentsInput>
+  connectOrCreate?: Prisma.ScanCreateOrConnectWithoutBaselineExperimentsInput
+  upsert?: Prisma.ScanUpsertWithoutBaselineExperimentsInput
+  connect?: Prisma.ScanWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ScanUpdateToOneWithWhereWithoutBaselineExperimentsInput, Prisma.ScanUpdateWithoutBaselineExperimentsInput>, Prisma.ScanUncheckedUpdateWithoutBaselineExperimentsInput>
+}
+
+export type ScanUpdateOneWithoutFollowUpExperimentNestedInput = {
+  create?: Prisma.XOR<Prisma.ScanCreateWithoutFollowUpExperimentInput, Prisma.ScanUncheckedCreateWithoutFollowUpExperimentInput>
+  connectOrCreate?: Prisma.ScanCreateOrConnectWithoutFollowUpExperimentInput
+  upsert?: Prisma.ScanUpsertWithoutFollowUpExperimentInput
+  disconnect?: Prisma.ScanWhereInput | boolean
+  delete?: Prisma.ScanWhereInput | boolean
+  connect?: Prisma.ScanWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ScanUpdateToOneWithWhereWithoutFollowUpExperimentInput, Prisma.ScanUpdateWithoutFollowUpExperimentInput>, Prisma.ScanUncheckedUpdateWithoutFollowUpExperimentInput>
+}
+
+export type ScanUpdateManyWithoutVerificationExperimentNestedInput = {
+  create?: Prisma.XOR<Prisma.ScanCreateWithoutVerificationExperimentInput, Prisma.ScanUncheckedCreateWithoutVerificationExperimentInput> | Prisma.ScanCreateWithoutVerificationExperimentInput[] | Prisma.ScanUncheckedCreateWithoutVerificationExperimentInput[]
+  connectOrCreate?: Prisma.ScanCreateOrConnectWithoutVerificationExperimentInput | Prisma.ScanCreateOrConnectWithoutVerificationExperimentInput[]
+  upsert?: Prisma.ScanUpsertWithWhereUniqueWithoutVerificationExperimentInput | Prisma.ScanUpsertWithWhereUniqueWithoutVerificationExperimentInput[]
+  createMany?: Prisma.ScanCreateManyVerificationExperimentInputEnvelope
+  set?: Prisma.ScanWhereUniqueInput | Prisma.ScanWhereUniqueInput[]
+  disconnect?: Prisma.ScanWhereUniqueInput | Prisma.ScanWhereUniqueInput[]
+  delete?: Prisma.ScanWhereUniqueInput | Prisma.ScanWhereUniqueInput[]
+  connect?: Prisma.ScanWhereUniqueInput | Prisma.ScanWhereUniqueInput[]
+  update?: Prisma.ScanUpdateWithWhereUniqueWithoutVerificationExperimentInput | Prisma.ScanUpdateWithWhereUniqueWithoutVerificationExperimentInput[]
+  updateMany?: Prisma.ScanUpdateManyWithWhereWithoutVerificationExperimentInput | Prisma.ScanUpdateManyWithWhereWithoutVerificationExperimentInput[]
+  deleteMany?: Prisma.ScanScalarWhereInput | Prisma.ScanScalarWhereInput[]
+}
+
+export type ScanUncheckedUpdateManyWithoutVerificationExperimentNestedInput = {
+  create?: Prisma.XOR<Prisma.ScanCreateWithoutVerificationExperimentInput, Prisma.ScanUncheckedCreateWithoutVerificationExperimentInput> | Prisma.ScanCreateWithoutVerificationExperimentInput[] | Prisma.ScanUncheckedCreateWithoutVerificationExperimentInput[]
+  connectOrCreate?: Prisma.ScanCreateOrConnectWithoutVerificationExperimentInput | Prisma.ScanCreateOrConnectWithoutVerificationExperimentInput[]
+  upsert?: Prisma.ScanUpsertWithWhereUniqueWithoutVerificationExperimentInput | Prisma.ScanUpsertWithWhereUniqueWithoutVerificationExperimentInput[]
+  createMany?: Prisma.ScanCreateManyVerificationExperimentInputEnvelope
+  set?: Prisma.ScanWhereUniqueInput | Prisma.ScanWhereUniqueInput[]
+  disconnect?: Prisma.ScanWhereUniqueInput | Prisma.ScanWhereUniqueInput[]
+  delete?: Prisma.ScanWhereUniqueInput | Prisma.ScanWhereUniqueInput[]
+  connect?: Prisma.ScanWhereUniqueInput | Prisma.ScanWhereUniqueInput[]
+  update?: Prisma.ScanUpdateWithWhereUniqueWithoutVerificationExperimentInput | Prisma.ScanUpdateWithWhereUniqueWithoutVerificationExperimentInput[]
+  updateMany?: Prisma.ScanUpdateManyWithWhereWithoutVerificationExperimentInput | Prisma.ScanUpdateManyWithWhereWithoutVerificationExperimentInput[]
+  deleteMany?: Prisma.ScanScalarWhereInput | Prisma.ScanScalarWhereInput[]
+}
+
 export type ScanCreateNestedOneWithoutObservationsInput = {
   create?: Prisma.XOR<Prisma.ScanCreateWithoutObservationsInput, Prisma.ScanUncheckedCreateWithoutObservationsInput>
   connectOrCreate?: Prisma.ScanCreateOrConnectWithoutObservationsInput
@@ -536,30 +892,90 @@ export type ScanUpdateOneRequiredWithoutScoreSnapshotNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ScanUpdateToOneWithWhereWithoutScoreSnapshotInput, Prisma.ScanUpdateWithoutScoreSnapshotInput>, Prisma.ScanUncheckedUpdateWithoutScoreSnapshotInput>
 }
 
+export type ScanCreateNestedOneWithoutRiskFindingsInput = {
+  create?: Prisma.XOR<Prisma.ScanCreateWithoutRiskFindingsInput, Prisma.ScanUncheckedCreateWithoutRiskFindingsInput>
+  connectOrCreate?: Prisma.ScanCreateOrConnectWithoutRiskFindingsInput
+  connect?: Prisma.ScanWhereUniqueInput
+}
+
+export type ScanUpdateOneWithoutRiskFindingsNestedInput = {
+  create?: Prisma.XOR<Prisma.ScanCreateWithoutRiskFindingsInput, Prisma.ScanUncheckedCreateWithoutRiskFindingsInput>
+  connectOrCreate?: Prisma.ScanCreateOrConnectWithoutRiskFindingsInput
+  upsert?: Prisma.ScanUpsertWithoutRiskFindingsInput
+  disconnect?: Prisma.ScanWhereInput | boolean
+  delete?: Prisma.ScanWhereInput | boolean
+  connect?: Prisma.ScanWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ScanUpdateToOneWithWhereWithoutRiskFindingsInput, Prisma.ScanUpdateWithoutRiskFindingsInput>, Prisma.ScanUncheckedUpdateWithoutRiskFindingsInput>
+}
+
+export type ScanCreateNestedOneWithoutRecommendationsInput = {
+  create?: Prisma.XOR<Prisma.ScanCreateWithoutRecommendationsInput, Prisma.ScanUncheckedCreateWithoutRecommendationsInput>
+  connectOrCreate?: Prisma.ScanCreateOrConnectWithoutRecommendationsInput
+  connect?: Prisma.ScanWhereUniqueInput
+}
+
+export type ScanUpdateOneWithoutRecommendationsNestedInput = {
+  create?: Prisma.XOR<Prisma.ScanCreateWithoutRecommendationsInput, Prisma.ScanUncheckedCreateWithoutRecommendationsInput>
+  connectOrCreate?: Prisma.ScanCreateOrConnectWithoutRecommendationsInput
+  upsert?: Prisma.ScanUpsertWithoutRecommendationsInput
+  disconnect?: Prisma.ScanWhereInput | boolean
+  delete?: Prisma.ScanWhereInput | boolean
+  connect?: Prisma.ScanWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ScanUpdateToOneWithWhereWithoutRecommendationsInput, Prisma.ScanUpdateWithoutRecommendationsInput>, Prisma.ScanUncheckedUpdateWithoutRecommendationsInput>
+}
+
 export type ScanCreateWithoutBrandInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
+  verificationExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutVerificationScansInput
+  baselineExperiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutFollowUpScanInput
   observations?: Prisma.ObservationCreateNestedManyWithoutScanInput
   scoreSnapshot?: Prisma.ScoreSnapshotCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutScanInput
 }
 
 export type ScanUncheckedCreateWithoutBrandInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedCreateNestedOneWithoutFollowUpScanInput
   observations?: Prisma.ObservationUncheckedCreateNestedManyWithoutScanInput
   scoreSnapshot?: Prisma.ScoreSnapshotUncheckedCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutScanInput
 }
 
 export type ScanCreateOrConnectWithoutBrandInput = {
@@ -596,24 +1012,498 @@ export type ScanScalarWhereInput = {
   brandId?: Prisma.StringFilter<"Scan"> | string
   status?: Prisma.EnumScanStatusFilter<"Scan"> | $Enums.ScanStatus
   providerIds?: Prisma.JsonFilter<"Scan">
+  promptVersionIds?: Prisma.JsonNullableFilter<"Scan">
   requestedCount?: Prisma.IntFilter<"Scan"> | number
+  repeatCount?: Prisma.IntFilter<"Scan"> | number
+  dataMode?: Prisma.EnumScanDataModeFilter<"Scan"> | $Enums.ScanDataMode
+  creationKey?: Prisma.StringNullableFilter<"Scan"> | string | null
+  verificationExperimentId?: Prisma.StringNullableFilter<"Scan"> | string | null
+  executionLeaseToken?: Prisma.StringNullableFilter<"Scan"> | string | null
+  executionLeaseExpiresAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
+  verificationAttemptToken?: Prisma.StringNullableFilter<"Scan"> | string | null
+  verificationActionRevision?: Prisma.IntNullableFilter<"Scan"> | number | null
   errorMessage?: Prisma.StringNullableFilter<"Scan"> | string | null
   startedAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Scan"> | Date | string
 }
 
-export type ScanCreateWithoutObservationsInput = {
+export type ScanCreateWithoutOpportunitiesInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   brand: Prisma.BrandCreateNestedOneWithoutScansInput
+  verificationExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutVerificationScansInput
+  baselineExperiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutFollowUpScanInput
+  observations?: Prisma.ObservationCreateNestedManyWithoutScanInput
   scoreSnapshot?: Prisma.ScoreSnapshotCreateNestedOneWithoutScanInput
+  riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutScanInput
+}
+
+export type ScanUncheckedCreateWithoutOpportunitiesInput = {
+  id?: string
+  brandId: string
+  status?: $Enums.ScanStatus
+  providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedCreateNestedOneWithoutFollowUpScanInput
+  observations?: Prisma.ObservationUncheckedCreateNestedManyWithoutScanInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUncheckedCreateNestedOneWithoutScanInput
+  riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutScanInput
+}
+
+export type ScanCreateOrConnectWithoutOpportunitiesInput = {
+  where: Prisma.ScanWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScanCreateWithoutOpportunitiesInput, Prisma.ScanUncheckedCreateWithoutOpportunitiesInput>
+}
+
+export type ScanUpsertWithoutOpportunitiesInput = {
+  update: Prisma.XOR<Prisma.ScanUpdateWithoutOpportunitiesInput, Prisma.ScanUncheckedUpdateWithoutOpportunitiesInput>
+  create: Prisma.XOR<Prisma.ScanCreateWithoutOpportunitiesInput, Prisma.ScanUncheckedCreateWithoutOpportunitiesInput>
+  where?: Prisma.ScanWhereInput
+}
+
+export type ScanUpdateToOneWithWhereWithoutOpportunitiesInput = {
+  where?: Prisma.ScanWhereInput
+  data: Prisma.XOR<Prisma.ScanUpdateWithoutOpportunitiesInput, Prisma.ScanUncheckedUpdateWithoutOpportunitiesInput>
+}
+
+export type ScanUpdateWithoutOpportunitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
+  providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  brand?: Prisma.BrandUpdateOneRequiredWithoutScansNestedInput
+  verificationExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutVerificationScansNestedInput
+  baselineExperiments?: Prisma.OptimizationExperimentUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutFollowUpScanNestedInput
+  observations?: Prisma.ObservationUpdateManyWithoutScanNestedInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUpdateOneWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutScanNestedInput
+}
+
+export type ScanUncheckedUpdateWithoutOpportunitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  brandId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
+  providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedUpdateOneWithoutFollowUpScanNestedInput
+  observations?: Prisma.ObservationUncheckedUpdateManyWithoutScanNestedInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUncheckedUpdateOneWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutScanNestedInput
+}
+
+export type ScanCreateWithoutBaselineExperimentsInput = {
+  id?: string
+  status?: $Enums.ScanStatus
+  providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  brand: Prisma.BrandCreateNestedOneWithoutScansInput
+  verificationExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutVerificationScansInput
+  followUpExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutFollowUpScanInput
+  observations?: Prisma.ObservationCreateNestedManyWithoutScanInput
+  scoreSnapshot?: Prisma.ScoreSnapshotCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutScanInput
+}
+
+export type ScanUncheckedCreateWithoutBaselineExperimentsInput = {
+  id?: string
+  brandId: string
+  status?: $Enums.ScanStatus
+  providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedCreateNestedOneWithoutFollowUpScanInput
+  observations?: Prisma.ObservationUncheckedCreateNestedManyWithoutScanInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUncheckedCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutScanInput
+}
+
+export type ScanCreateOrConnectWithoutBaselineExperimentsInput = {
+  where: Prisma.ScanWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScanCreateWithoutBaselineExperimentsInput, Prisma.ScanUncheckedCreateWithoutBaselineExperimentsInput>
+}
+
+export type ScanCreateWithoutFollowUpExperimentInput = {
+  id?: string
+  status?: $Enums.ScanStatus
+  providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  brand: Prisma.BrandCreateNestedOneWithoutScansInput
+  verificationExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutVerificationScansInput
+  baselineExperiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBaselineScanInput
+  observations?: Prisma.ObservationCreateNestedManyWithoutScanInput
+  scoreSnapshot?: Prisma.ScoreSnapshotCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutScanInput
+}
+
+export type ScanUncheckedCreateWithoutFollowUpExperimentInput = {
+  id?: string
+  brandId: string
+  status?: $Enums.ScanStatus
+  providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBaselineScanInput
+  observations?: Prisma.ObservationUncheckedCreateNestedManyWithoutScanInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUncheckedCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutScanInput
+}
+
+export type ScanCreateOrConnectWithoutFollowUpExperimentInput = {
+  where: Prisma.ScanWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScanCreateWithoutFollowUpExperimentInput, Prisma.ScanUncheckedCreateWithoutFollowUpExperimentInput>
+}
+
+export type ScanCreateWithoutVerificationExperimentInput = {
+  id?: string
+  status?: $Enums.ScanStatus
+  providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  brand: Prisma.BrandCreateNestedOneWithoutScansInput
+  baselineExperiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutFollowUpScanInput
+  observations?: Prisma.ObservationCreateNestedManyWithoutScanInput
+  scoreSnapshot?: Prisma.ScoreSnapshotCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutScanInput
+}
+
+export type ScanUncheckedCreateWithoutVerificationExperimentInput = {
+  id?: string
+  status?: $Enums.ScanStatus
+  providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedCreateNestedOneWithoutFollowUpScanInput
+  observations?: Prisma.ObservationUncheckedCreateNestedManyWithoutScanInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUncheckedCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutScanInput
+}
+
+export type ScanCreateOrConnectWithoutVerificationExperimentInput = {
+  where: Prisma.ScanWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScanCreateWithoutVerificationExperimentInput, Prisma.ScanUncheckedCreateWithoutVerificationExperimentInput>
+}
+
+export type ScanCreateManyVerificationExperimentInputEnvelope = {
+  data: Prisma.ScanCreateManyVerificationExperimentInput | Prisma.ScanCreateManyVerificationExperimentInput[]
+  skipDuplicates?: boolean
+}
+
+export type ScanUpsertWithoutBaselineExperimentsInput = {
+  update: Prisma.XOR<Prisma.ScanUpdateWithoutBaselineExperimentsInput, Prisma.ScanUncheckedUpdateWithoutBaselineExperimentsInput>
+  create: Prisma.XOR<Prisma.ScanCreateWithoutBaselineExperimentsInput, Prisma.ScanUncheckedCreateWithoutBaselineExperimentsInput>
+  where?: Prisma.ScanWhereInput
+}
+
+export type ScanUpdateToOneWithWhereWithoutBaselineExperimentsInput = {
+  where?: Prisma.ScanWhereInput
+  data: Prisma.XOR<Prisma.ScanUpdateWithoutBaselineExperimentsInput, Prisma.ScanUncheckedUpdateWithoutBaselineExperimentsInput>
+}
+
+export type ScanUpdateWithoutBaselineExperimentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
+  providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  brand?: Prisma.BrandUpdateOneRequiredWithoutScansNestedInput
+  verificationExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutVerificationScansNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutFollowUpScanNestedInput
+  observations?: Prisma.ObservationUpdateManyWithoutScanNestedInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutScanNestedInput
+}
+
+export type ScanUncheckedUpdateWithoutBaselineExperimentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  brandId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
+  providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedUpdateOneWithoutFollowUpScanNestedInput
+  observations?: Prisma.ObservationUncheckedUpdateManyWithoutScanNestedInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUncheckedUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutScanNestedInput
+}
+
+export type ScanUpsertWithoutFollowUpExperimentInput = {
+  update: Prisma.XOR<Prisma.ScanUpdateWithoutFollowUpExperimentInput, Prisma.ScanUncheckedUpdateWithoutFollowUpExperimentInput>
+  create: Prisma.XOR<Prisma.ScanCreateWithoutFollowUpExperimentInput, Prisma.ScanUncheckedCreateWithoutFollowUpExperimentInput>
+  where?: Prisma.ScanWhereInput
+}
+
+export type ScanUpdateToOneWithWhereWithoutFollowUpExperimentInput = {
+  where?: Prisma.ScanWhereInput
+  data: Prisma.XOR<Prisma.ScanUpdateWithoutFollowUpExperimentInput, Prisma.ScanUncheckedUpdateWithoutFollowUpExperimentInput>
+}
+
+export type ScanUpdateWithoutFollowUpExperimentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
+  providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  brand?: Prisma.BrandUpdateOneRequiredWithoutScansNestedInput
+  verificationExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutVerificationScansNestedInput
+  baselineExperiments?: Prisma.OptimizationExperimentUpdateManyWithoutBaselineScanNestedInput
+  observations?: Prisma.ObservationUpdateManyWithoutScanNestedInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutScanNestedInput
+}
+
+export type ScanUncheckedUpdateWithoutFollowUpExperimentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  brandId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
+  providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBaselineScanNestedInput
+  observations?: Prisma.ObservationUncheckedUpdateManyWithoutScanNestedInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUncheckedUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutScanNestedInput
+}
+
+export type ScanUpsertWithWhereUniqueWithoutVerificationExperimentInput = {
+  where: Prisma.ScanWhereUniqueInput
+  update: Prisma.XOR<Prisma.ScanUpdateWithoutVerificationExperimentInput, Prisma.ScanUncheckedUpdateWithoutVerificationExperimentInput>
+  create: Prisma.XOR<Prisma.ScanCreateWithoutVerificationExperimentInput, Prisma.ScanUncheckedCreateWithoutVerificationExperimentInput>
+}
+
+export type ScanUpdateWithWhereUniqueWithoutVerificationExperimentInput = {
+  where: Prisma.ScanWhereUniqueInput
+  data: Prisma.XOR<Prisma.ScanUpdateWithoutVerificationExperimentInput, Prisma.ScanUncheckedUpdateWithoutVerificationExperimentInput>
+}
+
+export type ScanUpdateManyWithWhereWithoutVerificationExperimentInput = {
+  where: Prisma.ScanScalarWhereInput
+  data: Prisma.XOR<Prisma.ScanUpdateManyMutationInput, Prisma.ScanUncheckedUpdateManyWithoutVerificationExperimentInput>
+}
+
+export type ScanCreateWithoutObservationsInput = {
+  id?: string
+  status?: $Enums.ScanStatus
+  providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  brand: Prisma.BrandCreateNestedOneWithoutScansInput
+  verificationExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutVerificationScansInput
+  baselineExperiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutFollowUpScanInput
+  scoreSnapshot?: Prisma.ScoreSnapshotCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutScanInput
 }
 
 export type ScanUncheckedCreateWithoutObservationsInput = {
@@ -621,12 +1511,26 @@ export type ScanUncheckedCreateWithoutObservationsInput = {
   brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedCreateNestedOneWithoutFollowUpScanInput
   scoreSnapshot?: Prisma.ScoreSnapshotUncheckedCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutScanInput
 }
 
 export type ScanCreateOrConnectWithoutObservationsInput = {
@@ -649,13 +1553,27 @@ export type ScanUpdateWithoutObservationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   brand?: Prisma.BrandUpdateOneRequiredWithoutScansNestedInput
+  verificationExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutVerificationScansNestedInput
+  baselineExperiments?: Prisma.OptimizationExperimentUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutFollowUpScanNestedInput
   scoreSnapshot?: Prisma.ScoreSnapshotUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutScanNestedInput
 }
 
 export type ScanUncheckedUpdateWithoutObservationsInput = {
@@ -663,25 +1581,53 @@ export type ScanUncheckedUpdateWithoutObservationsInput = {
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedUpdateOneWithoutFollowUpScanNestedInput
   scoreSnapshot?: Prisma.ScoreSnapshotUncheckedUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutScanNestedInput
 }
 
 export type ScanCreateWithoutScoreSnapshotInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   brand: Prisma.BrandCreateNestedOneWithoutScansInput
+  verificationExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutVerificationScansInput
+  baselineExperiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutFollowUpScanInput
   observations?: Prisma.ObservationCreateNestedManyWithoutScanInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutScanInput
 }
 
 export type ScanUncheckedCreateWithoutScoreSnapshotInput = {
@@ -689,12 +1635,26 @@ export type ScanUncheckedCreateWithoutScoreSnapshotInput = {
   brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedCreateNestedOneWithoutFollowUpScanInput
   observations?: Prisma.ObservationUncheckedCreateNestedManyWithoutScanInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutScanInput
 }
 
 export type ScanCreateOrConnectWithoutScoreSnapshotInput = {
@@ -717,13 +1677,27 @@ export type ScanUpdateWithoutScoreSnapshotInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   brand?: Prisma.BrandUpdateOneRequiredWithoutScansNestedInput
+  verificationExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutVerificationScansNestedInput
+  baselineExperiments?: Prisma.OptimizationExperimentUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutFollowUpScanNestedInput
   observations?: Prisma.ObservationUpdateManyWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutScanNestedInput
 }
 
 export type ScanUncheckedUpdateWithoutScoreSnapshotInput = {
@@ -731,19 +1705,290 @@ export type ScanUncheckedUpdateWithoutScoreSnapshotInput = {
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedUpdateOneWithoutFollowUpScanNestedInput
   observations?: Prisma.ObservationUncheckedUpdateManyWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutScanNestedInput
+}
+
+export type ScanCreateWithoutRiskFindingsInput = {
+  id?: string
+  status?: $Enums.ScanStatus
+  providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  brand: Prisma.BrandCreateNestedOneWithoutScansInput
+  verificationExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutVerificationScansInput
+  baselineExperiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutFollowUpScanInput
+  observations?: Prisma.ObservationCreateNestedManyWithoutScanInput
+  scoreSnapshot?: Prisma.ScoreSnapshotCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutScanInput
+}
+
+export type ScanUncheckedCreateWithoutRiskFindingsInput = {
+  id?: string
+  brandId: string
+  status?: $Enums.ScanStatus
+  providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedCreateNestedOneWithoutFollowUpScanInput
+  observations?: Prisma.ObservationUncheckedCreateNestedManyWithoutScanInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUncheckedCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutScanInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutScanInput
+}
+
+export type ScanCreateOrConnectWithoutRiskFindingsInput = {
+  where: Prisma.ScanWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScanCreateWithoutRiskFindingsInput, Prisma.ScanUncheckedCreateWithoutRiskFindingsInput>
+}
+
+export type ScanUpsertWithoutRiskFindingsInput = {
+  update: Prisma.XOR<Prisma.ScanUpdateWithoutRiskFindingsInput, Prisma.ScanUncheckedUpdateWithoutRiskFindingsInput>
+  create: Prisma.XOR<Prisma.ScanCreateWithoutRiskFindingsInput, Prisma.ScanUncheckedCreateWithoutRiskFindingsInput>
+  where?: Prisma.ScanWhereInput
+}
+
+export type ScanUpdateToOneWithWhereWithoutRiskFindingsInput = {
+  where?: Prisma.ScanWhereInput
+  data: Prisma.XOR<Prisma.ScanUpdateWithoutRiskFindingsInput, Prisma.ScanUncheckedUpdateWithoutRiskFindingsInput>
+}
+
+export type ScanUpdateWithoutRiskFindingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
+  providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  brand?: Prisma.BrandUpdateOneRequiredWithoutScansNestedInput
+  verificationExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutVerificationScansNestedInput
+  baselineExperiments?: Prisma.OptimizationExperimentUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutFollowUpScanNestedInput
+  observations?: Prisma.ObservationUpdateManyWithoutScanNestedInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutScanNestedInput
+}
+
+export type ScanUncheckedUpdateWithoutRiskFindingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  brandId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
+  providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedUpdateOneWithoutFollowUpScanNestedInput
+  observations?: Prisma.ObservationUncheckedUpdateManyWithoutScanNestedInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUncheckedUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutScanNestedInput
+}
+
+export type ScanCreateWithoutRecommendationsInput = {
+  id?: string
+  status?: $Enums.ScanStatus
+  providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  brand: Prisma.BrandCreateNestedOneWithoutScansInput
+  verificationExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutVerificationScansInput
+  baselineExperiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentCreateNestedOneWithoutFollowUpScanInput
+  observations?: Prisma.ObservationCreateNestedManyWithoutScanInput
+  scoreSnapshot?: Prisma.ScoreSnapshotCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutScanInput
+}
+
+export type ScanUncheckedCreateWithoutRecommendationsInput = {
+  id?: string
+  brandId: string
+  status?: $Enums.ScanStatus
+  providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBaselineScanInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedCreateNestedOneWithoutFollowUpScanInput
+  observations?: Prisma.ObservationUncheckedCreateNestedManyWithoutScanInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUncheckedCreateNestedOneWithoutScanInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutScanInput
+  riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutScanInput
+}
+
+export type ScanCreateOrConnectWithoutRecommendationsInput = {
+  where: Prisma.ScanWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScanCreateWithoutRecommendationsInput, Prisma.ScanUncheckedCreateWithoutRecommendationsInput>
+}
+
+export type ScanUpsertWithoutRecommendationsInput = {
+  update: Prisma.XOR<Prisma.ScanUpdateWithoutRecommendationsInput, Prisma.ScanUncheckedUpdateWithoutRecommendationsInput>
+  create: Prisma.XOR<Prisma.ScanCreateWithoutRecommendationsInput, Prisma.ScanUncheckedCreateWithoutRecommendationsInput>
+  where?: Prisma.ScanWhereInput
+}
+
+export type ScanUpdateToOneWithWhereWithoutRecommendationsInput = {
+  where?: Prisma.ScanWhereInput
+  data: Prisma.XOR<Prisma.ScanUpdateWithoutRecommendationsInput, Prisma.ScanUncheckedUpdateWithoutRecommendationsInput>
+}
+
+export type ScanUpdateWithoutRecommendationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
+  providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  brand?: Prisma.BrandUpdateOneRequiredWithoutScansNestedInput
+  verificationExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutVerificationScansNestedInput
+  baselineExperiments?: Prisma.OptimizationExperimentUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutFollowUpScanNestedInput
+  observations?: Prisma.ObservationUpdateManyWithoutScanNestedInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUpdateManyWithoutScanNestedInput
+}
+
+export type ScanUncheckedUpdateWithoutRecommendationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  brandId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
+  providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedUpdateOneWithoutFollowUpScanNestedInput
+  observations?: Prisma.ObservationUncheckedUpdateManyWithoutScanNestedInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUncheckedUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutScanNestedInput
 }
 
 export type ScanCreateManyBrandInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -754,33 +1999,161 @@ export type ScanUpdateWithoutBrandInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  verificationExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutVerificationScansNestedInput
+  baselineExperiments?: Prisma.OptimizationExperimentUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutFollowUpScanNestedInput
   observations?: Prisma.ObservationUpdateManyWithoutScanNestedInput
   scoreSnapshot?: Prisma.ScoreSnapshotUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutScanNestedInput
 }
 
 export type ScanUncheckedUpdateWithoutBrandInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedUpdateOneWithoutFollowUpScanNestedInput
   observations?: Prisma.ObservationUncheckedUpdateManyWithoutScanNestedInput
   scoreSnapshot?: Prisma.ScoreSnapshotUncheckedUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutScanNestedInput
 }
 
 export type ScanUncheckedUpdateManyWithoutBrandInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ScanCreateManyVerificationExperimentInput = {
+  id?: string
+  status?: $Enums.ScanStatus
+  providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount: number
+  repeatCount?: number
+  dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type ScanUpdateWithoutVerificationExperimentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
+  providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  brand?: Prisma.BrandUpdateOneRequiredWithoutScansNestedInput
+  baselineExperiments?: Prisma.OptimizationExperimentUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUpdateOneWithoutFollowUpScanNestedInput
+  observations?: Prisma.ObservationUpdateManyWithoutScanNestedInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutScanNestedInput
+}
+
+export type ScanUncheckedUpdateWithoutVerificationExperimentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
+  providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  baselineExperiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBaselineScanNestedInput
+  followUpExperiment?: Prisma.OptimizationExperimentUncheckedUpdateOneWithoutFollowUpScanNestedInput
+  observations?: Prisma.ObservationUncheckedUpdateManyWithoutScanNestedInput
+  scoreSnapshot?: Prisma.ScoreSnapshotUncheckedUpdateOneWithoutScanNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutScanNestedInput
+  riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutScanNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutScanNestedInput
+}
+
+export type ScanUncheckedUpdateManyWithoutVerificationExperimentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
+  providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -793,11 +2166,19 @@ export type ScanUncheckedUpdateManyWithoutBrandInput = {
  */
 
 export type ScanCountOutputType = {
+  baselineExperiments: number
   observations: number
+  opportunities: number
+  riskFindings: number
+  recommendations: number
 }
 
 export type ScanCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  baselineExperiments?: boolean | ScanCountOutputTypeCountBaselineExperimentsArgs
   observations?: boolean | ScanCountOutputTypeCountObservationsArgs
+  opportunities?: boolean | ScanCountOutputTypeCountOpportunitiesArgs
+  riskFindings?: boolean | ScanCountOutputTypeCountRiskFindingsArgs
+  recommendations?: boolean | ScanCountOutputTypeCountRecommendationsArgs
 }
 
 /**
@@ -813,8 +2194,36 @@ export type ScanCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * ScanCountOutputType without action
  */
+export type ScanCountOutputTypeCountBaselineExperimentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OptimizationExperimentWhereInput
+}
+
+/**
+ * ScanCountOutputType without action
+ */
 export type ScanCountOutputTypeCountObservationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ObservationWhereInput
+}
+
+/**
+ * ScanCountOutputType without action
+ */
+export type ScanCountOutputTypeCountOpportunitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OpportunityWhereInput
+}
+
+/**
+ * ScanCountOutputType without action
+ */
+export type ScanCountOutputTypeCountRiskFindingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RiskFindingWhereInput
+}
+
+/**
+ * ScanCountOutputType without action
+ */
+export type ScanCountOutputTypeCountRecommendationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RecommendationWhereInput
 }
 
 
@@ -823,14 +2232,29 @@ export type ScanSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   brandId?: boolean
   status?: boolean
   providerIds?: boolean
+  promptVersionIds?: boolean
   requestedCount?: boolean
+  repeatCount?: boolean
+  dataMode?: boolean
+  creationKey?: boolean
+  verificationExperimentId?: boolean
+  executionLeaseToken?: boolean
+  executionLeaseExpiresAt?: boolean
+  verificationAttemptToken?: boolean
+  verificationActionRevision?: boolean
   errorMessage?: boolean
   startedAt?: boolean
   completedAt?: boolean
   createdAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  verificationExperiment?: boolean | Prisma.Scan$verificationExperimentArgs<ExtArgs>
+  baselineExperiments?: boolean | Prisma.Scan$baselineExperimentsArgs<ExtArgs>
+  followUpExperiment?: boolean | Prisma.Scan$followUpExperimentArgs<ExtArgs>
   observations?: boolean | Prisma.Scan$observationsArgs<ExtArgs>
   scoreSnapshot?: boolean | Prisma.Scan$scoreSnapshotArgs<ExtArgs>
+  opportunities?: boolean | Prisma.Scan$opportunitiesArgs<ExtArgs>
+  riskFindings?: boolean | Prisma.Scan$riskFindingsArgs<ExtArgs>
+  recommendations?: boolean | Prisma.Scan$recommendationsArgs<ExtArgs>
   _count?: boolean | Prisma.ScanCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["scan"]>
 
@@ -839,12 +2263,22 @@ export type ScanSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   brandId?: boolean
   status?: boolean
   providerIds?: boolean
+  promptVersionIds?: boolean
   requestedCount?: boolean
+  repeatCount?: boolean
+  dataMode?: boolean
+  creationKey?: boolean
+  verificationExperimentId?: boolean
+  executionLeaseToken?: boolean
+  executionLeaseExpiresAt?: boolean
+  verificationAttemptToken?: boolean
+  verificationActionRevision?: boolean
   errorMessage?: boolean
   startedAt?: boolean
   completedAt?: boolean
   createdAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  verificationExperiment?: boolean | Prisma.Scan$verificationExperimentArgs<ExtArgs>
 }, ExtArgs["result"]["scan"]>
 
 export type ScanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -852,12 +2286,22 @@ export type ScanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   brandId?: boolean
   status?: boolean
   providerIds?: boolean
+  promptVersionIds?: boolean
   requestedCount?: boolean
+  repeatCount?: boolean
+  dataMode?: boolean
+  creationKey?: boolean
+  verificationExperimentId?: boolean
+  executionLeaseToken?: boolean
+  executionLeaseExpiresAt?: boolean
+  verificationAttemptToken?: boolean
+  verificationActionRevision?: boolean
   errorMessage?: boolean
   startedAt?: boolean
   completedAt?: boolean
   createdAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  verificationExperiment?: boolean | Prisma.Scan$verificationExperimentArgs<ExtArgs>
 }, ExtArgs["result"]["scan"]>
 
 export type ScanSelectScalar = {
@@ -865,40 +2309,72 @@ export type ScanSelectScalar = {
   brandId?: boolean
   status?: boolean
   providerIds?: boolean
+  promptVersionIds?: boolean
   requestedCount?: boolean
+  repeatCount?: boolean
+  dataMode?: boolean
+  creationKey?: boolean
+  verificationExperimentId?: boolean
+  executionLeaseToken?: boolean
+  executionLeaseExpiresAt?: boolean
+  verificationAttemptToken?: boolean
+  verificationActionRevision?: boolean
   errorMessage?: boolean
   startedAt?: boolean
   completedAt?: boolean
   createdAt?: boolean
 }
 
-export type ScanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brandId" | "status" | "providerIds" | "requestedCount" | "errorMessage" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["scan"]>
+export type ScanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brandId" | "status" | "providerIds" | "promptVersionIds" | "requestedCount" | "repeatCount" | "dataMode" | "creationKey" | "verificationExperimentId" | "executionLeaseToken" | "executionLeaseExpiresAt" | "verificationAttemptToken" | "verificationActionRevision" | "errorMessage" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["scan"]>
 export type ScanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  verificationExperiment?: boolean | Prisma.Scan$verificationExperimentArgs<ExtArgs>
+  baselineExperiments?: boolean | Prisma.Scan$baselineExperimentsArgs<ExtArgs>
+  followUpExperiment?: boolean | Prisma.Scan$followUpExperimentArgs<ExtArgs>
   observations?: boolean | Prisma.Scan$observationsArgs<ExtArgs>
   scoreSnapshot?: boolean | Prisma.Scan$scoreSnapshotArgs<ExtArgs>
+  opportunities?: boolean | Prisma.Scan$opportunitiesArgs<ExtArgs>
+  riskFindings?: boolean | Prisma.Scan$riskFindingsArgs<ExtArgs>
+  recommendations?: boolean | Prisma.Scan$recommendationsArgs<ExtArgs>
   _count?: boolean | Prisma.ScanCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ScanIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  verificationExperiment?: boolean | Prisma.Scan$verificationExperimentArgs<ExtArgs>
 }
 export type ScanIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  verificationExperiment?: boolean | Prisma.Scan$verificationExperimentArgs<ExtArgs>
 }
 
 export type $ScanPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Scan"
   objects: {
     brand: Prisma.$BrandPayload<ExtArgs>
+    verificationExperiment: Prisma.$OptimizationExperimentPayload<ExtArgs> | null
+    baselineExperiments: Prisma.$OptimizationExperimentPayload<ExtArgs>[]
+    followUpExperiment: Prisma.$OptimizationExperimentPayload<ExtArgs> | null
     observations: Prisma.$ObservationPayload<ExtArgs>[]
     scoreSnapshot: Prisma.$ScoreSnapshotPayload<ExtArgs> | null
+    opportunities: Prisma.$OpportunityPayload<ExtArgs>[]
+    riskFindings: Prisma.$RiskFindingPayload<ExtArgs>[]
+    recommendations: Prisma.$RecommendationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     brandId: string
     status: $Enums.ScanStatus
     providerIds: runtime.JsonValue
+    promptVersionIds: runtime.JsonValue | null
     requestedCount: number
+    repeatCount: number
+    dataMode: $Enums.ScanDataMode
+    creationKey: string | null
+    verificationExperimentId: string | null
+    executionLeaseToken: string | null
+    executionLeaseExpiresAt: Date | null
+    verificationAttemptToken: string | null
+    verificationActionRevision: number | null
     errorMessage: string | null
     startedAt: Date | null
     completedAt: Date | null
@@ -1298,8 +2774,14 @@ readonly fields: ScanFieldRefs;
 export interface Prisma__ScanClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   brand<T extends Prisma.BrandDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BrandDefaultArgs<ExtArgs>>): Prisma.Prisma__BrandClient<runtime.Types.Result.GetResult<Prisma.$BrandPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  verificationExperiment<T extends Prisma.Scan$verificationExperimentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scan$verificationExperimentArgs<ExtArgs>>): Prisma.Prisma__OptimizationExperimentClient<runtime.Types.Result.GetResult<Prisma.$OptimizationExperimentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  baselineExperiments<T extends Prisma.Scan$baselineExperimentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scan$baselineExperimentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OptimizationExperimentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  followUpExperiment<T extends Prisma.Scan$followUpExperimentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scan$followUpExperimentArgs<ExtArgs>>): Prisma.Prisma__OptimizationExperimentClient<runtime.Types.Result.GetResult<Prisma.$OptimizationExperimentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   observations<T extends Prisma.Scan$observationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scan$observationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ObservationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   scoreSnapshot<T extends Prisma.Scan$scoreSnapshotArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scan$scoreSnapshotArgs<ExtArgs>>): Prisma.Prisma__ScoreSnapshotClient<runtime.Types.Result.GetResult<Prisma.$ScoreSnapshotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  opportunities<T extends Prisma.Scan$opportunitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scan$opportunitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OpportunityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  riskFindings<T extends Prisma.Scan$riskFindingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scan$riskFindingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RiskFindingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  recommendations<T extends Prisma.Scan$recommendationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scan$recommendationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecommendationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1333,7 +2815,16 @@ export interface ScanFieldRefs {
   readonly brandId: Prisma.FieldRef<"Scan", 'String'>
   readonly status: Prisma.FieldRef<"Scan", 'ScanStatus'>
   readonly providerIds: Prisma.FieldRef<"Scan", 'Json'>
+  readonly promptVersionIds: Prisma.FieldRef<"Scan", 'Json'>
   readonly requestedCount: Prisma.FieldRef<"Scan", 'Int'>
+  readonly repeatCount: Prisma.FieldRef<"Scan", 'Int'>
+  readonly dataMode: Prisma.FieldRef<"Scan", 'ScanDataMode'>
+  readonly creationKey: Prisma.FieldRef<"Scan", 'String'>
+  readonly verificationExperimentId: Prisma.FieldRef<"Scan", 'String'>
+  readonly executionLeaseToken: Prisma.FieldRef<"Scan", 'String'>
+  readonly executionLeaseExpiresAt: Prisma.FieldRef<"Scan", 'DateTime'>
+  readonly verificationAttemptToken: Prisma.FieldRef<"Scan", 'String'>
+  readonly verificationActionRevision: Prisma.FieldRef<"Scan", 'Int'>
   readonly errorMessage: Prisma.FieldRef<"Scan", 'String'>
   readonly startedAt: Prisma.FieldRef<"Scan", 'DateTime'>
   readonly completedAt: Prisma.FieldRef<"Scan", 'DateTime'>
@@ -1739,6 +3230,68 @@ export type ScanDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
+ * Scan.verificationExperiment
+ */
+export type Scan$verificationExperimentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OptimizationExperiment
+   */
+  select?: Prisma.OptimizationExperimentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OptimizationExperiment
+   */
+  omit?: Prisma.OptimizationExperimentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OptimizationExperimentInclude<ExtArgs> | null
+  where?: Prisma.OptimizationExperimentWhereInput
+}
+
+/**
+ * Scan.baselineExperiments
+ */
+export type Scan$baselineExperimentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OptimizationExperiment
+   */
+  select?: Prisma.OptimizationExperimentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OptimizationExperiment
+   */
+  omit?: Prisma.OptimizationExperimentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OptimizationExperimentInclude<ExtArgs> | null
+  where?: Prisma.OptimizationExperimentWhereInput
+  orderBy?: Prisma.OptimizationExperimentOrderByWithRelationInput | Prisma.OptimizationExperimentOrderByWithRelationInput[]
+  cursor?: Prisma.OptimizationExperimentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OptimizationExperimentScalarFieldEnum | Prisma.OptimizationExperimentScalarFieldEnum[]
+}
+
+/**
+ * Scan.followUpExperiment
+ */
+export type Scan$followUpExperimentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OptimizationExperiment
+   */
+  select?: Prisma.OptimizationExperimentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OptimizationExperiment
+   */
+  omit?: Prisma.OptimizationExperimentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OptimizationExperimentInclude<ExtArgs> | null
+  where?: Prisma.OptimizationExperimentWhereInput
+}
+
+/**
  * Scan.observations
  */
 export type Scan$observationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1779,6 +3332,78 @@ export type Scan$scoreSnapshotArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   include?: Prisma.ScoreSnapshotInclude<ExtArgs> | null
   where?: Prisma.ScoreSnapshotWhereInput
+}
+
+/**
+ * Scan.opportunities
+ */
+export type Scan$opportunitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Opportunity
+   */
+  select?: Prisma.OpportunitySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Opportunity
+   */
+  omit?: Prisma.OpportunityOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OpportunityInclude<ExtArgs> | null
+  where?: Prisma.OpportunityWhereInput
+  orderBy?: Prisma.OpportunityOrderByWithRelationInput | Prisma.OpportunityOrderByWithRelationInput[]
+  cursor?: Prisma.OpportunityWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OpportunityScalarFieldEnum | Prisma.OpportunityScalarFieldEnum[]
+}
+
+/**
+ * Scan.riskFindings
+ */
+export type Scan$riskFindingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RiskFinding
+   */
+  select?: Prisma.RiskFindingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RiskFinding
+   */
+  omit?: Prisma.RiskFindingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RiskFindingInclude<ExtArgs> | null
+  where?: Prisma.RiskFindingWhereInput
+  orderBy?: Prisma.RiskFindingOrderByWithRelationInput | Prisma.RiskFindingOrderByWithRelationInput[]
+  cursor?: Prisma.RiskFindingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RiskFindingScalarFieldEnum | Prisma.RiskFindingScalarFieldEnum[]
+}
+
+/**
+ * Scan.recommendations
+ */
+export type Scan$recommendationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Recommendation
+   */
+  select?: Prisma.RecommendationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Recommendation
+   */
+  omit?: Prisma.RecommendationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecommendationInclude<ExtArgs> | null
+  where?: Prisma.RecommendationWhereInput
+  orderBy?: Prisma.RecommendationOrderByWithRelationInput | Prisma.RecommendationOrderByWithRelationInput[]
+  cursor?: Prisma.RecommendationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RecommendationScalarFieldEnum | Prisma.RecommendationScalarFieldEnum[]
 }
 
 /**

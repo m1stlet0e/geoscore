@@ -230,6 +230,7 @@ export type PromptVersionWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"PromptVersion"> | Date | string
   prompt?: Prisma.XOR<Prisma.PromptScalarRelationFilter, Prisma.PromptWhereInput>
   observations?: Prisma.ObservationListRelationFilter
+  opportunities?: Prisma.OpportunityListRelationFilter
 }
 
 export type PromptVersionOrderByWithRelationInput = {
@@ -241,6 +242,7 @@ export type PromptVersionOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   prompt?: Prisma.PromptOrderByWithRelationInput
   observations?: Prisma.ObservationOrderByRelationAggregateInput
+  opportunities?: Prisma.OpportunityOrderByRelationAggregateInput
 }
 
 export type PromptVersionWhereUniqueInput = Prisma.AtLeast<{
@@ -256,6 +258,7 @@ export type PromptVersionWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"PromptVersion"> | Date | string
   prompt?: Prisma.XOR<Prisma.PromptScalarRelationFilter, Prisma.PromptWhereInput>
   observations?: Prisma.ObservationListRelationFilter
+  opportunities?: Prisma.OpportunityListRelationFilter
 }, "id" | "promptId_version">
 
 export type PromptVersionOrderByWithAggregationInput = {
@@ -292,6 +295,7 @@ export type PromptVersionCreateInput = {
   createdAt?: Date | string
   prompt: Prisma.PromptCreateNestedOneWithoutVersionsInput
   observations?: Prisma.ObservationCreateNestedManyWithoutPromptVersionInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutPromptVersionInput
 }
 
 export type PromptVersionUncheckedCreateInput = {
@@ -302,6 +306,7 @@ export type PromptVersionUncheckedCreateInput = {
   weight?: number
   createdAt?: Date | string
   observations?: Prisma.ObservationUncheckedCreateNestedManyWithoutPromptVersionInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutPromptVersionInput
 }
 
 export type PromptVersionUpdateInput = {
@@ -312,6 +317,7 @@ export type PromptVersionUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   prompt?: Prisma.PromptUpdateOneRequiredWithoutVersionsNestedInput
   observations?: Prisma.ObservationUpdateManyWithoutPromptVersionNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutPromptVersionNestedInput
 }
 
 export type PromptVersionUncheckedUpdateInput = {
@@ -322,6 +328,7 @@ export type PromptVersionUncheckedUpdateInput = {
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   observations?: Prisma.ObservationUncheckedUpdateManyWithoutPromptVersionNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutPromptVersionNestedInput
 }
 
 export type PromptVersionCreateManyInput = {
@@ -465,6 +472,20 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type PromptVersionCreateNestedOneWithoutOpportunitiesInput = {
+  create?: Prisma.XOR<Prisma.PromptVersionCreateWithoutOpportunitiesInput, Prisma.PromptVersionUncheckedCreateWithoutOpportunitiesInput>
+  connectOrCreate?: Prisma.PromptVersionCreateOrConnectWithoutOpportunitiesInput
+  connect?: Prisma.PromptVersionWhereUniqueInput
+}
+
+export type PromptVersionUpdateOneRequiredWithoutOpportunitiesNestedInput = {
+  create?: Prisma.XOR<Prisma.PromptVersionCreateWithoutOpportunitiesInput, Prisma.PromptVersionUncheckedCreateWithoutOpportunitiesInput>
+  connectOrCreate?: Prisma.PromptVersionCreateOrConnectWithoutOpportunitiesInput
+  upsert?: Prisma.PromptVersionUpsertWithoutOpportunitiesInput
+  connect?: Prisma.PromptVersionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PromptVersionUpdateToOneWithWhereWithoutOpportunitiesInput, Prisma.PromptVersionUpdateWithoutOpportunitiesInput>, Prisma.PromptVersionUncheckedUpdateWithoutOpportunitiesInput>
+}
+
 export type PromptVersionCreateNestedOneWithoutObservationsInput = {
   create?: Prisma.XOR<Prisma.PromptVersionCreateWithoutObservationsInput, Prisma.PromptVersionUncheckedCreateWithoutObservationsInput>
   connectOrCreate?: Prisma.PromptVersionCreateOrConnectWithoutObservationsInput
@@ -486,6 +507,7 @@ export type PromptVersionCreateWithoutPromptInput = {
   weight?: number
   createdAt?: Date | string
   observations?: Prisma.ObservationCreateNestedManyWithoutPromptVersionInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutPromptVersionInput
 }
 
 export type PromptVersionUncheckedCreateWithoutPromptInput = {
@@ -495,6 +517,7 @@ export type PromptVersionUncheckedCreateWithoutPromptInput = {
   weight?: number
   createdAt?: Date | string
   observations?: Prisma.ObservationUncheckedCreateNestedManyWithoutPromptVersionInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutPromptVersionInput
 }
 
 export type PromptVersionCreateOrConnectWithoutPromptInput = {
@@ -535,6 +558,62 @@ export type PromptVersionScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"PromptVersion"> | Date | string
 }
 
+export type PromptVersionCreateWithoutOpportunitiesInput = {
+  id?: string
+  version: number
+  text: string
+  weight?: number
+  createdAt?: Date | string
+  prompt: Prisma.PromptCreateNestedOneWithoutVersionsInput
+  observations?: Prisma.ObservationCreateNestedManyWithoutPromptVersionInput
+}
+
+export type PromptVersionUncheckedCreateWithoutOpportunitiesInput = {
+  id?: string
+  promptId: string
+  version: number
+  text: string
+  weight?: number
+  createdAt?: Date | string
+  observations?: Prisma.ObservationUncheckedCreateNestedManyWithoutPromptVersionInput
+}
+
+export type PromptVersionCreateOrConnectWithoutOpportunitiesInput = {
+  where: Prisma.PromptVersionWhereUniqueInput
+  create: Prisma.XOR<Prisma.PromptVersionCreateWithoutOpportunitiesInput, Prisma.PromptVersionUncheckedCreateWithoutOpportunitiesInput>
+}
+
+export type PromptVersionUpsertWithoutOpportunitiesInput = {
+  update: Prisma.XOR<Prisma.PromptVersionUpdateWithoutOpportunitiesInput, Prisma.PromptVersionUncheckedUpdateWithoutOpportunitiesInput>
+  create: Prisma.XOR<Prisma.PromptVersionCreateWithoutOpportunitiesInput, Prisma.PromptVersionUncheckedCreateWithoutOpportunitiesInput>
+  where?: Prisma.PromptVersionWhereInput
+}
+
+export type PromptVersionUpdateToOneWithWhereWithoutOpportunitiesInput = {
+  where?: Prisma.PromptVersionWhereInput
+  data: Prisma.XOR<Prisma.PromptVersionUpdateWithoutOpportunitiesInput, Prisma.PromptVersionUncheckedUpdateWithoutOpportunitiesInput>
+}
+
+export type PromptVersionUpdateWithoutOpportunitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  text?: Prisma.StringFieldUpdateOperationsInput | string
+  weight?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  prompt?: Prisma.PromptUpdateOneRequiredWithoutVersionsNestedInput
+  observations?: Prisma.ObservationUpdateManyWithoutPromptVersionNestedInput
+}
+
+export type PromptVersionUncheckedUpdateWithoutOpportunitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  promptId?: Prisma.StringFieldUpdateOperationsInput | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  text?: Prisma.StringFieldUpdateOperationsInput | string
+  weight?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  observations?: Prisma.ObservationUncheckedUpdateManyWithoutPromptVersionNestedInput
+}
+
 export type PromptVersionCreateWithoutObservationsInput = {
   id?: string
   version: number
@@ -542,6 +621,7 @@ export type PromptVersionCreateWithoutObservationsInput = {
   weight?: number
   createdAt?: Date | string
   prompt: Prisma.PromptCreateNestedOneWithoutVersionsInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutPromptVersionInput
 }
 
 export type PromptVersionUncheckedCreateWithoutObservationsInput = {
@@ -551,6 +631,7 @@ export type PromptVersionUncheckedCreateWithoutObservationsInput = {
   text: string
   weight?: number
   createdAt?: Date | string
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutPromptVersionInput
 }
 
 export type PromptVersionCreateOrConnectWithoutObservationsInput = {
@@ -576,6 +657,7 @@ export type PromptVersionUpdateWithoutObservationsInput = {
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   prompt?: Prisma.PromptUpdateOneRequiredWithoutVersionsNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutPromptVersionNestedInput
 }
 
 export type PromptVersionUncheckedUpdateWithoutObservationsInput = {
@@ -585,6 +667,7 @@ export type PromptVersionUncheckedUpdateWithoutObservationsInput = {
   text?: Prisma.StringFieldUpdateOperationsInput | string
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutPromptVersionNestedInput
 }
 
 export type PromptVersionCreateManyPromptInput = {
@@ -602,6 +685,7 @@ export type PromptVersionUpdateWithoutPromptInput = {
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   observations?: Prisma.ObservationUpdateManyWithoutPromptVersionNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutPromptVersionNestedInput
 }
 
 export type PromptVersionUncheckedUpdateWithoutPromptInput = {
@@ -611,6 +695,7 @@ export type PromptVersionUncheckedUpdateWithoutPromptInput = {
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   observations?: Prisma.ObservationUncheckedUpdateManyWithoutPromptVersionNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutPromptVersionNestedInput
 }
 
 export type PromptVersionUncheckedUpdateManyWithoutPromptInput = {
@@ -628,10 +713,12 @@ export type PromptVersionUncheckedUpdateManyWithoutPromptInput = {
 
 export type PromptVersionCountOutputType = {
   observations: number
+  opportunities: number
 }
 
 export type PromptVersionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   observations?: boolean | PromptVersionCountOutputTypeCountObservationsArgs
+  opportunities?: boolean | PromptVersionCountOutputTypeCountOpportunitiesArgs
 }
 
 /**
@@ -651,6 +738,13 @@ export type PromptVersionCountOutputTypeCountObservationsArgs<ExtArgs extends ru
   where?: Prisma.ObservationWhereInput
 }
 
+/**
+ * PromptVersionCountOutputType without action
+ */
+export type PromptVersionCountOutputTypeCountOpportunitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OpportunityWhereInput
+}
+
 
 export type PromptVersionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -661,6 +755,7 @@ export type PromptVersionSelect<ExtArgs extends runtime.Types.Extensions.Interna
   createdAt?: boolean
   prompt?: boolean | Prisma.PromptDefaultArgs<ExtArgs>
   observations?: boolean | Prisma.PromptVersion$observationsArgs<ExtArgs>
+  opportunities?: boolean | Prisma.PromptVersion$opportunitiesArgs<ExtArgs>
   _count?: boolean | Prisma.PromptVersionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["promptVersion"]>
 
@@ -697,6 +792,7 @@ export type PromptVersionOmit<ExtArgs extends runtime.Types.Extensions.InternalA
 export type PromptVersionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   prompt?: boolean | Prisma.PromptDefaultArgs<ExtArgs>
   observations?: boolean | Prisma.PromptVersion$observationsArgs<ExtArgs>
+  opportunities?: boolean | Prisma.PromptVersion$opportunitiesArgs<ExtArgs>
   _count?: boolean | Prisma.PromptVersionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PromptVersionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -711,6 +807,7 @@ export type $PromptVersionPayload<ExtArgs extends runtime.Types.Extensions.Inter
   objects: {
     prompt: Prisma.$PromptPayload<ExtArgs>
     observations: Prisma.$ObservationPayload<ExtArgs>[]
+    opportunities: Prisma.$OpportunityPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1115,6 +1212,7 @@ export interface Prisma__PromptVersionClient<T, Null = never, ExtArgs extends ru
   readonly [Symbol.toStringTag]: "PrismaPromise"
   prompt<T extends Prisma.PromptDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PromptDefaultArgs<ExtArgs>>): Prisma.Prisma__PromptClient<runtime.Types.Result.GetResult<Prisma.$PromptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   observations<T extends Prisma.PromptVersion$observationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PromptVersion$observationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ObservationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  opportunities<T extends Prisma.PromptVersion$opportunitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PromptVersion$opportunitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OpportunityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1572,6 +1670,30 @@ export type PromptVersion$observationsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.ObservationScalarFieldEnum | Prisma.ObservationScalarFieldEnum[]
+}
+
+/**
+ * PromptVersion.opportunities
+ */
+export type PromptVersion$opportunitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Opportunity
+   */
+  select?: Prisma.OpportunitySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Opportunity
+   */
+  omit?: Prisma.OpportunityOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OpportunityInclude<ExtArgs> | null
+  where?: Prisma.OpportunityWhereInput
+  orderBy?: Prisma.OpportunityOrderByWithRelationInput | Prisma.OpportunityOrderByWithRelationInput[]
+  cursor?: Prisma.OpportunityWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OpportunityScalarFieldEnum | Prisma.OpportunityScalarFieldEnum[]
 }
 
 /**

@@ -73,6 +73,16 @@ export type PromptVersion = Prisma.PromptVersionModel
  */
 export type Scan = Prisma.ScanModel
 /**
+ * Model Opportunity
+ * 
+ */
+export type Opportunity = Prisma.OpportunityModel
+/**
+ * Model OptimizationExperiment
+ * 
+ */
+export type OptimizationExperiment = Prisma.OptimizationExperimentModel
+/**
  * Model Observation
  * 
  */

@@ -13,6 +13,18 @@ async function createUser() {
 }
 
 describe("订单履约", () => {
+  it.each([
+    ["STARTER", 9900],
+    ["PRO", 29900],
+    ["BUSINESS", 89900],
+  ] as const)("%s 套餐订单使用数据库中的真实金额", async (planCode, amountCents) => {
+    const user = await createUser();
+
+    const order = await createOrderForUser(user.id, planCode, "mock");
+
+    expect(order.amountCents).toBe(amountCents);
+  });
+
   it("金额由服务端套餐生成且重复回调不重复发放额度", async () => {
     const user = await createUser();
     const order = await createOrderForUser(user.id, "STARTER", "mock");

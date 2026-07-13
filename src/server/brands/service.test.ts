@@ -35,7 +35,13 @@ describe("品牌服务", () => {
     });
     expect(brand.aliases.map((x) => x.value)).toEqual(["Geo Score", "geoscore"]);
     expect(new Set(brand.competitors.map((x) => x.name))).toEqual(new Set(["竞品甲", "竞品乙"]));
-    expect(brand.prompts.length).toBeGreaterThanOrEqual(8);
+    expect(brand.prompts).toHaveLength(20);
+    expect(new Set(brand.prompts.map((prompt) => prompt.category))).toEqual(
+      new Set(["DISCOVERY", "PROBLEM", "COMPARISON", "PURCHASE"]),
+    );
+    const promptTexts = brand.prompts.flatMap((prompt) => prompt.versions.map((version) => version.text));
+    expect(new Set(promptTexts).size).toBe(20);
+    expect(promptTexts.every((text) => !text.includes("GeoScore"))).toBe(true);
   });
 
   it("不能读取其他用户的品牌", async () => {

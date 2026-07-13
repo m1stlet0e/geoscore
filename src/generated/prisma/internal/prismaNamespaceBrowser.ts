@@ -62,6 +62,8 @@ export const ModelName = {
   Prompt: 'Prompt',
   PromptVersion: 'PromptVersion',
   Scan: 'Scan',
+  Opportunity: 'Opportunity',
+  OptimizationExperiment: 'OptimizationExperiment',
   Observation: 'Observation',
   Mention: 'Mention',
   Citation: 'Citation',
@@ -229,7 +231,16 @@ export const ScanScalarFieldEnum = {
   brandId: 'brandId',
   status: 'status',
   providerIds: 'providerIds',
+  promptVersionIds: 'promptVersionIds',
   requestedCount: 'requestedCount',
+  repeatCount: 'repeatCount',
+  dataMode: 'dataMode',
+  creationKey: 'creationKey',
+  verificationExperimentId: 'verificationExperimentId',
+  executionLeaseToken: 'executionLeaseToken',
+  executionLeaseExpiresAt: 'executionLeaseExpiresAt',
+  verificationAttemptToken: 'verificationAttemptToken',
+  verificationActionRevision: 'verificationActionRevision',
   errorMessage: 'errorMessage',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
@@ -237,6 +248,55 @@ export const ScanScalarFieldEnum = {
 } as const
 
 export type ScanScalarFieldEnum = (typeof ScanScalarFieldEnum)[keyof typeof ScanScalarFieldEnum]
+
+
+export const OpportunityScalarFieldEnum = {
+  id: 'id',
+  brandId: 'brandId',
+  scanId: 'scanId',
+  promptVersionId: 'promptVersionId',
+  platformId: 'platformId',
+  type: 'type',
+  priority: 'priority',
+  title: 'title',
+  summary: 'summary',
+  evidence: 'evidence',
+  recommendedAction: 'recommendedAction',
+  targetContentType: 'targetContentType',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OpportunityScalarFieldEnum = (typeof OpportunityScalarFieldEnum)[keyof typeof OpportunityScalarFieldEnum]
+
+
+export const OptimizationExperimentScalarFieldEnum = {
+  id: 'id',
+  brandId: 'brandId',
+  opportunityId: 'opportunityId',
+  baselineScanId: 'baselineScanId',
+  followUpScanId: 'followUpScanId',
+  title: 'title',
+  hypothesis: 'hypothesis',
+  actionPlan: 'actionPlan',
+  targetUrl: 'targetUrl',
+  publishedAt: 'publishedAt',
+  nextCheckAt: 'nextCheckAt',
+  status: 'status',
+  actionRevision: 'actionRevision',
+  verificationLeaseToken: 'verificationLeaseToken',
+  verificationLeaseExpiresAt: 'verificationLeaseExpiresAt',
+  resultSummary: 'resultSummary',
+  scoreDelta: 'scoreDelta',
+  mentionDelta: 'mentionDelta',
+  recommendationDelta: 'recommendationDelta',
+  citationDelta: 'citationDelta',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OptimizationExperimentScalarFieldEnum = (typeof OptimizationExperimentScalarFieldEnum)[keyof typeof OptimizationExperimentScalarFieldEnum]
 
 
 export const ObservationScalarFieldEnum = {
@@ -306,6 +366,7 @@ export type ScoreSnapshotScalarFieldEnum = (typeof ScoreSnapshotScalarFieldEnum)
 export const RiskFindingScalarFieldEnum = {
   id: 'id',
   brandId: 'brandId',
+  scanId: 'scanId',
   level: 'level',
   title: 'title',
   description: 'description',
@@ -320,6 +381,7 @@ export type RiskFindingScalarFieldEnum = (typeof RiskFindingScalarFieldEnum)[key
 export const RecommendationScalarFieldEnum = {
   id: 'id',
   brandId: 'brandId',
+  scanId: 'scanId',
   title: 'title',
   finding: 'finding',
   action: 'action',
