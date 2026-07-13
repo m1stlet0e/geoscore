@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { afterEach, describe, expect, it } from "vitest";
+import { access, readFile } from "node:fs/promises";
+import path from "node:path";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { db } from "@/lib/db";
 import { createBrandForUser } from "@/server/brands/service";
 import { createScanForUser, executeScanForUser } from "@/server/scans/service";
@@ -12,6 +14,7 @@ import {
 const userIds: string[] = [];
 
 afterEach(async () => {
+  vi.restoreAllMocks();
   await db.user.deleteMany({ where: { id: { in: userIds.splice(0) } } });
 });
 
@@ -88,6 +91,7 @@ async function createVerificationCandidate(
       repeatCount: baselineScan.repeatCount,
       promptVersionIds: baselineScan.promptVersionIds as string[],
       verificationExperimentId: experimentId,
+      verificationLeaseToken,
     },
   );
 }
@@ -345,6 +349,32 @@ describe("实验服务", () => {
       .actionRevision).toBe(1);
   });
 
+  it("ACTIVE 同一旧版本并发提交相同变更时幂等返回且只递增一次", async () => {
+    const { user, opportunity } = await createBaselineFixture();
+    const draft = await createExperimentForUser(user.id, opportunity.id);
+    const first = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "发布并发变更前的第一版完整行动计划",
+      targetUrl: "https://experiment.example.cn/before-active-race",
+    });
+    const input = {
+      actionPlan: "发布两个并发请求完全相同的第二版行动计划",
+      targetUrl: " https://experiment.example.cn/same-active-race/ ",
+    };
+
+    const results = await Promise.all([
+      publishExperimentForUser(user.id, first.id, input),
+      publishExperimentForUser(user.id, first.id, input),
+    ]);
+
+    expect(results.every((item) => item.status === "ACTIVE")).toBe(true);
+    expect(results.every((item) => item.actionRevision === 2)).toBe(true);
+    expect(results.every(
+      (item) => item.targetUrl === "https://experiment.example.cn/same-active-race",
+    )).toBe(true);
+    expect((await db.optimizationExperiment.findUniqueOrThrow({ where: { id: first.id } }))
+      .actionRevision).toBe(2);
+  });
+
   it.each([
     { actionPlan: "太短", targetUrl: undefined, message: "行动计划至少需要 10 个字符" },
     { actionPlan: "这是满足十个字符以上的行动计划", targetUrl: "ftp://example.com/file", message: "目标网址只支持 HTTP 或 HTTPS" },
@@ -502,6 +532,58 @@ describe("实验服务", () => {
       .toBe(balanceBefore);
   });
 
+  it("REAL 验证初读后动作升级并重置窗口时旧请求拒绝且零扫描零扣费", async () => {
+    const { user, baselineScan, opportunity } = await createBaselineFixture();
+    const draft = await createExperimentForUser(user.id, opportunity.id);
+    const active = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "发布第一版已到复查时间的真实数据行动计划",
+    });
+    await Promise.all([
+      db.scan.update({
+        where: { id: baselineScan.id },
+        data: { dataMode: "REAL" },
+      }),
+      db.optimizationExperiment.update({
+        where: { id: active.id },
+        data: { nextCheckAt: new Date(Date.now() - 60_000) },
+      }),
+    ]);
+    const delegate = db.optimizationExperiment as unknown as {
+      findFirst: (args: unknown) => Promise<unknown>;
+    };
+    const originalFindFirst = delegate.findFirst.bind(delegate);
+    vi.spyOn(delegate, "findFirst").mockImplementationOnce(async (args) => {
+      const staleRevision = await originalFindFirst(args);
+      await db.optimizationExperiment.update({
+        where: { id: active.id },
+        data: {
+          actionPlan: "发布第二版需要重新等待观察窗口的真实数据行动计划",
+          actionRevision: { increment: 1 },
+          nextCheckAt: new Date(Date.now() + 7 * 86_400_000),
+        },
+      });
+      return staleRevision;
+    });
+    const balanceBefore = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: user.id },
+    })).balance;
+    const scanCountBefore = await db.scan.count({ where: { brandId: opportunity.brandId } });
+
+    await expect(verifyExperimentForUser(user.id, active.id))
+      .rejects.toThrow("实验动作或复查时间已变化，请重新发起验证");
+
+    const current = await db.optimizationExperiment.findUniqueOrThrow({
+      where: { id: active.id },
+    });
+    expect(current.status).toBe("ACTIVE");
+    expect(current.actionRevision).toBe(2);
+    expect(current.verificationLeaseToken).toBeNull();
+    expect(await db.scan.count({ where: { brandId: opportunity.brandId } }))
+      .toBe(scanCountBefore);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(balanceBefore);
+  });
+
   it("已完成实验重复复扫直接返回现有结果且不再次扣费", async () => {
     const { user, opportunity } = await createBaselineFixture();
     const draft = await createExperimentForUser(user.id, opportunity.id);
@@ -566,6 +648,7 @@ describe("实验服务", () => {
         repeatCount: baselineScan.repeatCount,
         promptVersionIds: baselineScan.promptVersionIds as string[],
         verificationExperimentId: active.id,
+        verificationLeaseToken: "completed-candidate-owner",
       },
     );
     await executeScanForUser(user.id, completedVerification.id);
@@ -738,6 +821,52 @@ describe("实验服务", () => {
       .toBe(balanceBeforeVerification - baselineScan.requestedCount);
   });
 
+  it("纠正迁移隔离历史 ACTIVE 完成候选后验证必须新建当前版本扫描", async () => {
+    const { user, baselineScan, opportunity } = await createBaselineFixture(150);
+    const draft = await createExperimentForUser(user.id, opportunity.id);
+    const active = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "发布迁移前无法证明动作一致性的完整行动计划",
+    });
+    const historicalCandidate = await createVerificationCandidate(
+      user.id,
+      opportunity.brandId,
+      active.id,
+      baselineScan,
+      "historical-active-candidate-owner",
+    );
+    await executeScanForUser(user.id, historicalCandidate.id);
+    await db.optimizationExperiment.update({
+      where: { id: active.id },
+      data: {
+        status: "ACTIVE",
+        verificationLeaseToken: null,
+        verificationLeaseExpiresAt: null,
+      },
+    });
+    const migrationPath = path.join(
+      process.cwd(),
+      "prisma/migrations/20260714093000_quarantine_active_verification_candidates/migration.sql",
+    );
+    const migrationExists = await access(migrationPath).then(() => true, () => false);
+    expect(migrationExists).toBe(true);
+    if (!migrationExists) return;
+    await db.$executeRawUnsafe(await readFile(migrationPath, "utf8"));
+    const balanceBeforeVerification = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: user.id },
+    })).balance;
+
+    const result = await verifyExperimentForUser(user.id, active.id);
+    const quarantined = await db.scan.findUniqueOrThrow({
+      where: { id: historicalCandidate.id },
+    });
+
+    expect(quarantined.verificationActionRevision).toBeNull();
+    expect(result.followUpScanId).not.toBe(historicalCandidate.id);
+    expect(await db.scan.count({ where: { verificationExperimentId: active.id } })).toBe(2);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(balanceBeforeVerification - baselineScan.requestedCount);
+  });
+
   it("品牌风险机会可仅凭同目标风险解除验证成功", async () => {
     const { user, brand, baselineScan, opportunity } = await createBaselineFixture();
     await db.opportunity.deleteMany({
@@ -874,6 +1003,7 @@ describe("实验服务", () => {
         repeatCount: baselineScan.repeatCount,
         promptVersionIds: baselineScan.promptVersionIds as string[],
         verificationExperimentId: active.id,
+        verificationLeaseToken: `mismatched-candidate-${mismatch}`,
       },
     );
     await executeScanForUser(user.id, mismatchedScan.id);

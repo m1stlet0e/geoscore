@@ -21,6 +21,8 @@ export type CreateScanOptions = {
   env?: AiProviderEnvironment;
   promptVersionIds?: string[];
   verificationExperimentId?: string;
+  /** 仅供实验验证服务内部传递，HTTP 扫描接口不得接收。 */
+  verificationLeaseToken?: string;
 };
 
 export type RepeatConsistencySample = {
@@ -36,8 +38,17 @@ export type ScanExecutionConfig = {
 };
 
 type VerificationBaselineConfig = ScanExecutionConfig & {
+  baselineScanId: string;
   actionRevision: number;
   verificationAttemptToken: string;
+};
+
+type LockedVerificationBaselineRow = {
+  baselineScanId: string;
+  baselineStatus: string;
+  providerIds: unknown;
+  promptVersionIds: unknown;
+  repeatCount: number;
 };
 
 type ScanLeaseContext = {
@@ -71,14 +82,19 @@ export function scanExecutionConfigMatches(
 async function loadVerificationBaselineConfig(
   verificationExperimentId: string,
   brandId: string,
+  verificationLeaseToken: string,
 ): Promise<VerificationBaselineConfig> {
+  const now = new Date();
   const verificationExperiment = await db.optimizationExperiment.findFirst({
-    where: { id: verificationExperimentId, brandId },
+    where: {
+      id: verificationExperimentId,
+      brandId,
+      status: "VERIFYING",
+      verificationLeaseToken,
+      verificationLeaseExpiresAt: { gt: now },
+    },
     select: {
-      status: true,
       actionRevision: true,
-      verificationLeaseToken: true,
-      verificationLeaseExpiresAt: true,
       baselineScan: {
         select: {
           id: true,
@@ -91,17 +107,7 @@ async function loadVerificationBaselineConfig(
       },
     },
   });
-  if (!verificationExperiment) throw new Error("验证实验不存在或不属于当前品牌");
-  if (verificationExperiment.status !== "VERIFYING") {
-    throw new Error("只有验证中的实验可以创建复扫");
-  }
-  if (
-    !verificationExperiment.verificationLeaseToken
-    || !verificationExperiment.verificationLeaseExpiresAt
-    || verificationExperiment.verificationLeaseExpiresAt <= new Date()
-  ) {
-    throw new Error("验证实验没有有效执行权，请重新发起验证");
-  }
+  if (!verificationExperiment) throw new Error("验证实验执行权不匹配或已过期");
   if (
     verificationExperiment.baselineScan.brandId !== brandId
     || verificationExperiment.baselineScan.status !== "COMPLETED"
@@ -127,12 +133,70 @@ async function loadVerificationBaselineConfig(
   if (!providerIds.length) throw new Error("基线扫描缺少 AI 平台");
 
   return {
+    baselineScanId: verificationExperiment.baselineScan.id,
     promptVersionIds,
     providerIds,
     repeatCount: verificationExperiment.baselineScan.repeatCount,
     actionRevision: verificationExperiment.actionRevision,
-    verificationAttemptToken: verificationExperiment.verificationLeaseToken,
+    verificationAttemptToken: verificationLeaseToken,
   };
+}
+
+async function lockVerificationScanCreation(
+  tx: Prisma.TransactionClient,
+  verificationExperimentId: string,
+  brandId: string,
+  verificationLeaseToken: string,
+  expected: VerificationBaselineConfig,
+) {
+  const now = new Date();
+  const rows = await tx.$queryRaw<LockedVerificationBaselineRow[]>`
+    SELECT
+      baseline."id" AS "baselineScanId",
+      baseline."status"::text AS "baselineStatus",
+      baseline."providerIds" AS "providerIds",
+      baseline."promptVersionIds" AS "promptVersionIds",
+      baseline."repeatCount" AS "repeatCount"
+    FROM "OptimizationExperiment" AS experiment
+    JOIN "Scan" AS baseline
+      ON baseline."id" = experiment."baselineScanId"
+      AND baseline."brandId" = experiment."brandId"
+    WHERE experiment."id" = ${verificationExperimentId}
+      AND experiment."brandId" = ${brandId}
+      AND experiment."status" = 'VERIFYING'
+      AND experiment."verificationLeaseToken" = ${verificationLeaseToken}
+      AND experiment."verificationLeaseExpiresAt" > ${now}
+      AND experiment."actionRevision" = ${expected.actionRevision}
+      AND experiment."baselineScanId" = ${expected.baselineScanId}
+    FOR UPDATE OF experiment, baseline
+  `;
+  const baseline = rows[0];
+  if (!baseline) throw new Error("验证实验执行权不匹配或已过期");
+  if (baseline.baselineStatus !== "COMPLETED") {
+    throw new Error("验证实验的基线扫描必须已完成且属于当前品牌");
+  }
+
+  let promptVersionIds = asUniqueStringArray(baseline.promptVersionIds);
+  if (!promptVersionIds.length) {
+    const historicalObservations = await tx.observation.findMany({
+      where: { scanId: baseline.baselineScanId },
+      select: { promptVersionId: true },
+      orderBy: { createdAt: "asc" },
+    });
+    promptVersionIds = [...new Set(
+      historicalObservations.map((item) => item.promptVersionId),
+    )];
+  }
+  if (!scanExecutionConfigMatches(
+    {
+      promptVersionIds,
+      providerIds: baseline.providerIds,
+      repeatCount: baseline.repeatCount,
+    },
+    expected,
+  )) {
+    throw new Error("验证扫描必须完整复用基线配置");
+  }
 }
 
 export function calculateRepeatConsistency(samples: RepeatConsistencySample[]) {
@@ -158,6 +222,12 @@ export async function createScanForUser(
   platformIds: string[],
   options: CreateScanOptions = {},
 ) {
+  if (
+    (options.verificationExperimentId && !options.verificationLeaseToken)
+    || (!options.verificationExperimentId && options.verificationLeaseToken)
+  ) {
+    throw new Error("验证实验执行权不匹配或已过期");
+  }
   const repeatCount = options.repeatCount ?? 1;
   if (!Number.isInteger(repeatCount) || repeatCount < 1 || repeatCount > 3) {
     throw new Error("重复采样次数必须是 1 到 3 之间的整数");
@@ -187,7 +257,11 @@ export async function createScanForUser(
   if (dataModes.size > 1) throw new Error("一次扫描不能混合真实与模拟 AI 平台");
   const dataMode = [...dataModes][0];
   const verificationBaselineConfig = options.verificationExperimentId
-    ? await loadVerificationBaselineConfig(options.verificationExperimentId, brandId)
+    ? await loadVerificationBaselineConfig(
+      options.verificationExperimentId,
+      brandId,
+      options.verificationLeaseToken as string,
+    )
     : null;
   if (verificationBaselineConfig && options.promptVersionIds === undefined) {
     throw new Error("验证扫描必须完整复用基线配置");
@@ -217,6 +291,19 @@ export async function createScanForUser(
   if (!requestedCount) throw new Error("品牌没有可扫描的问题");
 
   return db.$transaction(async (tx) => {
+    if (
+      verificationBaselineConfig
+      && options.verificationExperimentId
+      && options.verificationLeaseToken
+    ) {
+      await lockVerificationScanCreation(
+        tx,
+        options.verificationExperimentId,
+        brandId,
+        options.verificationLeaseToken,
+        verificationBaselineConfig,
+      );
+    }
     const quota = await tx.quotaAccount.findUnique({ where: { userId } });
     if (!quota || quota.balance < requestedCount) throw new Error(`额度不足，本次需要 ${requestedCount} 次`);
     const scan = await tx.scan.create({

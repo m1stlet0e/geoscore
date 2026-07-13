@@ -191,6 +191,16 @@ export async function publishExperimentForUser(
       },
     });
     if (updated.count !== 1) {
+      const concurrentCurrent = await tx.optimizationExperiment.findUniqueOrThrow({
+        where: { id: currentExperiment.id },
+      });
+      if (
+        concurrentCurrent.status === "ACTIVE"
+        && concurrentCurrent.actionPlan === actionPlan
+        && concurrentCurrent.targetUrl === effectiveTargetUrl
+      ) {
+        return concurrentCurrent;
+      }
       throw new ExperimentServiceError("当前实验状态不能发布", "CONFLICT");
     }
     return tx.optimizationExperiment.findUniqueOrThrow({
@@ -327,33 +337,67 @@ export async function verifyExperimentForUser(
   }
 
   const verificationLeaseToken = randomUUID();
-  const claimed = await db.optimizationExperiment.updateMany({
-    where: {
-      id: initialExperiment.id,
-      OR: [
-        { status: "ACTIVE" },
-        {
+  const initialActionRevision = initialExperiment.actionRevision;
+  const claimedFromActive = initialExperiment.status === "ACTIVE";
+  const claimData = {
+    status: "VERIFYING" as const,
+    verificationLeaseToken,
+    verificationLeaseExpiresAt: nextExperimentLeaseExpiry(),
+  };
+  const claimed = claimedFromActive
+    ? await db.optimizationExperiment.updateMany({
+        where: {
+          id: initialExperiment.id,
+          status: "ACTIVE",
+          actionRevision: initialActionRevision,
+          ...(initialExperiment.baselineScan.dataMode === "REAL"
+            ? {
+                OR: [
+                  { nextCheckAt: null },
+                  { nextCheckAt: { lte: claimTime } },
+                ],
+              }
+            : {}),
+        },
+        data: claimData,
+      })
+    : await db.optimizationExperiment.updateMany({
+        where: {
+          id: initialExperiment.id,
           status: "VERIFYING",
+          actionRevision: initialActionRevision,
           OR: [
             { verificationLeaseToken: null },
             { verificationLeaseExpiresAt: null },
             { verificationLeaseExpiresAt: { lte: claimTime } },
           ],
         },
-      ],
-    },
-    data: {
-      status: "VERIFYING",
-      verificationLeaseToken,
-      verificationLeaseExpiresAt: nextExperimentLeaseExpiry(),
-    },
-  });
+        data: claimData,
+      });
   if (claimed.count !== 1) {
     const current = await db.optimizationExperiment.findFirst({
       where: { id: initialExperiment.id, brand: { ownerId: userId } },
     });
     if (current?.status === "VERIFIED" || current?.status === "INCONCLUSIVE") {
       return current;
+    }
+    if (
+      current
+      && (
+        current.actionRevision !== initialActionRevision
+        || (
+          claimedFromActive
+          && initialExperiment.baselineScan.dataMode === "REAL"
+          && current.status === "ACTIVE"
+          && current.nextCheckAt
+          && current.nextCheckAt > new Date()
+        )
+      )
+    ) {
+      throw new ExperimentServiceError(
+        "实验动作或复查时间已变化，请重新发起验证",
+        "CONFLICT",
+      );
     }
     throw new ExperimentServiceError("实验正在复扫验证", "CONFLICT");
   }
@@ -371,6 +415,20 @@ export async function verifyExperimentForUser(
       || experiment.status !== "VERIFYING"
     ) {
       throw new ExperimentLeaseLostError();
+    }
+    if (
+      experiment.actionRevision !== initialActionRevision
+      || (
+        claimedFromActive
+        && experiment.baselineScan.dataMode === "REAL"
+        && experiment.nextCheckAt
+        && experiment.nextCheckAt > new Date()
+      )
+    ) {
+      throw new ExperimentServiceError(
+        "实验动作或复查时间已变化，请重新发起验证",
+        "CONFLICT",
+      );
     }
     if (
       !experiment.baselineScan.scoreSnapshot
@@ -465,6 +523,7 @@ export async function verifyExperimentForUser(
           repeatCount: experiment.baselineScan.repeatCount,
           promptVersionIds,
           verificationExperimentId: experiment.id,
+          verificationLeaseToken,
         },
       );
       const completed = await executeScanForUser(userId, verificationScan.id);

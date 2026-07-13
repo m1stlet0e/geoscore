@@ -10,6 +10,7 @@ import {
 
 const userIds: string[] = [];
 afterEach(async () => {
+  vi.restoreAllMocks();
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
   await db.user.deleteMany({ where: { id: { in: userIds.splice(0) } } });
@@ -259,7 +260,8 @@ describe("扫描服务", () => {
     await expect(createScanForUser(user.id, brand.id, ["mock"], {
       promptVersionIds: [promptVersionId],
       verificationExperimentId: draft.id,
-    })).rejects.toThrow("只有验证中的实验可以创建复扫");
+      verificationLeaseToken: "draft-verification-owner",
+    })).rejects.toThrow("验证实验执行权不匹配或已过期");
 
     expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
       .toBe(50);
@@ -267,19 +269,72 @@ describe("扫描服务", () => {
   });
 
   it.each([
-    { label: "缺失", token: null, expiresAt: null },
     {
-      label: "过期",
-      token: "expired-verification-owner",
+      label: "缺失 owner token 参数",
+      databaseToken: "current-verification-owner",
+      passedToken: undefined,
+      expiresAt: new Date(Date.now() + 60_000),
+    },
+    {
+      label: "错误 owner token",
+      databaseToken: "current-verification-owner",
+      passedToken: "wrong-verification-owner",
+      expiresAt: new Date(Date.now() + 60_000),
+    },
+    {
+      label: "过期 owner token",
+      databaseToken: "expired-verification-owner",
+      passedToken: "expired-verification-owner",
       expiresAt: new Date(Date.now() - 60_000),
     },
-  ])("实验 $label lease 时拒绝创建验证扫描且不扣费", async ({ token, expiresAt }) => {
+  ])("实验 $label 时拒绝创建验证扫描且不扣费", async ({
+    databaseToken,
+    passedToken,
+    expiresAt,
+  }) => {
     const fixture = await createVerifyingExperimentFixture();
     await db.optimizationExperiment.update({
       where: { id: fixture.experiment.id },
       data: {
-        verificationLeaseToken: token,
+        verificationLeaseToken: databaseToken,
         verificationLeaseExpiresAt: expiresAt,
+      },
+    });
+    const balanceBefore = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: fixture.user.id },
+    })).balance;
+
+    const options = {
+      repeatCount: fixture.baselineScan.repeatCount,
+      promptVersionIds: fixture.promptVersionIds,
+      verificationExperimentId: fixture.experiment.id,
+      verificationLeaseToken: passedToken,
+      env: { AI_PROVIDER: "mock" },
+    } as Parameters<typeof createScanForUser>[3] & {
+      verificationLeaseToken?: string;
+    };
+
+    await expect(createScanForUser(
+      fixture.user.id,
+      fixture.brand.id,
+      fixture.baselineScan.providerIds as string[],
+      options,
+    )).rejects.toThrow("验证实验执行权不匹配或已过期");
+
+    expect(await db.scan.count({ where: { brandId: fixture.brand.id } })).toBe(1);
+    expect((await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: fixture.user.id },
+    })).balance).toBe(balanceBefore);
+  });
+
+  it("旧 owner A 在 B 接管后不能借用 B 的 lease 创建扫描或扣费", async () => {
+    const fixture = await createVerifyingExperimentFixture();
+    const tokenA = fixture.experiment.verificationLeaseToken!;
+    await db.optimizationExperiment.update({
+      where: { id: fixture.experiment.id },
+      data: {
+        verificationLeaseToken: "verification-owner-b",
+        verificationLeaseExpiresAt: new Date(Date.now() + 60_000),
       },
     });
     const balanceBefore = (await db.quotaAccount.findUniqueOrThrow({
@@ -294,14 +349,104 @@ describe("扫描服务", () => {
         repeatCount: fixture.baselineScan.repeatCount,
         promptVersionIds: fixture.promptVersionIds,
         verificationExperimentId: fixture.experiment.id,
+        verificationLeaseToken: tokenA,
         env: { AI_PROVIDER: "mock" },
-      },
-    )).rejects.toThrow("验证实验没有有效执行权，请重新发起验证");
+      } as Parameters<typeof createScanForUser>[3] & { verificationLeaseToken: string },
+    )).rejects.toThrow("验证实验执行权不匹配或已过期");
 
     expect(await db.scan.count({ where: { brandId: fixture.brand.id } })).toBe(1);
     expect((await db.quotaAccount.findUniqueOrThrow({
       where: { userId: fixture.user.id },
     })).balance).toBe(balanceBefore);
+  });
+
+  it("外层校验后 owner 被接管时事务内再次拒绝且不创建、不扣费", async () => {
+    const fixture = await createVerifyingExperimentFixture();
+    const tokenA = fixture.experiment.verificationLeaseToken!;
+    const delegate = db.optimizationExperiment as unknown as {
+      findFirst: (args: unknown) => Promise<unknown>;
+    };
+    const originalFindFirst = delegate.findFirst.bind(delegate);
+    vi.spyOn(delegate, "findFirst").mockImplementationOnce(async (args) => {
+      const staleOwner = await originalFindFirst(args);
+      await db.optimizationExperiment.update({
+        where: { id: fixture.experiment.id },
+        data: {
+          verificationLeaseToken: "verification-owner-b-after-read",
+          verificationLeaseExpiresAt: new Date(Date.now() + 60_000),
+        },
+      });
+      return staleOwner;
+    });
+    const balanceBefore = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: fixture.user.id },
+    })).balance;
+
+    await expect(createScanForUser(
+      fixture.user.id,
+      fixture.brand.id,
+      fixture.baselineScan.providerIds as string[],
+      {
+        repeatCount: fixture.baselineScan.repeatCount,
+        promptVersionIds: fixture.promptVersionIds,
+        verificationExperimentId: fixture.experiment.id,
+        verificationLeaseToken: tokenA,
+        env: { AI_PROVIDER: "mock" },
+      } as Parameters<typeof createScanForUser>[3] & { verificationLeaseToken: string },
+    )).rejects.toThrow("验证实验执行权不匹配或已过期");
+
+    expect(await db.scan.count({ where: { brandId: fixture.brand.id } })).toBe(1);
+    expect((await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: fixture.user.id },
+    })).balance).toBe(balanceBefore);
+  });
+
+  it("A/B 并发看到无候选时只有当前 owner B 能创建一条扫描并扣一次", async () => {
+    const fixture = await createVerifyingExperimentFixture();
+    const tokenA = fixture.experiment.verificationLeaseToken!;
+    const tokenB = "concurrent-verification-owner-b";
+    await db.optimizationExperiment.update({
+      where: { id: fixture.experiment.id },
+      data: {
+        verificationLeaseToken: tokenB,
+        verificationLeaseExpiresAt: new Date(Date.now() + 60_000),
+      },
+    });
+    const balanceBefore = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: fixture.user.id },
+    })).balance;
+    const createWithToken = (verificationLeaseToken: string) => createScanForUser(
+      fixture.user.id,
+      fixture.brand.id,
+      fixture.baselineScan.providerIds as string[],
+      {
+        repeatCount: fixture.baselineScan.repeatCount,
+        promptVersionIds: fixture.promptVersionIds,
+        verificationExperimentId: fixture.experiment.id,
+        verificationLeaseToken,
+        env: { AI_PROVIDER: "mock" },
+      } as Parameters<typeof createScanForUser>[3] & { verificationLeaseToken: string },
+    );
+
+    const results = await Promise.allSettled([
+      createWithToken(tokenA),
+      createWithToken(tokenB),
+    ]);
+
+    expect(results.filter((item) => item.status === "fulfilled")).toHaveLength(1);
+    expect(results.filter((item) => item.status === "rejected")).toHaveLength(1);
+    expect(await db.scan.count({ where: { brandId: fixture.brand.id } })).toBe(2);
+    expect((await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: fixture.user.id },
+    })).balance).toBe(balanceBefore - fixture.baselineScan.requestedCount);
+    expect(await db.quotaLedger.count({
+      where: {
+        userId: fixture.user.id,
+        referenceType: "SCAN",
+        type: "CONSUME",
+        referenceId: { not: fixture.baselineScan.id },
+      },
+    })).toBe(1);
   });
 
   it.each([
@@ -320,6 +465,7 @@ describe("扫描服务", () => {
       repeatCount: fixture.baselineScan.repeatCount,
       promptVersionIds: fixture.promptVersionIds,
       verificationExperimentId: fixture.experiment.id,
+      verificationLeaseToken: fixture.experiment.verificationLeaseToken!,
     };
     let platformIds = fixture.baselineScan.providerIds as string[];
 
@@ -375,6 +521,7 @@ describe("扫描服务", () => {
         repeatCount: fixture.baselineScan.repeatCount,
         promptVersionIds: fixture.promptVersionIds,
         verificationExperimentId: fixture.experiment.id,
+        verificationLeaseToken: fixture.experiment.verificationLeaseToken!,
         env: { AI_PROVIDER: "mock" },
       },
     )).rejects.toThrow("验证实验的基线扫描必须已完成且属于当前品牌");
@@ -399,6 +546,7 @@ describe("扫描服务", () => {
         repeatCount: fixture.baselineScan.repeatCount,
         promptVersionIds: [...fixture.promptVersionIds].reverse(),
         verificationExperimentId: fixture.experiment.id,
+        verificationLeaseToken: fixture.experiment.verificationLeaseToken!,
         env: { AI_PROVIDER: "mock" },
       },
     );
@@ -426,6 +574,7 @@ describe("扫描服务", () => {
         repeatCount: fixture.baselineScan.repeatCount,
         promptVersionIds: fixture.promptVersionIds,
         verificationExperimentId: fixture.experiment.id,
+        verificationLeaseToken: fixture.experiment.verificationLeaseToken!,
         env: { AI_PROVIDER: "mock" },
       },
     );
