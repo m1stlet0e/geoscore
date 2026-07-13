@@ -115,7 +115,6 @@ export async function executeScanForUser(userId: string, scanId: string) {
   const scoring: ParsedObservation[] = [];
   const repeatSignals: RepeatConsistencySample[] = [];
   const opportunitySamples: OpportunitySample[] = [];
-  const criticalEvidence: string[] = [];
   try {
     for (const prompt of scan.brand.prompts) {
       const version = prompt.versions[0];
@@ -131,7 +130,6 @@ export async function executeScanForUser(userId: string, scanId: string) {
           const target = answer.mentions.find((item) => item.isTarget);
           const competitorMentions = answer.mentions.filter((item) => !item.isTarget);
           const officialCitation = answer.citations.find((item) => item.isOfficial);
-          if (/已倒闭|停止运营|诈骗|违法|被查处/.test(answer.rawResponse)) criticalEvidence.push(answer.rawResponse);
           await db.observation.create({
             data: {
               scanId: scan.id, promptVersionId: version.id, platformId: answer.platformId, modelId: answer.modelId,
@@ -173,29 +171,36 @@ export async function executeScanForUser(userId: string, scanId: string) {
         }
       }
     }
+    const opportunities = buildOpportunities(opportunitySamples);
+    const riskOpportunities = opportunities.filter(
+      (opportunity) => opportunity.type === "BRAND_RISK",
+    );
     const components = calculateComponents(scoring);
     const confidence = calculateConfidence({
       sampleCount: scoring.length,
       platformCount: new Set(scoring.map((item) => item.platformId)).size,
       repeatConsistency: calculateRepeatConsistency(repeatSignals),
     });
-    const total = calculateGeoScore({ ...components, confidenceScore: confidence.score, hasCriticalRisk: criticalEvidence.length > 0 });
+    const total = calculateGeoScore({
+      ...components,
+      confidenceScore: confidence.score,
+      hasCriticalRisk: riskOpportunities.length > 0,
+    });
     await db.scoreSnapshot.create({
       data: {
         scanId: scan.id, brandId: scan.brandId, algorithmVersion: SCORING_VERSION, score: total.score,
         ...components, confidenceScore: confidence.score, isProvisional: confidence.isProvisional, riskLevel: total.riskLevel,
       },
     });
-    if (criticalEvidence.length) {
+    if (riskOpportunities.length) {
       await db.riskFinding.create({
         data: {
           brandId: scan.brandId, scanId: scan.id, level: "CRITICAL", title: "AI 回答包含高风险品牌描述",
           description: "监测回答中出现倒闭、违法或诈骗等可能严重影响品牌信任的描述，请尽快核查事实并处理信息源。",
-          evidence: criticalEvidence.slice(0, 3).join("\n\n"),
+          evidence: riskOpportunities.slice(0, 3).map((opportunity) => opportunity.evidence).join("\n\n"),
         },
       });
     }
-    const opportunities = buildOpportunities(opportunitySamples);
     if (opportunities.length) {
       await db.opportunity.createMany({
         data: opportunities.map((opportunity) => ({

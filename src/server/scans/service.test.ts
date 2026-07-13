@@ -156,6 +156,29 @@ describe("扫描服务", () => {
     expect((await db.scan.findUniqueOrThrow({ where: { id: scan.id } })).status).toBe("FAILED");
   });
 
+  it("同一品牌连续扫描的建议按 scanId 严格隔离", async () => {
+    const user = await createReadyUser(50);
+    const brand = await createBrandForUser(user.id, {
+      name: "建议隔离品牌", website: "recommendation-isolation.example.cn", industry: "企业服务", product: "监测软件", targetAudience: "品牌团队", aliases: [], competitors: [],
+    });
+
+    const firstScan = await createScanForUser(user.id, brand.id, ["mock"]);
+    await executeScanForUser(user.id, firstScan.id);
+    const secondScan = await createScanForUser(user.id, brand.id, ["mock"]);
+    await executeScanForUser(user.id, secondScan.id);
+
+    const [firstRecommendations, secondRecommendations] = await Promise.all([
+      db.recommendation.findMany({ where: { brandId: brand.id, scanId: firstScan.id } }),
+      db.recommendation.findMany({ where: { brandId: brand.id, scanId: secondScan.id } }),
+    ]);
+    expect(firstRecommendations.length).toBeGreaterThan(0);
+    expect(secondRecommendations.length).toBeGreaterThan(0);
+    expect(firstRecommendations.every((item) => item.scanId === firstScan.id)).toBe(true);
+    expect(secondRecommendations.every((item) => item.scanId === secondScan.id)).toBe(true);
+    const firstIds = new Set(firstRecommendations.map((item) => item.id));
+    expect(secondRecommendations.some((item) => firstIds.has(item.id))).toBe(false);
+  });
+
   it("并发创建扫描时额度不会被超扣", async () => {
     const user = await createReadyUser();
     await db.quotaAccount.update({ where: { userId: user.id }, data: { balance: 20 } });

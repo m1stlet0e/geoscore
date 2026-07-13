@@ -34,7 +34,45 @@ export type BuiltOpportunity = {
   targetContentType: string;
 };
 
-const BRAND_RISK_PATTERN = /已倒闭|停止运营|诈骗|违法|被查处/;
+const BRAND_RISK_SOURCE = "已倒闭|停止运营|诈骗|违法|被查处";
+const CLAUSE_SEPARATOR = /(?<=[。！？!?；;，,\n])/u;
+
+function mentionIndexes(text: string, name: string) {
+  const indexes: number[] = [];
+  const normalizedText = text.toLocaleLowerCase();
+  const normalizedName = name.trim().toLocaleLowerCase();
+  if (!normalizedName) return indexes;
+  let index = normalizedText.indexOf(normalizedName);
+  while (index >= 0) {
+    indexes.push(index);
+    index = normalizedText.indexOf(normalizedName, index + normalizedName.length);
+  }
+  return indexes;
+}
+
+function nearestDistance(index: number, indexes: number[]) {
+  return indexes.length
+    ? Math.min(...indexes.map((mentionIndex) => Math.abs(index - mentionIndex)))
+    : Number.POSITIVE_INFINITY;
+}
+
+function findTargetBrandRiskEvidence(sample: OpportunitySample) {
+  const evidence: string[] = [];
+  for (const rawClause of sample.rawResponse.split(CLAUSE_SEPARATOR)) {
+    const clause = rawClause.trim();
+    const targetIndexes = mentionIndexes(clause, sample.brandName);
+    if (!targetIndexes.length) continue;
+    const competitorIndexes = sample.competitorNames.flatMap((name) => mentionIndexes(clause, name));
+    const matches = [...clause.matchAll(new RegExp(BRAND_RISK_SOURCE, "g"))];
+    if (matches.some((match) => {
+      const riskIndex = match.index;
+      return nearestDistance(riskIndex, targetIndexes) <= nearestDistance(riskIndex, competitorIndexes);
+    })) {
+      evidence.push(clause);
+    }
+  }
+  return evidence;
+}
 
 function groupSamples(samples: OpportunitySample[]) {
   const groups = new Map<string, OpportunitySample[]>();
@@ -184,10 +222,12 @@ export function buildOpportunities(samples: OpportunitySample[]): BuiltOpportuni
       }
     }
 
-    const riskSamples = group.filter((sample) => BRAND_RISK_PATTERN.test(sample.rawResponse));
-    if (riskSamples.length) {
+    const targetRiskEvidence = [...new Set(
+      group.flatMap((sample) => findTargetBrandRiskEvidence(sample)),
+    )];
+    if (targetRiskEvidence.length) {
       const riskPhrases = [...new Set(
-        riskSamples.flatMap((sample) => sample.rawResponse.match(new RegExp(BRAND_RISK_PATTERN, "g")) ?? []),
+        targetRiskEvidence.flatMap((evidence) => evidence.match(new RegExp(BRAND_RISK_SOURCE, "g")) ?? []),
       )];
       const targetContentType = "品牌事实澄清页";
       opportunities.push({
@@ -199,7 +239,7 @@ export function buildOpportunities(samples: OpportunitySample[]): BuiltOpportuni
         ),
         title: `问题“${first.promptText}”出现${first.brandName}高风险描述`,
         summary: `${first.platformId} 的回答出现“${riskPhrases.join("、")}”等高风险表述，需要立即核查并澄清。`,
-        evidence: truncateEvidence(`问题“${first.promptText}”的风险证据：${riskSamples.map((sample) => sample.rawResponse).join("；")}`),
+        evidence: truncateEvidence(`问题“${first.promptText}”的风险证据：${targetRiskEvidence.join("；")}`),
         recommendedAction: `立即核查关于${first.brandName}的高风险表述，并制作${targetContentType}，针对问题“${first.promptText}”发布可验证的运营状态、资质与官方声明。`,
         targetContentType,
       });

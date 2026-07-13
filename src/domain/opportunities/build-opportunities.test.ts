@@ -158,6 +158,23 @@ describe("问题级竞品抢位机会", () => {
     },
   );
 
+  it("风险词明确指向竞品时不误判目标品牌风险", () => {
+    const opportunities = buildOpportunities([
+      sample({
+        rawResponse: "GeoScore 是正常运营的候选方案；竞品甲因诈骗和违法已被查处。",
+        targetMentioned: true,
+        targetPosition: 1,
+        targetRecommendationStrength: 0.8,
+        competitorNames: ["竞品甲"],
+        competitorPositions: [2],
+        competitorRecommendationStrengths: [0.4],
+        hasOfficialCitation: true,
+      }),
+    ]);
+
+    expect(opportunities.some((item) => item.type === "BRAND_RISK")).toBe(false);
+  });
+
   it("购买和比较问题的机会优先级高于普通发现问题", () => {
     const shared = {
       promptWeight: 1,
