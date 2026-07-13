@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildDashboardGrowthSnapshot,
+  formatAiProviderLabel,
   groupScoreTrends,
   getScanRecoveryAction,
   selectBrandWorkOpportunities,
@@ -8,6 +9,12 @@ import {
 } from "./growth-data";
 
 describe("增长工作台纯数据规则", () => {
+  it("把内部 AI 平台 ID 映射为用户可读文案", () => {
+    expect(formatAiProviderLabel("mock")).toBe("模拟 AI");
+    expect(formatAiProviderLabel("deepseek")).toBe("DeepSeek");
+    expect(formatAiProviderLabel("private-model")).toBe("private-model");
+  });
+
   it("Dashboard 每个品牌只采用最新已完成扫描的 OPEN 机会，避免历史膨胀", () => {
     const snapshot = buildDashboardGrowthSnapshot([
       {

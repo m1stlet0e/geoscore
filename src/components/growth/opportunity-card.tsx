@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight, FlaskConical } from "lucide-react";
 import { ClientApiError, clientErrorMessage, readApiResponse } from "@/lib/client-api";
+import { formatAiProviderLabel } from "@/lib/growth-data";
 
 export type OpportunityCardData = {
   id: string;
@@ -26,11 +27,6 @@ const opportunityLabels = {
   CITATION_GAP: "引用缺口",
   BRAND_RISK: "品牌风险",
 } as const;
-
-const platformLabels: Record<string, string> = {
-  deepseek: "DeepSeek",
-  mock: "模拟 AI",
-};
 
 export function OpportunityCard({ opportunity }: { opportunity: OpportunityCardData }) {
   const router = useRouter();
@@ -73,7 +69,7 @@ export function OpportunityCard({ opportunity }: { opportunity: OpportunityCardD
         </div>
         <div>
           <dt>数据源</dt>
-          <dd>{platformLabels[opportunity.platformId] ?? opportunity.platformId}</dd>
+          <dd>{formatAiProviderLabel(opportunity.platformId)}</dd>
         </div>
         <div>
           <dt>目标内容</dt>

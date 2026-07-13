@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -50,6 +52,25 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("扫描配置工作台", () => {
+  it("原生 Provider checkbox 覆盖选项卡接收指针，并保留键盘焦点入口", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => jsonResponse({ providers })));
+    const user = userEvent.setup();
+    render(<StartScanButton brandId="brand-1" activePromptCount={5} quotaBalance={100} />);
+
+    const checkbox = await screen.findByRole("checkbox", { name: /模拟 AI.*模拟演示数据/ });
+    expect(checkbox.closest("label")).toHaveClass("provider-option");
+    await user.tab();
+    expect(checkbox).toHaveFocus();
+
+    const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf8");
+    const inputRule = css.match(/\.provider-option input\s*\{([^}]*)\}/)?.[1] ?? "";
+    expect(inputRule).toMatch(/inset:\s*0/);
+    expect(inputRule).toMatch(/width:\s*100%/);
+    expect(inputRule).toMatch(/height:\s*100%/);
+    expect(inputRule).not.toMatch(/pointer-events:\s*none/);
+    expect(css).toMatch(/\.provider-option:has\(input:focus-visible\)/);
+  });
+
   it("加载 Provider，可用性和原因不只依赖颜色表达", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => jsonResponse({ providers })));
 

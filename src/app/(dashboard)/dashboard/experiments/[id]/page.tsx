@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { formatAiProviderLabel } from "@/lib/growth-data";
 import { ExperimentPanel } from "@/components/growth/experiment-panel";
 
 const opportunityLabels = {
@@ -50,7 +51,9 @@ export default async function ExperimentDetailPage({ params }: { params: Promise
         </div>
         <div>
           <span>平台与优先级</span>
-          <p>{experiment.opportunity.platformId} · {experiment.opportunity.priority}</p>
+          <p>
+            {formatAiProviderLabel(experiment.opportunity.platformId)} · 优先级 {experiment.opportunity.priority}
+          </p>
         </div>
         <div>
           <span>基线证据</span>

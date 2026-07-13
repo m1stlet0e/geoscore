@@ -2,6 +2,15 @@ type DataMode = "REAL" | "SIMULATED";
 type ScanStatus = "PENDING" | "RUNNING" | "COMPLETED" | "FAILED";
 type OpportunityStatus = "OPEN" | "IN_PROGRESS" | "COMPLETED" | "DISMISSED";
 
+const aiProviderLabels: Record<string, string> = {
+  deepseek: "DeepSeek",
+  mock: "模拟 AI",
+};
+
+export function formatAiProviderLabel(providerId: string) {
+  return aiProviderLabels[providerId] ?? providerId;
+}
+
 type DashboardOpportunity = {
   id: string;
   status: OpportunityStatus;

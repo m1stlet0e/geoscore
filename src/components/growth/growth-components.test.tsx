@@ -119,6 +119,13 @@ describe("机会卡片", () => {
     expect(screen.getByText(opportunity.recommendedAction)).toBeInTheDocument();
   });
 
+  it("模拟平台只展示用户文案，不暴露内部 mock ID", () => {
+    render(<OpportunityCard opportunity={{ ...opportunity, platformId: "mock" }} />);
+
+    expect(screen.getByText("模拟 AI")).toBeInTheDocument();
+    expect(screen.queryByText("mock")).not.toBeInTheDocument();
+  });
+
   it("创建实验时显示进行状态并跳转详情", async () => {
     let resolveRequest: ((response: Response) => void) | undefined;
     const fetchMock = vi.fn(() => new Promise<Response>((resolve) => {
