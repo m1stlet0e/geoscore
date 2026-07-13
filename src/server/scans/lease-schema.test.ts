@@ -33,6 +33,7 @@ describe("扫描与实验 lease 数据结构", () => {
       "executionLeaseExpiresAt",
       "verificationAttemptToken",
       "verificationActionRevision",
+      "creationKey",
     ]));
     expect([...(namesByTable.get("OptimizationExperiment") ?? [])]).toEqual(expect.arrayContaining([
       "verificationLeaseToken",
@@ -55,6 +56,19 @@ describe("扫描与实验 lease 数据结构", () => {
     expect(indexes.map((item) => item.indexname).sort()).toEqual([
       "OptimizationExperiment_status_verificationLeaseExpiresAt_idx",
       "Scan_status_executionLeaseExpiresAt_idx",
+    ]);
+  });
+
+  it("为扫描创建幂等键建立品牌内唯一索引", async () => {
+    const indexes = await db.$queryRaw<IndexRow[]>`
+      SELECT indexname
+      FROM pg_indexes
+      WHERE schemaname = 'public'
+        AND indexname = 'Scan_brandId_creationKey_key'
+    `;
+
+    expect(indexes.map((item) => item.indexname)).toEqual([
+      "Scan_brandId_creationKey_key",
     ]);
   });
 

@@ -235,6 +235,7 @@ export const ScanScalarFieldEnum = {
   requestedCount: 'requestedCount',
   repeatCount: 'repeatCount',
   dataMode: 'dataMode',
+  creationKey: 'creationKey',
   verificationExperimentId: 'verificationExperimentId',
   executionLeaseToken: 'executionLeaseToken',
   executionLeaseExpiresAt: 'executionLeaseExpiresAt',

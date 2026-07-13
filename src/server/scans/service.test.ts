@@ -624,6 +624,100 @@ describe("扫描服务", () => {
     expect(completed.scoreSnapshot?.confidenceScore).toBe(50);
   });
 
+  it("创建响应丢失式二次调用复用同一扫描、单流水且只扣一次", async () => {
+    const user = await createReadyUser(100);
+    const brand = await createBrandForUser(user.id, {
+      name: `幂等创建品牌-${randomUUID()}`,
+      website: "idempotent-create.example.cn",
+      industry: "企业服务",
+      product: "监测软件",
+      targetAudience: "品牌团队",
+      aliases: [],
+      competitors: [],
+    });
+    const creationKey = randomUUID();
+    const options = {
+      repeatCount: 1,
+      env: { AI_PROVIDER: "mock" },
+      creationKey,
+    };
+
+    const first = await createScanForUser(user.id, brand.id, ["mock"], options);
+    const second = await createScanForUser(user.id, brand.id, ["mock"], options);
+
+    expect(second.id).toBe(first.id);
+    expect(await db.scan.count({ where: { brandId: brand.id, creationKey } })).toBe(1);
+    expect(await db.quotaLedger.count({
+      where: { referenceType: "SCAN", referenceId: first.id, type: "CONSUME" },
+    })).toBe(1);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(100 - first.requestedCount);
+  });
+
+  it("并发同 creationKey 由唯一约束收敛为一次扫描和一次扣费", async () => {
+    const user = await createReadyUser(100);
+    const brand = await createBrandForUser(user.id, {
+      name: `并发幂等品牌-${randomUUID()}`,
+      website: "concurrent-idempotent.example.cn",
+      industry: "企业服务",
+      product: "监测软件",
+      targetAudience: "品牌团队",
+      aliases: [],
+      competitors: [],
+    });
+    const creationKey = randomUUID();
+    const create = () => createScanForUser(user.id, brand.id, ["mock"], {
+      repeatCount: 1,
+      env: { AI_PROVIDER: "mock" },
+      creationKey,
+    });
+
+    const [first, second] = await Promise.all([create(), create()]);
+
+    expect(second.id).toBe(first.id);
+    expect(await db.scan.count({ where: { brandId: brand.id, creationKey } })).toBe(1);
+    expect(await db.quotaLedger.count({
+      where: { referenceType: "SCAN", referenceId: first.id, type: "CONSUME" },
+    })).toBe(1);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(100 - first.requestedCount);
+  });
+
+  it("同 creationKey 改变扫描配置时拒绝且不产生第二次副作用", async () => {
+    const user = await createReadyUser(100);
+    const brand = await createBrandForUser(user.id, {
+      name: `幂等冲突品牌-${randomUUID()}`,
+      website: "idempotent-conflict.example.cn",
+      industry: "企业服务",
+      product: "监测软件",
+      targetAudience: "品牌团队",
+      aliases: [],
+      competitors: [],
+    });
+    const creationKey = randomUUID();
+    const first = await createScanForUser(user.id, brand.id, ["mock"], {
+      repeatCount: 1,
+      env: { AI_PROVIDER: "mock" },
+      creationKey,
+    });
+    const balanceAfterFirst = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: user.id },
+    })).balance;
+    const ledgerCountAfterFirst = await db.quotaLedger.count({ where: { userId: user.id } });
+
+    await expect(createScanForUser(user.id, brand.id, ["mock"], {
+      repeatCount: 2,
+      env: { AI_PROVIDER: "mock" },
+      creationKey,
+    })).rejects.toThrow("幂等键已用于不同扫描配置");
+
+    expect(await db.scan.count({ where: { brandId: brand.id, creationKey } })).toBe(1);
+    expect(await db.quotaLedger.count({ where: { userId: user.id } })).toBe(ledgerCountAfterFirst);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(balanceAfterFirst);
+    expect(first.repeatCount).toBe(1);
+  });
+
   it.each([0, 4, 1.5])("repeatCount=%s 非法时在扣额度前拒绝", async (repeatCount) => {
     const user = await createReadyUser(50);
     const brand = await createBrandForUser(user.id, {
@@ -725,6 +819,83 @@ describe("扫描服务", () => {
       where: { referenceId: scan.id, type: "REFUND" },
     })).toBe(1);
     expect((await db.scan.findUniqueOrThrow({ where: { id: scan.id } })).status).toBe("FAILED");
+  });
+
+  it("退款流水写入失败时失败状态与余额一起回滚，lease 过期后可再次结算", async () => {
+    const user = await createReadyUser();
+    const brand = await createBrandForUser(user.id, {
+      name: `退款原子性品牌-${randomUUID()}`,
+      website: "atomic-refund.example.cn",
+      industry: "企业服务",
+      product: "监测软件",
+      targetAudience: "品牌团队",
+      aliases: [],
+      competitors: [],
+    });
+    const scan = await createScanForUser(user.id, brand.id, ["mock"]);
+    await db.scan.update({ where: { id: scan.id }, data: { providerIds: ["unknown"] } });
+    const balanceAfterDebit = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: user.id },
+    })).balance;
+    const suffix = randomUUID().replaceAll("-", "");
+    const functionName = `fail_refund_${suffix}`;
+    const triggerName = `fail_refund_trigger_${suffix}`;
+    const safeScanId = scan.id.replaceAll("'", "''");
+    let functionCreated = false;
+    let triggerCreated = false;
+
+    try {
+      await db.$executeRawUnsafe(`
+        CREATE FUNCTION "${functionName}"() RETURNS trigger
+        LANGUAGE plpgsql AS $$
+        BEGIN
+          IF NEW."referenceId" = '${safeScanId}' AND NEW."type" = 'REFUND' THEN
+            RAISE EXCEPTION 'injected refund failure';
+          END IF;
+          RETURN NEW;
+        END;
+        $$
+      `);
+      functionCreated = true;
+      await db.$executeRawUnsafe(`
+        CREATE TRIGGER "${triggerName}"
+        BEFORE INSERT ON "QuotaLedger"
+        FOR EACH ROW EXECUTE FUNCTION "${functionName}"()
+      `);
+      triggerCreated = true;
+
+      await expect(executeScanForUser(user.id, scan.id))
+        .rejects.toThrow("injected refund failure");
+
+      const rolledBack = await db.scan.findUniqueOrThrow({ where: { id: scan.id } });
+      expect(rolledBack.status).toBe("RUNNING");
+      expect(rolledBack.executionLeaseToken).not.toBeNull();
+      expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+        .toBe(balanceAfterDebit);
+      expect(await db.quotaLedger.count({
+        where: { referenceId: scan.id, type: "REFUND" },
+      })).toBe(0);
+    } finally {
+      if (triggerCreated) {
+        await db.$executeRawUnsafe(`DROP TRIGGER IF EXISTS "${triggerName}" ON "QuotaLedger"`);
+      }
+      if (functionCreated) {
+        await db.$executeRawUnsafe(`DROP FUNCTION IF EXISTS "${functionName}"()`);
+      }
+    }
+
+    await db.scan.update({
+      where: { id: scan.id },
+      data: { executionLeaseExpiresAt: new Date(Date.now() - 1_000) },
+    });
+    await expect(executeScanForUser(user.id, scan.id)).rejects.toThrow("未知 AI 平台");
+
+    expect((await db.scan.findUniqueOrThrow({ where: { id: scan.id } })).status).toBe("FAILED");
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(30);
+    expect(await db.quotaLedger.count({
+      where: { referenceId: scan.id, type: "REFUND" },
+    })).toBe(1);
   });
 
   it("最终产物任一写入失败时回滚同批业务产物", async () => {

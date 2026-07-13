@@ -242,6 +242,7 @@ model Scan {
   requestedCount             Int
   repeatCount                Int                      @default(1)
   dataMode                   ScanDataMode             @default(REAL)
+  creationKey                String?
   verificationExperimentId   String?
   executionLeaseToken        String?
   executionLeaseExpiresAt    DateTime?
@@ -262,6 +263,7 @@ model Scan {
   recommendations            Recommendation[]
 
   @@unique([id, brandId])
+  @@unique([brandId, creationKey])
   @@index([brandId, createdAt])
   @@index([verificationExperimentId])
   @@index([status, executionLeaseExpiresAt])

@@ -19,6 +19,7 @@ class ScanLeaseLostError extends Error {
 export type CreateScanOptions = {
   repeatCount?: number;
   env?: AiProviderEnvironment;
+  creationKey?: string;
   promptVersionIds?: string[];
   verificationExperimentId?: string;
   /** 仅供实验验证服务内部传递，HTTP 扫描接口不得接收。 */
@@ -68,6 +69,40 @@ function asUniqueStringArray(value: unknown) {
 function hasSameStringSet(left: string[], right: string[]) {
   return left.length === right.length
     && left.every((item) => right.includes(item));
+}
+
+type IdempotentScanConfig = {
+  providerIds: unknown;
+  promptVersionIds: unknown;
+  repeatCount: number;
+  verificationExperimentId: string | null;
+};
+
+function assertIdempotentScanConfig(
+  scan: IdempotentScanConfig,
+  platformIds: string[],
+  options: CreateScanOptions,
+) {
+  const sameProviders = hasSameStringSet(
+    asUniqueStringArray(scan.providerIds),
+    platformIds,
+  );
+  const sameRepeatCount = scan.repeatCount === (options.repeatCount ?? 1);
+  const sameVerificationExperiment = scan.verificationExperimentId
+    === (options.verificationExperimentId ?? null);
+  const samePromptVersions = options.promptVersionIds === undefined
+    || hasSameStringSet(
+      asUniqueStringArray(scan.promptVersionIds),
+      [...new Set(options.promptVersionIds.map((id) => id.trim()).filter(Boolean))],
+    );
+  if (
+    !sameProviders
+    || !sameRepeatCount
+    || !sameVerificationExperiment
+    || !samePromptVersions
+  ) {
+    throw new Error("幂等键已用于不同扫描配置");
+  }
 }
 
 export function scanExecutionConfigMatches(
@@ -235,6 +270,22 @@ export async function createScanForUser(
   if (new Set(platformIds).size !== platformIds.length) {
     throw new Error("AI 平台不能重复选择");
   }
+  const creationKey = options.creationKey?.trim();
+  if (
+    options.creationKey !== undefined
+    && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(creationKey ?? "")
+  ) {
+    throw new Error("扫描幂等键不正确");
+  }
+  if (creationKey) {
+    const existing = await db.scan.findFirst({
+      where: { brandId, creationKey, brand: { ownerId: userId } },
+    });
+    if (existing) {
+      assertIdempotentScanConfig(existing, platformIds, options);
+      return existing;
+    }
+  }
   const env = options.env ?? process.env;
   const brand = await db.brand.findFirst({
     where: { id: brandId, ownerId: userId },
@@ -290,59 +341,117 @@ export async function createScanForUser(
   const requestedCount = promptVersionIds.length * platformIds.length * repeatCount;
   if (!requestedCount) throw new Error("品牌没有可扫描的问题");
 
-  return db.$transaction(async (tx) => {
-    if (
-      verificationBaselineConfig
-      && options.verificationExperimentId
-      && options.verificationLeaseToken
-    ) {
-      await lockVerificationScanCreation(
-        tx,
-        options.verificationExperimentId,
-        brandId,
-        options.verificationLeaseToken,
-        verificationBaselineConfig,
-      );
+  try {
+    return await db.$transaction(async (tx) => {
+      if (creationKey) {
+        const existing = await tx.scan.findFirst({
+          where: { brandId, creationKey },
+        });
+        if (existing) {
+          assertIdempotentScanConfig(existing, platformIds, options);
+          return existing;
+        }
+      }
+      if (
+        verificationBaselineConfig
+        && options.verificationExperimentId
+        && options.verificationLeaseToken
+      ) {
+        await lockVerificationScanCreation(
+          tx,
+          options.verificationExperimentId,
+          brandId,
+          options.verificationLeaseToken,
+          verificationBaselineConfig,
+        );
+      }
+      const quota = await tx.quotaAccount.findUnique({ where: { userId } });
+      if (!quota || quota.balance < requestedCount) throw new Error(`额度不足，本次需要 ${requestedCount} 次`);
+      const scan = await tx.scan.create({
+        data: {
+          brandId,
+          providerIds: platformIds,
+          promptVersionIds,
+          requestedCount,
+          repeatCount,
+          dataMode,
+          creationKey,
+          verificationExperimentId: options.verificationExperimentId,
+          verificationActionRevision: verificationBaselineConfig?.actionRevision,
+          verificationAttemptToken: verificationBaselineConfig?.verificationAttemptToken,
+        },
+      });
+      const debited = await tx.quotaAccount.updateMany({
+        where: { userId, balance: { gte: requestedCount } },
+        data: { balance: { decrement: requestedCount } },
+      });
+      if (debited.count !== 1) throw new Error(`额度不足，本次需要 ${requestedCount} 次`);
+      const updated = await tx.quotaAccount.findUniqueOrThrow({ where: { userId } });
+      await tx.quotaLedger.create({
+        data: {
+          userId, type: "CONSUME", amount: -requestedCount, balanceAfter: updated.balance,
+          referenceType: "SCAN", referenceId: scan.id, idempotencyKey: `scan:${scan.id}:consume`,
+        },
+      });
+      return scan;
+    });
+  } catch (error) {
+    if (creationKey) {
+      const existing = await db.scan.findFirst({
+        where: { brandId, creationKey, brand: { ownerId: userId } },
+      });
+      if (existing) {
+        assertIdempotentScanConfig(existing, platformIds, options);
+        return existing;
+      }
     }
-    const quota = await tx.quotaAccount.findUnique({ where: { userId } });
-    if (!quota || quota.balance < requestedCount) throw new Error(`额度不足，本次需要 ${requestedCount} 次`);
-    const scan = await tx.scan.create({
-      data: {
-        brandId,
-        providerIds: platformIds,
-        promptVersionIds,
-        requestedCount,
-        repeatCount,
-        dataMode,
-        verificationExperimentId: options.verificationExperimentId,
-        verificationActionRevision: verificationBaselineConfig?.actionRevision,
-        verificationAttemptToken: verificationBaselineConfig?.verificationAttemptToken,
-      },
-    });
-    const debited = await tx.quotaAccount.updateMany({
-      where: { userId, balance: { gte: requestedCount } },
-      data: { balance: { decrement: requestedCount } },
-    });
-    if (debited.count !== 1) throw new Error(`额度不足，本次需要 ${requestedCount} 次`);
-    const updated = await tx.quotaAccount.findUniqueOrThrow({ where: { userId } });
-    await tx.quotaLedger.create({
-      data: {
-        userId, type: "CONSUME", amount: -requestedCount, balanceAfter: updated.balance,
-        referenceType: "SCAN", referenceId: scan.id, idempotencyKey: `scan:${scan.id}:consume`,
-      },
-    });
-    return scan;
-  });
+    throw error;
+  }
 }
 
-async function refundFailedScan(userId: string, scanId: string, amount: number) {
-  await db.$transaction(async (tx) => {
-    const existing = await tx.quotaLedger.findUnique({ where: { idempotencyKey: `scan:${scanId}:refund` } });
-    if (existing) return;
-    const updated = await tx.quotaAccount.update({ where: { userId }, data: { balance: { increment: amount } } });
-    await tx.quotaLedger.create({
-      data: { userId, type: "REFUND", amount, balanceAfter: updated.balance, referenceType: "SCAN", referenceId: scanId, idempotencyKey: `scan:${scanId}:refund` },
+async function settleFailedScan(input: {
+  userId: string;
+  scanId: string;
+  amount: number;
+  executionLeaseToken: string;
+  message: string;
+}) {
+  return db.$transaction(async (tx) => {
+    const failed = await tx.scan.updateMany({
+      where: {
+        id: input.scanId,
+        status: "RUNNING",
+        executionLeaseToken: input.executionLeaseToken,
+      },
+      data: {
+        status: "FAILED",
+        errorMessage: input.message,
+        completedAt: new Date(),
+        executionLeaseToken: null,
+        executionLeaseExpiresAt: null,
+      },
     });
+    if (failed.count !== 1) return false;
+    const existing = await tx.quotaLedger.findUnique({
+      where: { idempotencyKey: `scan:${input.scanId}:refund` },
+    });
+    if (existing) return true;
+    const updated = await tx.quotaAccount.update({
+      where: { userId: input.userId },
+      data: { balance: { increment: input.amount } },
+    });
+    await tx.quotaLedger.create({
+      data: {
+        userId: input.userId,
+        type: "REFUND",
+        amount: input.amount,
+        balanceAfter: updated.balance,
+        referenceType: "SCAN",
+        referenceId: input.scanId,
+        idempotencyKey: `scan:${input.scanId}:refund`,
+      },
+    });
+    return true;
   });
 }
 
@@ -725,23 +834,13 @@ export async function executeScanForUser(userId: string, scanId: string) {
   } catch (error) {
     if (error instanceof ScanLeaseLostError) throw error;
     const message = error instanceof Error ? error.message : "扫描执行失败";
-    const failed = await db.scan.updateMany({
-      where: {
-        id: scan.id,
-        status: "RUNNING",
-        executionLeaseToken,
-      },
-      data: {
-        status: "FAILED",
-        errorMessage: message,
-        completedAt: new Date(),
-        executionLeaseToken: null,
-        executionLeaseExpiresAt: null,
-      },
+    await settleFailedScan({
+      userId,
+      scanId: scan.id,
+      amount: scan.requestedCount,
+      executionLeaseToken,
+      message,
     });
-    if (failed.count === 1) {
-      await refundFailedScan(userId, scan.id, scan.requestedCount);
-    }
     throw error;
   }
 

@@ -45,6 +45,7 @@ export type ScanMinAggregateOutputType = {
   requestedCount: number | null
   repeatCount: number | null
   dataMode: $Enums.ScanDataMode | null
+  creationKey: string | null
   verificationExperimentId: string | null
   executionLeaseToken: string | null
   executionLeaseExpiresAt: Date | null
@@ -63,6 +64,7 @@ export type ScanMaxAggregateOutputType = {
   requestedCount: number | null
   repeatCount: number | null
   dataMode: $Enums.ScanDataMode | null
+  creationKey: string | null
   verificationExperimentId: string | null
   executionLeaseToken: string | null
   executionLeaseExpiresAt: Date | null
@@ -83,6 +85,7 @@ export type ScanCountAggregateOutputType = {
   requestedCount: number
   repeatCount: number
   dataMode: number
+  creationKey: number
   verificationExperimentId: number
   executionLeaseToken: number
   executionLeaseExpiresAt: number
@@ -115,6 +118,7 @@ export type ScanMinAggregateInputType = {
   requestedCount?: true
   repeatCount?: true
   dataMode?: true
+  creationKey?: true
   verificationExperimentId?: true
   executionLeaseToken?: true
   executionLeaseExpiresAt?: true
@@ -133,6 +137,7 @@ export type ScanMaxAggregateInputType = {
   requestedCount?: true
   repeatCount?: true
   dataMode?: true
+  creationKey?: true
   verificationExperimentId?: true
   executionLeaseToken?: true
   executionLeaseExpiresAt?: true
@@ -153,6 +158,7 @@ export type ScanCountAggregateInputType = {
   requestedCount?: true
   repeatCount?: true
   dataMode?: true
+  creationKey?: true
   verificationExperimentId?: true
   executionLeaseToken?: true
   executionLeaseExpiresAt?: true
@@ -260,6 +266,7 @@ export type ScanGroupByOutputType = {
   requestedCount: number
   repeatCount: number
   dataMode: $Enums.ScanDataMode
+  creationKey: string | null
   verificationExperimentId: string | null
   executionLeaseToken: string | null
   executionLeaseExpiresAt: Date | null
@@ -303,6 +310,7 @@ export type ScanWhereInput = {
   requestedCount?: Prisma.IntFilter<"Scan"> | number
   repeatCount?: Prisma.IntFilter<"Scan"> | number
   dataMode?: Prisma.EnumScanDataModeFilter<"Scan"> | $Enums.ScanDataMode
+  creationKey?: Prisma.StringNullableFilter<"Scan"> | string | null
   verificationExperimentId?: Prisma.StringNullableFilter<"Scan"> | string | null
   executionLeaseToken?: Prisma.StringNullableFilter<"Scan"> | string | null
   executionLeaseExpiresAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
@@ -332,6 +340,7 @@ export type ScanOrderByWithRelationInput = {
   requestedCount?: Prisma.SortOrder
   repeatCount?: Prisma.SortOrder
   dataMode?: Prisma.SortOrder
+  creationKey?: Prisma.SortOrderInput | Prisma.SortOrder
   verificationExperimentId?: Prisma.SortOrderInput | Prisma.SortOrder
   executionLeaseToken?: Prisma.SortOrderInput | Prisma.SortOrder
   executionLeaseExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -355,6 +364,7 @@ export type ScanOrderByWithRelationInput = {
 export type ScanWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   id_brandId?: Prisma.ScanIdBrandIdCompoundUniqueInput
+  brandId_creationKey?: Prisma.ScanBrandIdCreationKeyCompoundUniqueInput
   AND?: Prisma.ScanWhereInput | Prisma.ScanWhereInput[]
   OR?: Prisma.ScanWhereInput[]
   NOT?: Prisma.ScanWhereInput | Prisma.ScanWhereInput[]
@@ -365,6 +375,7 @@ export type ScanWhereUniqueInput = Prisma.AtLeast<{
   requestedCount?: Prisma.IntFilter<"Scan"> | number
   repeatCount?: Prisma.IntFilter<"Scan"> | number
   dataMode?: Prisma.EnumScanDataModeFilter<"Scan"> | $Enums.ScanDataMode
+  creationKey?: Prisma.StringNullableFilter<"Scan"> | string | null
   verificationExperimentId?: Prisma.StringNullableFilter<"Scan"> | string | null
   executionLeaseToken?: Prisma.StringNullableFilter<"Scan"> | string | null
   executionLeaseExpiresAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
@@ -383,7 +394,7 @@ export type ScanWhereUniqueInput = Prisma.AtLeast<{
   opportunities?: Prisma.OpportunityListRelationFilter
   riskFindings?: Prisma.RiskFindingListRelationFilter
   recommendations?: Prisma.RecommendationListRelationFilter
-}, "id" | "id_brandId">
+}, "id" | "id_brandId" | "brandId_creationKey">
 
 export type ScanOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -394,6 +405,7 @@ export type ScanOrderByWithAggregationInput = {
   requestedCount?: Prisma.SortOrder
   repeatCount?: Prisma.SortOrder
   dataMode?: Prisma.SortOrder
+  creationKey?: Prisma.SortOrderInput | Prisma.SortOrder
   verificationExperimentId?: Prisma.SortOrderInput | Prisma.SortOrder
   executionLeaseToken?: Prisma.SortOrderInput | Prisma.SortOrder
   executionLeaseExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -422,6 +434,7 @@ export type ScanScalarWhereWithAggregatesInput = {
   requestedCount?: Prisma.IntWithAggregatesFilter<"Scan"> | number
   repeatCount?: Prisma.IntWithAggregatesFilter<"Scan"> | number
   dataMode?: Prisma.EnumScanDataModeWithAggregatesFilter<"Scan"> | $Enums.ScanDataMode
+  creationKey?: Prisma.StringNullableWithAggregatesFilter<"Scan"> | string | null
   verificationExperimentId?: Prisma.StringNullableWithAggregatesFilter<"Scan"> | string | null
   executionLeaseToken?: Prisma.StringNullableWithAggregatesFilter<"Scan"> | string | null
   executionLeaseExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Scan"> | Date | string | null
@@ -441,6 +454,7 @@ export type ScanCreateInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
   verificationAttemptToken?: string | null
@@ -469,6 +483,7 @@ export type ScanUncheckedCreateInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   verificationExperimentId?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
@@ -495,6 +510,7 @@ export type ScanUpdateInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -523,6 +539,7 @@ export type ScanUncheckedUpdateInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -550,6 +567,7 @@ export type ScanCreateManyInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   verificationExperimentId?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
@@ -569,6 +587,7 @@ export type ScanUpdateManyMutationInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -588,6 +607,7 @@ export type ScanUncheckedUpdateManyInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -614,6 +634,11 @@ export type ScanIdBrandIdCompoundUniqueInput = {
   brandId: string
 }
 
+export type ScanBrandIdCreationKeyCompoundUniqueInput = {
+  brandId: string
+  creationKey: string
+}
+
 export type ScanCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
@@ -623,6 +648,7 @@ export type ScanCountOrderByAggregateInput = {
   requestedCount?: Prisma.SortOrder
   repeatCount?: Prisma.SortOrder
   dataMode?: Prisma.SortOrder
+  creationKey?: Prisma.SortOrder
   verificationExperimentId?: Prisma.SortOrder
   executionLeaseToken?: Prisma.SortOrder
   executionLeaseExpiresAt?: Prisma.SortOrder
@@ -647,6 +673,7 @@ export type ScanMaxOrderByAggregateInput = {
   requestedCount?: Prisma.SortOrder
   repeatCount?: Prisma.SortOrder
   dataMode?: Prisma.SortOrder
+  creationKey?: Prisma.SortOrder
   verificationExperimentId?: Prisma.SortOrder
   executionLeaseToken?: Prisma.SortOrder
   executionLeaseExpiresAt?: Prisma.SortOrder
@@ -665,6 +692,7 @@ export type ScanMinOrderByAggregateInput = {
   requestedCount?: Prisma.SortOrder
   repeatCount?: Prisma.SortOrder
   dataMode?: Prisma.SortOrder
+  creationKey?: Prisma.SortOrder
   verificationExperimentId?: Prisma.SortOrder
   executionLeaseToken?: Prisma.SortOrder
   executionLeaseExpiresAt?: Prisma.SortOrder
@@ -904,6 +932,7 @@ export type ScanCreateWithoutBrandInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
   verificationAttemptToken?: string | null
@@ -930,6 +959,7 @@ export type ScanUncheckedCreateWithoutBrandInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   verificationExperimentId?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
@@ -986,6 +1016,7 @@ export type ScanScalarWhereInput = {
   requestedCount?: Prisma.IntFilter<"Scan"> | number
   repeatCount?: Prisma.IntFilter<"Scan"> | number
   dataMode?: Prisma.EnumScanDataModeFilter<"Scan"> | $Enums.ScanDataMode
+  creationKey?: Prisma.StringNullableFilter<"Scan"> | string | null
   verificationExperimentId?: Prisma.StringNullableFilter<"Scan"> | string | null
   executionLeaseToken?: Prisma.StringNullableFilter<"Scan"> | string | null
   executionLeaseExpiresAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
@@ -1005,6 +1036,7 @@ export type ScanCreateWithoutOpportunitiesInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
   verificationAttemptToken?: string | null
@@ -1032,6 +1064,7 @@ export type ScanUncheckedCreateWithoutOpportunitiesInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   verificationExperimentId?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
@@ -1073,6 +1106,7 @@ export type ScanUpdateWithoutOpportunitiesInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1100,6 +1134,7 @@ export type ScanUncheckedUpdateWithoutOpportunitiesInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1125,6 +1160,7 @@ export type ScanCreateWithoutBaselineExperimentsInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
   verificationAttemptToken?: string | null
@@ -1152,6 +1188,7 @@ export type ScanUncheckedCreateWithoutBaselineExperimentsInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   verificationExperimentId?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
@@ -1182,6 +1219,7 @@ export type ScanCreateWithoutFollowUpExperimentInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
   verificationAttemptToken?: string | null
@@ -1209,6 +1247,7 @@ export type ScanUncheckedCreateWithoutFollowUpExperimentInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   verificationExperimentId?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
@@ -1239,6 +1278,7 @@ export type ScanCreateWithoutVerificationExperimentInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
   verificationAttemptToken?: string | null
@@ -1265,6 +1305,7 @@ export type ScanUncheckedCreateWithoutVerificationExperimentInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
   verificationAttemptToken?: string | null
@@ -1311,6 +1352,7 @@ export type ScanUpdateWithoutBaselineExperimentsInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1338,6 +1380,7 @@ export type ScanUncheckedUpdateWithoutBaselineExperimentsInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1374,6 +1417,7 @@ export type ScanUpdateWithoutFollowUpExperimentInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1401,6 +1445,7 @@ export type ScanUncheckedUpdateWithoutFollowUpExperimentInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1442,6 +1487,7 @@ export type ScanCreateWithoutObservationsInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
   verificationAttemptToken?: string | null
@@ -1469,6 +1515,7 @@ export type ScanUncheckedCreateWithoutObservationsInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   verificationExperimentId?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
@@ -1510,6 +1557,7 @@ export type ScanUpdateWithoutObservationsInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1537,6 +1585,7 @@ export type ScanUncheckedUpdateWithoutObservationsInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1562,6 +1611,7 @@ export type ScanCreateWithoutScoreSnapshotInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
   verificationAttemptToken?: string | null
@@ -1589,6 +1639,7 @@ export type ScanUncheckedCreateWithoutScoreSnapshotInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   verificationExperimentId?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
@@ -1630,6 +1681,7 @@ export type ScanUpdateWithoutScoreSnapshotInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1657,6 +1709,7 @@ export type ScanUncheckedUpdateWithoutScoreSnapshotInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1682,6 +1735,7 @@ export type ScanCreateWithoutRiskFindingsInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
   verificationAttemptToken?: string | null
@@ -1709,6 +1763,7 @@ export type ScanUncheckedCreateWithoutRiskFindingsInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   verificationExperimentId?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
@@ -1750,6 +1805,7 @@ export type ScanUpdateWithoutRiskFindingsInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1777,6 +1833,7 @@ export type ScanUncheckedUpdateWithoutRiskFindingsInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1802,6 +1859,7 @@ export type ScanCreateWithoutRecommendationsInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
   verificationAttemptToken?: string | null
@@ -1829,6 +1887,7 @@ export type ScanUncheckedCreateWithoutRecommendationsInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   verificationExperimentId?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
@@ -1870,6 +1929,7 @@ export type ScanUpdateWithoutRecommendationsInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1897,6 +1957,7 @@ export type ScanUncheckedUpdateWithoutRecommendationsInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1922,6 +1983,7 @@ export type ScanCreateManyBrandInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   verificationExperimentId?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
@@ -1941,6 +2003,7 @@ export type ScanUpdateWithoutBrandInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1967,6 +2030,7 @@ export type ScanUncheckedUpdateWithoutBrandInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1993,6 +2057,7 @@ export type ScanUncheckedUpdateManyWithoutBrandInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2012,6 +2077,7 @@ export type ScanCreateManyVerificationExperimentInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  creationKey?: string | null
   executionLeaseToken?: string | null
   executionLeaseExpiresAt?: Date | string | null
   verificationAttemptToken?: string | null
@@ -2030,6 +2096,7 @@ export type ScanUpdateWithoutVerificationExperimentInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2056,6 +2123,7 @@ export type ScanUncheckedUpdateWithoutVerificationExperimentInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2081,6 +2149,7 @@ export type ScanUncheckedUpdateManyWithoutVerificationExperimentInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  creationKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2167,6 +2236,7 @@ export type ScanSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   requestedCount?: boolean
   repeatCount?: boolean
   dataMode?: boolean
+  creationKey?: boolean
   verificationExperimentId?: boolean
   executionLeaseToken?: boolean
   executionLeaseExpiresAt?: boolean
@@ -2197,6 +2267,7 @@ export type ScanSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   requestedCount?: boolean
   repeatCount?: boolean
   dataMode?: boolean
+  creationKey?: boolean
   verificationExperimentId?: boolean
   executionLeaseToken?: boolean
   executionLeaseExpiresAt?: boolean
@@ -2219,6 +2290,7 @@ export type ScanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   requestedCount?: boolean
   repeatCount?: boolean
   dataMode?: boolean
+  creationKey?: boolean
   verificationExperimentId?: boolean
   executionLeaseToken?: boolean
   executionLeaseExpiresAt?: boolean
@@ -2241,6 +2313,7 @@ export type ScanSelectScalar = {
   requestedCount?: boolean
   repeatCount?: boolean
   dataMode?: boolean
+  creationKey?: boolean
   verificationExperimentId?: boolean
   executionLeaseToken?: boolean
   executionLeaseExpiresAt?: boolean
@@ -2252,7 +2325,7 @@ export type ScanSelectScalar = {
   createdAt?: boolean
 }
 
-export type ScanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brandId" | "status" | "providerIds" | "promptVersionIds" | "requestedCount" | "repeatCount" | "dataMode" | "verificationExperimentId" | "executionLeaseToken" | "executionLeaseExpiresAt" | "verificationAttemptToken" | "verificationActionRevision" | "errorMessage" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["scan"]>
+export type ScanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brandId" | "status" | "providerIds" | "promptVersionIds" | "requestedCount" | "repeatCount" | "dataMode" | "creationKey" | "verificationExperimentId" | "executionLeaseToken" | "executionLeaseExpiresAt" | "verificationAttemptToken" | "verificationActionRevision" | "errorMessage" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["scan"]>
 export type ScanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
   verificationExperiment?: boolean | Prisma.Scan$verificationExperimentArgs<ExtArgs>
@@ -2296,6 +2369,7 @@ export type $ScanPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     requestedCount: number
     repeatCount: number
     dataMode: $Enums.ScanDataMode
+    creationKey: string | null
     verificationExperimentId: string | null
     executionLeaseToken: string | null
     executionLeaseExpiresAt: Date | null
@@ -2745,6 +2819,7 @@ export interface ScanFieldRefs {
   readonly requestedCount: Prisma.FieldRef<"Scan", 'Int'>
   readonly repeatCount: Prisma.FieldRef<"Scan", 'Int'>
   readonly dataMode: Prisma.FieldRef<"Scan", 'ScanDataMode'>
+  readonly creationKey: Prisma.FieldRef<"Scan", 'String'>
   readonly verificationExperimentId: Prisma.FieldRef<"Scan", 'String'>
   readonly executionLeaseToken: Prisma.FieldRef<"Scan", 'String'>
   readonly executionLeaseExpiresAt: Prisma.FieldRef<"Scan", 'DateTime'>
