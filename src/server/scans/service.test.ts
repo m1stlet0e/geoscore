@@ -25,11 +25,11 @@ describe("扫描服务", () => {
     const scan = await createScanForUser(user.id, brand.id, ["mock"]);
     const completed = await executeScanForUser(user.id, scan.id);
     expect(completed.status).toBe("COMPLETED");
-    expect(completed.observations).toHaveLength(10);
+    expect(completed.observations).toHaveLength(20);
     expect(completed.scoreSnapshot?.score).toBeGreaterThanOrEqual(0);
     expect(await db.recommendation.count({ where: { brandId: brand.id } })).toBeGreaterThan(0);
     const quota = await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } });
-    expect(quota.balance).toBe(20);
+    expect(quota.balance).toBe(10);
   });
 
   it("额度不足时拒绝创建扫描", async () => {
@@ -43,7 +43,7 @@ describe("扫描服务", () => {
 
   it("并发创建扫描时额度不会被超扣", async () => {
     const user = await createReadyUser();
-    await db.quotaAccount.update({ where: { userId: user.id }, data: { balance: 10 } });
+    await db.quotaAccount.update({ where: { userId: user.id }, data: { balance: 20 } });
     const brand = await createBrandForUser(user.id, {
       name: "并发品牌", website: "concurrent.example.cn", industry: "企业服务", product: "监测软件", targetAudience: "品牌团队", aliases: [], competitors: [],
     });

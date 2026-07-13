@@ -35,3 +35,11 @@ export interface AiProvider {
   readonly id: string;
   query(input: AiQuery): Promise<AiAnswer>;
 }
+
+export type AiProviderDescriptor = {
+  id: string;
+  name: string;
+  dataMode: "REAL" | "SIMULATED";
+  available: boolean;
+  unavailableReason?: string;
+};

@@ -22,6 +22,33 @@ enum ScanStatus {
   FAILED
 }
 
+enum ScanDataMode {
+  REAL
+  SIMULATED
+}
+
+enum OpportunityType {
+  MENTION_GAP
+  COMPETITOR_ADVANTAGE
+  CITATION_GAP
+  BRAND_RISK
+}
+
+enum OpportunityStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  DISMISSED
+}
+
+enum ExperimentStatus {
+  DRAFT
+  ACTIVE
+  VERIFYING
+  VERIFIED
+  INCONCLUSIVE
+}
+
 enum Sentiment {
   POSITIVE
   NEUTRAL
@@ -136,16 +163,16 @@ model SmsChallenge {
 }
 
 model Brand {
-  id              String           @id @default(cuid())
+  id              String                   @id @default(cuid())
   name            String
   website         String
   industry        String
   product         String
   targetAudience  String
   ownerId         String
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  owner           User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  owner           User                     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   aliases         BrandAlias[]
   competitors     Competitor[]
   prompts         Prompt[]
@@ -153,6 +180,8 @@ model Brand {
   scoreSnapshots  ScoreSnapshot[]
   riskFindings    RiskFinding[]
   recommendations Recommendation[]
+  opportunities   Opportunity[]
+  experiments     OptimizationExperiment[]
 
   @@unique([ownerId, name])
   @@index([ownerId])
@@ -191,33 +220,99 @@ model Prompt {
 }
 
 model PromptVersion {
-  id           String        @id @default(cuid())
-  promptId     String
-  version      Int
-  text         String
-  weight       Float         @default(1)
-  createdAt    DateTime      @default(now())
-  prompt       Prompt        @relation(fields: [promptId], references: [id], onDelete: Cascade)
-  observations Observation[]
+  id            String        @id @default(cuid())
+  promptId      String
+  version       Int
+  text          String
+  weight        Float         @default(1)
+  createdAt     DateTime      @default(now())
+  prompt        Prompt        @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  observations  Observation[]
+  opportunities Opportunity[]
 
   @@unique([promptId, version])
 }
 
 model Scan {
-  id             String         @id @default(cuid())
-  brandId        String
-  status         ScanStatus     @default(PENDING)
-  providerIds    Json
-  requestedCount Int
-  errorMessage   String?
-  startedAt      DateTime?
-  completedAt    DateTime?
-  createdAt      DateTime       @default(now())
-  brand          Brand          @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  observations   Observation[]
-  scoreSnapshot  ScoreSnapshot?
+  id                       String                   @id @default(cuid())
+  brandId                  String
+  status                   ScanStatus               @default(PENDING)
+  providerIds              Json
+  requestedCount           Int
+  repeatCount              Int                      @default(1)
+  dataMode                 ScanDataMode             @default(REAL)
+  verificationExperimentId String?
+  errorMessage             String?
+  startedAt                DateTime?
+  completedAt              DateTime?
+  createdAt                DateTime                 @default(now())
+  brand                    Brand                    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  verificationExperiment   OptimizationExperiment?  @relation("ExperimentVerificationScans", fields: [verificationExperimentId], references: [id], onDelete: SetNull)
+  baselineExperiments      OptimizationExperiment[] @relation("ExperimentBaselineScan")
+  followUpExperiment       OptimizationExperiment?  @relation("ExperimentFollowUpScan")
+  observations             Observation[]
+  scoreSnapshot            ScoreSnapshot?
+  opportunities            Opportunity[]
+  riskFindings             RiskFinding[]
+  recommendations          Recommendation[]
 
   @@index([brandId, createdAt])
+  @@index([verificationExperimentId])
+}
+
+model Opportunity {
+  id                     String                  @id @default(cuid())
+  brandId                String
+  scanId                 String
+  promptVersionId        String
+  platformId             String
+  type                   OpportunityType
+  priority               Int
+  title                  String
+  summary                String
+  evidence               String
+  recommendedAction      String
+  targetContentType      String
+  status                 OpportunityStatus       @default(OPEN)
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  brand                  Brand                   @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  scan                   Scan                    @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  promptVersion          PromptVersion           @relation(fields: [promptVersionId], references: [id], onDelete: Cascade)
+  optimizationExperiment OptimizationExperiment?
+
+  @@unique([scanId, promptVersionId, platformId, type])
+  @@index([brandId, status, priority])
+  @@index([promptVersionId])
+}
+
+model OptimizationExperiment {
+  id                  String           @id @default(cuid())
+  brandId             String
+  opportunityId       String           @unique
+  baselineScanId      String
+  followUpScanId      String?          @unique
+  title               String
+  hypothesis          String
+  actionPlan          String
+  targetUrl           String?
+  publishedAt         DateTime?
+  nextCheckAt         DateTime?
+  status              ExperimentStatus @default(DRAFT)
+  resultSummary       String?
+  scoreDelta          Float?
+  mentionDelta        Float?
+  recommendationDelta Float?
+  citationDelta       Float?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  brand               Brand            @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  opportunity         Opportunity      @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  baselineScan        Scan             @relation("ExperimentBaselineScan", fields: [baselineScanId], references: [id], onDelete: Cascade)
+  followUpScan        Scan?            @relation("ExperimentFollowUpScan", fields: [followUpScanId], references: [id], onDelete: SetNull)
+  verificationScans   Scan[]           @relation("ExperimentVerificationScans")
+
+  @@index([brandId, status, createdAt])
 }
 
 model Observation {
@@ -227,7 +322,7 @@ model Observation {
   platformId      String
   modelId         String
   requestId       String?
-  runIndex        Int             @default(1)
+  runIndex        Int           @default(1)
   rawResponse     String
   rawMetadata     Json?
   latencyMs       Int?
@@ -292,6 +387,7 @@ model ScoreSnapshot {
 model RiskFinding {
   id          String    @id @default(cuid())
   brandId     String
+  scanId      String?
   level       RiskLevel
   title       String
   description String
@@ -299,13 +395,16 @@ model RiskFinding {
   resolvedAt  DateTime?
   createdAt   DateTime  @default(now())
   brand       Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  scan        Scan?     @relation(fields: [scanId], references: [id], onDelete: SetNull)
 
   @@index([brandId, resolvedAt])
+  @@index([scanId])
 }
 
 model Recommendation {
   id         String   @id @default(cuid())
   brandId    String
+  scanId     String?
   title      String
   finding    String
   action     String
@@ -315,8 +414,10 @@ model Recommendation {
   effort     Int
   createdAt  DateTime @default(now())
   brand      Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  scan       Scan?    @relation(fields: [scanId], references: [id], onDelete: SetNull)
 
   @@index([brandId, createdAt])
+  @@index([scanId])
 }
 
 model Plan {

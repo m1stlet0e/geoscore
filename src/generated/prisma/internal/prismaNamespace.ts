@@ -395,6 +395,8 @@ export const ModelName = {
   Prompt: 'Prompt',
   PromptVersion: 'PromptVersion',
   Scan: 'Scan',
+  Opportunity: 'Opportunity',
+  OptimizationExperiment: 'OptimizationExperiment',
   Observation: 'Observation',
   Mention: 'Mention',
   Citation: 'Citation',
@@ -422,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "smsChallenge" | "brand" | "brandAlias" | "competitor" | "prompt" | "promptVersion" | "scan" | "observation" | "mention" | "citation" | "scoreSnapshot" | "riskFinding" | "recommendation" | "plan" | "order" | "paymentEvent" | "subscription" | "quotaAccount" | "quotaLedger"
+    modelProps: "user" | "session" | "account" | "verification" | "smsChallenge" | "brand" | "brandAlias" | "competitor" | "prompt" | "promptVersion" | "scan" | "opportunity" | "optimizationExperiment" | "observation" | "mention" | "citation" | "scoreSnapshot" | "riskFinding" | "recommendation" | "plan" | "order" | "paymentEvent" | "subscription" | "quotaAccount" | "quotaLedger"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1237,6 +1239,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ScanCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ScanCountAggregateOutputType> | number
+        }
+      }
+    }
+    Opportunity: {
+      payload: Prisma.$OpportunityPayload<ExtArgs>
+      fields: Prisma.OpportunityFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.OpportunityFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpportunityPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.OpportunityFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpportunityPayload>
+        }
+        findFirst: {
+          args: Prisma.OpportunityFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpportunityPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.OpportunityFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpportunityPayload>
+        }
+        findMany: {
+          args: Prisma.OpportunityFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpportunityPayload>[]
+        }
+        create: {
+          args: Prisma.OpportunityCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpportunityPayload>
+        }
+        createMany: {
+          args: Prisma.OpportunityCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.OpportunityCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpportunityPayload>[]
+        }
+        delete: {
+          args: Prisma.OpportunityDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpportunityPayload>
+        }
+        update: {
+          args: Prisma.OpportunityUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpportunityPayload>
+        }
+        deleteMany: {
+          args: Prisma.OpportunityDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.OpportunityUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.OpportunityUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpportunityPayload>[]
+        }
+        upsert: {
+          args: Prisma.OpportunityUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpportunityPayload>
+        }
+        aggregate: {
+          args: Prisma.OpportunityAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOpportunity>
+        }
+        groupBy: {
+          args: Prisma.OpportunityGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OpportunityGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.OpportunityCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OpportunityCountAggregateOutputType> | number
+        }
+      }
+    }
+    OptimizationExperiment: {
+      payload: Prisma.$OptimizationExperimentPayload<ExtArgs>
+      fields: Prisma.OptimizationExperimentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.OptimizationExperimentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptimizationExperimentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.OptimizationExperimentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptimizationExperimentPayload>
+        }
+        findFirst: {
+          args: Prisma.OptimizationExperimentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptimizationExperimentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.OptimizationExperimentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptimizationExperimentPayload>
+        }
+        findMany: {
+          args: Prisma.OptimizationExperimentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptimizationExperimentPayload>[]
+        }
+        create: {
+          args: Prisma.OptimizationExperimentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptimizationExperimentPayload>
+        }
+        createMany: {
+          args: Prisma.OptimizationExperimentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.OptimizationExperimentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptimizationExperimentPayload>[]
+        }
+        delete: {
+          args: Prisma.OptimizationExperimentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptimizationExperimentPayload>
+        }
+        update: {
+          args: Prisma.OptimizationExperimentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptimizationExperimentPayload>
+        }
+        deleteMany: {
+          args: Prisma.OptimizationExperimentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.OptimizationExperimentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.OptimizationExperimentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptimizationExperimentPayload>[]
+        }
+        upsert: {
+          args: Prisma.OptimizationExperimentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptimizationExperimentPayload>
+        }
+        aggregate: {
+          args: Prisma.OptimizationExperimentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOptimizationExperiment>
+        }
+        groupBy: {
+          args: Prisma.OptimizationExperimentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OptimizationExperimentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.OptimizationExperimentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OptimizationExperimentCountAggregateOutputType> | number
         }
       }
     }
@@ -2305,6 +2455,9 @@ export const ScanScalarFieldEnum = {
   status: 'status',
   providerIds: 'providerIds',
   requestedCount: 'requestedCount',
+  repeatCount: 'repeatCount',
+  dataMode: 'dataMode',
+  verificationExperimentId: 'verificationExperimentId',
   errorMessage: 'errorMessage',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
@@ -2312,6 +2465,52 @@ export const ScanScalarFieldEnum = {
 } as const
 
 export type ScanScalarFieldEnum = (typeof ScanScalarFieldEnum)[keyof typeof ScanScalarFieldEnum]
+
+
+export const OpportunityScalarFieldEnum = {
+  id: 'id',
+  brandId: 'brandId',
+  scanId: 'scanId',
+  promptVersionId: 'promptVersionId',
+  platformId: 'platformId',
+  type: 'type',
+  priority: 'priority',
+  title: 'title',
+  summary: 'summary',
+  evidence: 'evidence',
+  recommendedAction: 'recommendedAction',
+  targetContentType: 'targetContentType',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OpportunityScalarFieldEnum = (typeof OpportunityScalarFieldEnum)[keyof typeof OpportunityScalarFieldEnum]
+
+
+export const OptimizationExperimentScalarFieldEnum = {
+  id: 'id',
+  brandId: 'brandId',
+  opportunityId: 'opportunityId',
+  baselineScanId: 'baselineScanId',
+  followUpScanId: 'followUpScanId',
+  title: 'title',
+  hypothesis: 'hypothesis',
+  actionPlan: 'actionPlan',
+  targetUrl: 'targetUrl',
+  publishedAt: 'publishedAt',
+  nextCheckAt: 'nextCheckAt',
+  status: 'status',
+  resultSummary: 'resultSummary',
+  scoreDelta: 'scoreDelta',
+  mentionDelta: 'mentionDelta',
+  recommendationDelta: 'recommendationDelta',
+  citationDelta: 'citationDelta',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OptimizationExperimentScalarFieldEnum = (typeof OptimizationExperimentScalarFieldEnum)[keyof typeof OptimizationExperimentScalarFieldEnum]
 
 
 export const ObservationScalarFieldEnum = {
@@ -2381,6 +2580,7 @@ export type ScoreSnapshotScalarFieldEnum = (typeof ScoreSnapshotScalarFieldEnum)
 export const RiskFindingScalarFieldEnum = {
   id: 'id',
   brandId: 'brandId',
+  scanId: 'scanId',
   level: 'level',
   title: 'title',
   description: 'description',
@@ -2395,6 +2595,7 @@ export type RiskFindingScalarFieldEnum = (typeof RiskFindingScalarFieldEnum)[key
 export const RecommendationScalarFieldEnum = {
   id: 'id',
   brandId: 'brandId',
+  scanId: 'scanId',
   title: 'title',
   finding: 'finding',
   action: 'action',
@@ -2649,6 +2850,62 @@ export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
 
 
 /**
+ * Reference to a field of type 'ScanDataMode'
+ */
+export type EnumScanDataModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ScanDataMode'>
+    
+
+
+/**
+ * Reference to a field of type 'ScanDataMode[]'
+ */
+export type ListEnumScanDataModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ScanDataMode[]'>
+    
+
+
+/**
+ * Reference to a field of type 'OpportunityType'
+ */
+export type EnumOpportunityTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OpportunityType'>
+    
+
+
+/**
+ * Reference to a field of type 'OpportunityType[]'
+ */
+export type ListEnumOpportunityTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OpportunityType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'OpportunityStatus'
+ */
+export type EnumOpportunityStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OpportunityStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'OpportunityStatus[]'
+ */
+export type ListEnumOpportunityStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OpportunityStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ExperimentStatus'
+ */
+export type EnumExperimentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExperimentStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ExperimentStatus[]'
+ */
+export type ListEnumExperimentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExperimentStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Sentiment'
  */
 export type EnumSentimentFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Sentiment'>
@@ -2838,6 +3095,8 @@ export type GlobalOmitConfig = {
   prompt?: Prisma.PromptOmit
   promptVersion?: Prisma.PromptVersionOmit
   scan?: Prisma.ScanOmit
+  opportunity?: Prisma.OpportunityOmit
+  optimizationExperiment?: Prisma.OptimizationExperimentOmit
   observation?: Prisma.ObservationOmit
   mention?: Prisma.MentionOmit
   citation?: Prisma.CitationOmit

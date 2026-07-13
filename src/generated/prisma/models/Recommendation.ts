@@ -41,6 +41,7 @@ export type RecommendationSumAggregateOutputType = {
 export type RecommendationMinAggregateOutputType = {
   id: string | null
   brandId: string | null
+  scanId: string | null
   title: string | null
   finding: string | null
   action: string | null
@@ -54,6 +55,7 @@ export type RecommendationMinAggregateOutputType = {
 export type RecommendationMaxAggregateOutputType = {
   id: string | null
   brandId: string | null
+  scanId: string | null
   title: string | null
   finding: string | null
   action: string | null
@@ -67,6 +69,7 @@ export type RecommendationMaxAggregateOutputType = {
 export type RecommendationCountAggregateOutputType = {
   id: number
   brandId: number
+  scanId: number
   title: number
   finding: number
   action: number
@@ -94,6 +97,7 @@ export type RecommendationSumAggregateInputType = {
 export type RecommendationMinAggregateInputType = {
   id?: true
   brandId?: true
+  scanId?: true
   title?: true
   finding?: true
   action?: true
@@ -107,6 +111,7 @@ export type RecommendationMinAggregateInputType = {
 export type RecommendationMaxAggregateInputType = {
   id?: true
   brandId?: true
+  scanId?: true
   title?: true
   finding?: true
   action?: true
@@ -120,6 +125,7 @@ export type RecommendationMaxAggregateInputType = {
 export type RecommendationCountAggregateInputType = {
   id?: true
   brandId?: true
+  scanId?: true
   title?: true
   finding?: true
   action?: true
@@ -220,6 +226,7 @@ export type RecommendationGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
 export type RecommendationGroupByOutputType = {
   id: string
   brandId: string
+  scanId: string | null
   title: string
   finding: string
   action: string
@@ -256,6 +263,7 @@ export type RecommendationWhereInput = {
   NOT?: Prisma.RecommendationWhereInput | Prisma.RecommendationWhereInput[]
   id?: Prisma.StringFilter<"Recommendation"> | string
   brandId?: Prisma.StringFilter<"Recommendation"> | string
+  scanId?: Prisma.StringNullableFilter<"Recommendation"> | string | null
   title?: Prisma.StringFilter<"Recommendation"> | string
   finding?: Prisma.StringFilter<"Recommendation"> | string
   action?: Prisma.StringFilter<"Recommendation"> | string
@@ -265,11 +273,13 @@ export type RecommendationWhereInput = {
   effort?: Prisma.IntFilter<"Recommendation"> | number
   createdAt?: Prisma.DateTimeFilter<"Recommendation"> | Date | string
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
+  scan?: Prisma.XOR<Prisma.ScanNullableScalarRelationFilter, Prisma.ScanWhereInput> | null
 }
 
 export type RecommendationOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  scanId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   finding?: Prisma.SortOrder
   action?: Prisma.SortOrder
@@ -279,6 +289,7 @@ export type RecommendationOrderByWithRelationInput = {
   effort?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   brand?: Prisma.BrandOrderByWithRelationInput
+  scan?: Prisma.ScanOrderByWithRelationInput
 }
 
 export type RecommendationWhereUniqueInput = Prisma.AtLeast<{
@@ -287,6 +298,7 @@ export type RecommendationWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.RecommendationWhereInput[]
   NOT?: Prisma.RecommendationWhereInput | Prisma.RecommendationWhereInput[]
   brandId?: Prisma.StringFilter<"Recommendation"> | string
+  scanId?: Prisma.StringNullableFilter<"Recommendation"> | string | null
   title?: Prisma.StringFilter<"Recommendation"> | string
   finding?: Prisma.StringFilter<"Recommendation"> | string
   action?: Prisma.StringFilter<"Recommendation"> | string
@@ -296,11 +308,13 @@ export type RecommendationWhereUniqueInput = Prisma.AtLeast<{
   effort?: Prisma.IntFilter<"Recommendation"> | number
   createdAt?: Prisma.DateTimeFilter<"Recommendation"> | Date | string
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
+  scan?: Prisma.XOR<Prisma.ScanNullableScalarRelationFilter, Prisma.ScanWhereInput> | null
 }, "id">
 
 export type RecommendationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  scanId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   finding?: Prisma.SortOrder
   action?: Prisma.SortOrder
@@ -322,6 +336,7 @@ export type RecommendationScalarWhereWithAggregatesInput = {
   NOT?: Prisma.RecommendationScalarWhereWithAggregatesInput | Prisma.RecommendationScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Recommendation"> | string
   brandId?: Prisma.StringWithAggregatesFilter<"Recommendation"> | string
+  scanId?: Prisma.StringNullableWithAggregatesFilter<"Recommendation"> | string | null
   title?: Prisma.StringWithAggregatesFilter<"Recommendation"> | string
   finding?: Prisma.StringWithAggregatesFilter<"Recommendation"> | string
   action?: Prisma.StringWithAggregatesFilter<"Recommendation"> | string
@@ -343,11 +358,13 @@ export type RecommendationCreateInput = {
   effort: number
   createdAt?: Date | string
   brand: Prisma.BrandCreateNestedOneWithoutRecommendationsInput
+  scan?: Prisma.ScanCreateNestedOneWithoutRecommendationsInput
 }
 
 export type RecommendationUncheckedCreateInput = {
   id?: string
   brandId: string
+  scanId?: string | null
   title: string
   finding: string
   action: string
@@ -369,11 +386,13 @@ export type RecommendationUpdateInput = {
   effort?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   brand?: Prisma.BrandUpdateOneRequiredWithoutRecommendationsNestedInput
+  scan?: Prisma.ScanUpdateOneWithoutRecommendationsNestedInput
 }
 
 export type RecommendationUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
+  scanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   finding?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.StringFieldUpdateOperationsInput | string
@@ -387,6 +406,7 @@ export type RecommendationUncheckedUpdateInput = {
 export type RecommendationCreateManyInput = {
   id?: string
   brandId: string
+  scanId?: string | null
   title: string
   finding: string
   action: string
@@ -412,6 +432,7 @@ export type RecommendationUpdateManyMutationInput = {
 export type RecommendationUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
+  scanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   finding?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.StringFieldUpdateOperationsInput | string
@@ -435,6 +456,7 @@ export type RecommendationOrderByRelationAggregateInput = {
 export type RecommendationCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  scanId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   finding?: Prisma.SortOrder
   action?: Prisma.SortOrder
@@ -454,6 +476,7 @@ export type RecommendationAvgOrderByAggregateInput = {
 export type RecommendationMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  scanId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   finding?: Prisma.SortOrder
   action?: Prisma.SortOrder
@@ -467,6 +490,7 @@ export type RecommendationMaxOrderByAggregateInput = {
 export type RecommendationMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  scanId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   finding?: Prisma.SortOrder
   action?: Prisma.SortOrder
@@ -525,6 +549,48 @@ export type RecommendationUncheckedUpdateManyWithoutBrandNestedInput = {
   deleteMany?: Prisma.RecommendationScalarWhereInput | Prisma.RecommendationScalarWhereInput[]
 }
 
+export type RecommendationCreateNestedManyWithoutScanInput = {
+  create?: Prisma.XOR<Prisma.RecommendationCreateWithoutScanInput, Prisma.RecommendationUncheckedCreateWithoutScanInput> | Prisma.RecommendationCreateWithoutScanInput[] | Prisma.RecommendationUncheckedCreateWithoutScanInput[]
+  connectOrCreate?: Prisma.RecommendationCreateOrConnectWithoutScanInput | Prisma.RecommendationCreateOrConnectWithoutScanInput[]
+  createMany?: Prisma.RecommendationCreateManyScanInputEnvelope
+  connect?: Prisma.RecommendationWhereUniqueInput | Prisma.RecommendationWhereUniqueInput[]
+}
+
+export type RecommendationUncheckedCreateNestedManyWithoutScanInput = {
+  create?: Prisma.XOR<Prisma.RecommendationCreateWithoutScanInput, Prisma.RecommendationUncheckedCreateWithoutScanInput> | Prisma.RecommendationCreateWithoutScanInput[] | Prisma.RecommendationUncheckedCreateWithoutScanInput[]
+  connectOrCreate?: Prisma.RecommendationCreateOrConnectWithoutScanInput | Prisma.RecommendationCreateOrConnectWithoutScanInput[]
+  createMany?: Prisma.RecommendationCreateManyScanInputEnvelope
+  connect?: Prisma.RecommendationWhereUniqueInput | Prisma.RecommendationWhereUniqueInput[]
+}
+
+export type RecommendationUpdateManyWithoutScanNestedInput = {
+  create?: Prisma.XOR<Prisma.RecommendationCreateWithoutScanInput, Prisma.RecommendationUncheckedCreateWithoutScanInput> | Prisma.RecommendationCreateWithoutScanInput[] | Prisma.RecommendationUncheckedCreateWithoutScanInput[]
+  connectOrCreate?: Prisma.RecommendationCreateOrConnectWithoutScanInput | Prisma.RecommendationCreateOrConnectWithoutScanInput[]
+  upsert?: Prisma.RecommendationUpsertWithWhereUniqueWithoutScanInput | Prisma.RecommendationUpsertWithWhereUniqueWithoutScanInput[]
+  createMany?: Prisma.RecommendationCreateManyScanInputEnvelope
+  set?: Prisma.RecommendationWhereUniqueInput | Prisma.RecommendationWhereUniqueInput[]
+  disconnect?: Prisma.RecommendationWhereUniqueInput | Prisma.RecommendationWhereUniqueInput[]
+  delete?: Prisma.RecommendationWhereUniqueInput | Prisma.RecommendationWhereUniqueInput[]
+  connect?: Prisma.RecommendationWhereUniqueInput | Prisma.RecommendationWhereUniqueInput[]
+  update?: Prisma.RecommendationUpdateWithWhereUniqueWithoutScanInput | Prisma.RecommendationUpdateWithWhereUniqueWithoutScanInput[]
+  updateMany?: Prisma.RecommendationUpdateManyWithWhereWithoutScanInput | Prisma.RecommendationUpdateManyWithWhereWithoutScanInput[]
+  deleteMany?: Prisma.RecommendationScalarWhereInput | Prisma.RecommendationScalarWhereInput[]
+}
+
+export type RecommendationUncheckedUpdateManyWithoutScanNestedInput = {
+  create?: Prisma.XOR<Prisma.RecommendationCreateWithoutScanInput, Prisma.RecommendationUncheckedCreateWithoutScanInput> | Prisma.RecommendationCreateWithoutScanInput[] | Prisma.RecommendationUncheckedCreateWithoutScanInput[]
+  connectOrCreate?: Prisma.RecommendationCreateOrConnectWithoutScanInput | Prisma.RecommendationCreateOrConnectWithoutScanInput[]
+  upsert?: Prisma.RecommendationUpsertWithWhereUniqueWithoutScanInput | Prisma.RecommendationUpsertWithWhereUniqueWithoutScanInput[]
+  createMany?: Prisma.RecommendationCreateManyScanInputEnvelope
+  set?: Prisma.RecommendationWhereUniqueInput | Prisma.RecommendationWhereUniqueInput[]
+  disconnect?: Prisma.RecommendationWhereUniqueInput | Prisma.RecommendationWhereUniqueInput[]
+  delete?: Prisma.RecommendationWhereUniqueInput | Prisma.RecommendationWhereUniqueInput[]
+  connect?: Prisma.RecommendationWhereUniqueInput | Prisma.RecommendationWhereUniqueInput[]
+  update?: Prisma.RecommendationUpdateWithWhereUniqueWithoutScanInput | Prisma.RecommendationUpdateWithWhereUniqueWithoutScanInput[]
+  updateMany?: Prisma.RecommendationUpdateManyWithWhereWithoutScanInput | Prisma.RecommendationUpdateManyWithWhereWithoutScanInput[]
+  deleteMany?: Prisma.RecommendationScalarWhereInput | Prisma.RecommendationScalarWhereInput[]
+}
+
 export type RecommendationCreateWithoutBrandInput = {
   id?: string
   title: string
@@ -535,10 +601,12 @@ export type RecommendationCreateWithoutBrandInput = {
   confidence: number
   effort: number
   createdAt?: Date | string
+  scan?: Prisma.ScanCreateNestedOneWithoutRecommendationsInput
 }
 
 export type RecommendationUncheckedCreateWithoutBrandInput = {
   id?: string
+  scanId?: string | null
   title: string
   finding: string
   action: string
@@ -581,6 +649,7 @@ export type RecommendationScalarWhereInput = {
   NOT?: Prisma.RecommendationScalarWhereInput | Prisma.RecommendationScalarWhereInput[]
   id?: Prisma.StringFilter<"Recommendation"> | string
   brandId?: Prisma.StringFilter<"Recommendation"> | string
+  scanId?: Prisma.StringNullableFilter<"Recommendation"> | string | null
   title?: Prisma.StringFilter<"Recommendation"> | string
   finding?: Prisma.StringFilter<"Recommendation"> | string
   action?: Prisma.StringFilter<"Recommendation"> | string
@@ -591,8 +660,61 @@ export type RecommendationScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Recommendation"> | Date | string
 }
 
+export type RecommendationCreateWithoutScanInput = {
+  id?: string
+  title: string
+  finding: string
+  action: string
+  evidence: string
+  impact: number
+  confidence: number
+  effort: number
+  createdAt?: Date | string
+  brand: Prisma.BrandCreateNestedOneWithoutRecommendationsInput
+}
+
+export type RecommendationUncheckedCreateWithoutScanInput = {
+  id?: string
+  brandId: string
+  title: string
+  finding: string
+  action: string
+  evidence: string
+  impact: number
+  confidence: number
+  effort: number
+  createdAt?: Date | string
+}
+
+export type RecommendationCreateOrConnectWithoutScanInput = {
+  where: Prisma.RecommendationWhereUniqueInput
+  create: Prisma.XOR<Prisma.RecommendationCreateWithoutScanInput, Prisma.RecommendationUncheckedCreateWithoutScanInput>
+}
+
+export type RecommendationCreateManyScanInputEnvelope = {
+  data: Prisma.RecommendationCreateManyScanInput | Prisma.RecommendationCreateManyScanInput[]
+  skipDuplicates?: boolean
+}
+
+export type RecommendationUpsertWithWhereUniqueWithoutScanInput = {
+  where: Prisma.RecommendationWhereUniqueInput
+  update: Prisma.XOR<Prisma.RecommendationUpdateWithoutScanInput, Prisma.RecommendationUncheckedUpdateWithoutScanInput>
+  create: Prisma.XOR<Prisma.RecommendationCreateWithoutScanInput, Prisma.RecommendationUncheckedCreateWithoutScanInput>
+}
+
+export type RecommendationUpdateWithWhereUniqueWithoutScanInput = {
+  where: Prisma.RecommendationWhereUniqueInput
+  data: Prisma.XOR<Prisma.RecommendationUpdateWithoutScanInput, Prisma.RecommendationUncheckedUpdateWithoutScanInput>
+}
+
+export type RecommendationUpdateManyWithWhereWithoutScanInput = {
+  where: Prisma.RecommendationScalarWhereInput
+  data: Prisma.XOR<Prisma.RecommendationUpdateManyMutationInput, Prisma.RecommendationUncheckedUpdateManyWithoutScanInput>
+}
+
 export type RecommendationCreateManyBrandInput = {
   id?: string
+  scanId?: string | null
   title: string
   finding: string
   action: string
@@ -613,10 +735,12 @@ export type RecommendationUpdateWithoutBrandInput = {
   confidence?: Prisma.IntFieldUpdateOperationsInput | number
   effort?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  scan?: Prisma.ScanUpdateOneWithoutRecommendationsNestedInput
 }
 
 export type RecommendationUncheckedUpdateWithoutBrandInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  scanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   finding?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.StringFieldUpdateOperationsInput | string
@@ -629,6 +753,59 @@ export type RecommendationUncheckedUpdateWithoutBrandInput = {
 
 export type RecommendationUncheckedUpdateManyWithoutBrandInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  scanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  finding?: Prisma.StringFieldUpdateOperationsInput | string
+  action?: Prisma.StringFieldUpdateOperationsInput | string
+  evidence?: Prisma.StringFieldUpdateOperationsInput | string
+  impact?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.IntFieldUpdateOperationsInput | number
+  effort?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type RecommendationCreateManyScanInput = {
+  id?: string
+  brandId: string
+  title: string
+  finding: string
+  action: string
+  evidence: string
+  impact: number
+  confidence: number
+  effort: number
+  createdAt?: Date | string
+}
+
+export type RecommendationUpdateWithoutScanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  finding?: Prisma.StringFieldUpdateOperationsInput | string
+  action?: Prisma.StringFieldUpdateOperationsInput | string
+  evidence?: Prisma.StringFieldUpdateOperationsInput | string
+  impact?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.IntFieldUpdateOperationsInput | number
+  effort?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  brand?: Prisma.BrandUpdateOneRequiredWithoutRecommendationsNestedInput
+}
+
+export type RecommendationUncheckedUpdateWithoutScanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  brandId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  finding?: Prisma.StringFieldUpdateOperationsInput | string
+  action?: Prisma.StringFieldUpdateOperationsInput | string
+  evidence?: Prisma.StringFieldUpdateOperationsInput | string
+  impact?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.IntFieldUpdateOperationsInput | number
+  effort?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type RecommendationUncheckedUpdateManyWithoutScanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  brandId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   finding?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.StringFieldUpdateOperationsInput | string
@@ -644,6 +821,7 @@ export type RecommendationUncheckedUpdateManyWithoutBrandInput = {
 export type RecommendationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   brandId?: boolean
+  scanId?: boolean
   title?: boolean
   finding?: boolean
   action?: boolean
@@ -653,11 +831,13 @@ export type RecommendationSelect<ExtArgs extends runtime.Types.Extensions.Intern
   effort?: boolean
   createdAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  scan?: boolean | Prisma.Recommendation$scanArgs<ExtArgs>
 }, ExtArgs["result"]["recommendation"]>
 
 export type RecommendationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   brandId?: boolean
+  scanId?: boolean
   title?: boolean
   finding?: boolean
   action?: boolean
@@ -667,11 +847,13 @@ export type RecommendationSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   effort?: boolean
   createdAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  scan?: boolean | Prisma.Recommendation$scanArgs<ExtArgs>
 }, ExtArgs["result"]["recommendation"]>
 
 export type RecommendationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   brandId?: boolean
+  scanId?: boolean
   title?: boolean
   finding?: boolean
   action?: boolean
@@ -681,11 +863,13 @@ export type RecommendationSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   effort?: boolean
   createdAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  scan?: boolean | Prisma.Recommendation$scanArgs<ExtArgs>
 }, ExtArgs["result"]["recommendation"]>
 
 export type RecommendationSelectScalar = {
   id?: boolean
   brandId?: boolean
+  scanId?: boolean
   title?: boolean
   finding?: boolean
   action?: boolean
@@ -696,25 +880,30 @@ export type RecommendationSelectScalar = {
   createdAt?: boolean
 }
 
-export type RecommendationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brandId" | "title" | "finding" | "action" | "evidence" | "impact" | "confidence" | "effort" | "createdAt", ExtArgs["result"]["recommendation"]>
+export type RecommendationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brandId" | "scanId" | "title" | "finding" | "action" | "evidence" | "impact" | "confidence" | "effort" | "createdAt", ExtArgs["result"]["recommendation"]>
 export type RecommendationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  scan?: boolean | Prisma.Recommendation$scanArgs<ExtArgs>
 }
 export type RecommendationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  scan?: boolean | Prisma.Recommendation$scanArgs<ExtArgs>
 }
 export type RecommendationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  scan?: boolean | Prisma.Recommendation$scanArgs<ExtArgs>
 }
 
 export type $RecommendationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Recommendation"
   objects: {
     brand: Prisma.$BrandPayload<ExtArgs>
+    scan: Prisma.$ScanPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     brandId: string
+    scanId: string | null
     title: string
     finding: string
     action: string
@@ -1118,6 +1307,7 @@ readonly fields: RecommendationFieldRefs;
 export interface Prisma__RecommendationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   brand<T extends Prisma.BrandDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BrandDefaultArgs<ExtArgs>>): Prisma.Prisma__BrandClient<runtime.Types.Result.GetResult<Prisma.$BrandPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  scan<T extends Prisma.Recommendation$scanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Recommendation$scanArgs<ExtArgs>>): Prisma.Prisma__ScanClient<runtime.Types.Result.GetResult<Prisma.$ScanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1149,6 +1339,7 @@ export interface Prisma__RecommendationClient<T, Null = never, ExtArgs extends r
 export interface RecommendationFieldRefs {
   readonly id: Prisma.FieldRef<"Recommendation", 'String'>
   readonly brandId: Prisma.FieldRef<"Recommendation", 'String'>
+  readonly scanId: Prisma.FieldRef<"Recommendation", 'String'>
   readonly title: Prisma.FieldRef<"Recommendation", 'String'>
   readonly finding: Prisma.FieldRef<"Recommendation", 'String'>
   readonly action: Prisma.FieldRef<"Recommendation", 'String'>
@@ -1555,6 +1746,25 @@ export type RecommendationDeleteManyArgs<ExtArgs extends runtime.Types.Extension
    * Limit how many Recommendations to delete.
    */
   limit?: number
+}
+
+/**
+ * Recommendation.scan
+ */
+export type Recommendation$scanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Scan
+   */
+  select?: Prisma.ScanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Scan
+   */
+  omit?: Prisma.ScanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScanInclude<ExtArgs> | null
+  where?: Prisma.ScanWhereInput
 }
 
 /**
