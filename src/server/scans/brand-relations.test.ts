@@ -127,6 +127,14 @@ describe("扫描增长实体的品牌一致性约束", () => {
     })).rejects.toThrow();
   });
 
+  it("拒绝把机会关联到其他品牌的问题版本", async () => {
+    const { brandA, promptVersionB, scanA } = await createBrandGraph();
+
+    await expect(db.opportunity.create({
+      data: opportunityData(brandA.id, scanA.id, promptVersionB.id),
+    })).rejects.toThrow("OPPORTUNITY_PROMPT_VERSION_BRAND_MISMATCH");
+  });
+
   it("拒绝把实验关联到其他品牌的机会", async () => {
     const { brandA, brandB, promptVersionA, scanA, scanB } = await createBrandGraph();
     const opportunity = await db.opportunity.create({
