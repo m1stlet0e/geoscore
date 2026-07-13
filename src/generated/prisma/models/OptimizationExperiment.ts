@@ -378,6 +378,9 @@ export type OptimizationExperimentWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   opportunityId?: string
   followUpScanId?: string
+  id_brandId?: Prisma.OptimizationExperimentIdBrandIdCompoundUniqueInput
+  opportunityId_brandId?: Prisma.OptimizationExperimentOpportunityIdBrandIdCompoundUniqueInput
+  followUpScanId_brandId?: Prisma.OptimizationExperimentFollowUpScanIdBrandIdCompoundUniqueInput
   AND?: Prisma.OptimizationExperimentWhereInput | Prisma.OptimizationExperimentWhereInput[]
   OR?: Prisma.OptimizationExperimentWhereInput[]
   NOT?: Prisma.OptimizationExperimentWhereInput | Prisma.OptimizationExperimentWhereInput[]
@@ -402,7 +405,7 @@ export type OptimizationExperimentWhereUniqueInput = Prisma.AtLeast<{
   baselineScan?: Prisma.XOR<Prisma.ScanScalarRelationFilter, Prisma.ScanWhereInput>
   followUpScan?: Prisma.XOR<Prisma.ScanNullableScalarRelationFilter, Prisma.ScanWhereInput> | null
   verificationScans?: Prisma.ScanListRelationFilter
-}, "id" | "opportunityId" | "followUpScanId">
+}, "id" | "opportunityId" | "followUpScanId" | "id_brandId" | "opportunityId_brandId" | "followUpScanId_brandId">
 
 export type OptimizationExperimentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -623,6 +626,21 @@ export type OptimizationExperimentOrderByRelationAggregateInput = {
 export type OptimizationExperimentNullableScalarRelationFilter = {
   is?: Prisma.OptimizationExperimentWhereInput | null
   isNot?: Prisma.OptimizationExperimentWhereInput | null
+}
+
+export type OptimizationExperimentIdBrandIdCompoundUniqueInput = {
+  id: string
+  brandId: string
+}
+
+export type OptimizationExperimentOpportunityIdBrandIdCompoundUniqueInput = {
+  opportunityId: string
+  brandId: string
+}
+
+export type OptimizationExperimentFollowUpScanIdBrandIdCompoundUniqueInput = {
+  followUpScanId: string
+  brandId: string
 }
 
 export type OptimizationExperimentCountOrderByAggregateInput = {
@@ -1049,7 +1067,6 @@ export type OptimizationExperimentCreateWithoutBaselineScanInput = {
 
 export type OptimizationExperimentUncheckedCreateWithoutBaselineScanInput = {
   id?: string
-  brandId: string
   opportunityId: string
   followUpScanId?: string | null
   title: string
@@ -1103,7 +1120,6 @@ export type OptimizationExperimentCreateWithoutFollowUpScanInput = {
 
 export type OptimizationExperimentUncheckedCreateWithoutFollowUpScanInput = {
   id?: string
-  brandId: string
   opportunityId: string
   baselineScanId: string
   title: string
@@ -1234,7 +1250,6 @@ export type OptimizationExperimentUpdateWithoutFollowUpScanInput = {
 
 export type OptimizationExperimentUncheckedUpdateWithoutFollowUpScanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  brandId?: Prisma.StringFieldUpdateOperationsInput | string
   opportunityId?: Prisma.StringFieldUpdateOperationsInput | string
   baselineScanId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1278,7 +1293,6 @@ export type OptimizationExperimentCreateWithoutOpportunityInput = {
 
 export type OptimizationExperimentUncheckedCreateWithoutOpportunityInput = {
   id?: string
-  brandId: string
   baselineScanId: string
   followUpScanId?: string | null
   title: string
@@ -1338,7 +1352,6 @@ export type OptimizationExperimentUpdateWithoutOpportunityInput = {
 
 export type OptimizationExperimentUncheckedUpdateWithoutOpportunityInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  brandId?: Prisma.StringFieldUpdateOperationsInput | string
   baselineScanId?: Prisma.StringFieldUpdateOperationsInput | string
   followUpScanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1446,7 +1459,6 @@ export type OptimizationExperimentUncheckedUpdateManyWithoutBrandInput = {
 
 export type OptimizationExperimentCreateManyBaselineScanInput = {
   id?: string
-  brandId: string
   opportunityId: string
   followUpScanId?: string | null
   title: string
@@ -1489,7 +1501,6 @@ export type OptimizationExperimentUpdateWithoutBaselineScanInput = {
 
 export type OptimizationExperimentUncheckedUpdateWithoutBaselineScanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  brandId?: Prisma.StringFieldUpdateOperationsInput | string
   opportunityId?: Prisma.StringFieldUpdateOperationsInput | string
   followUpScanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1511,7 +1522,6 @@ export type OptimizationExperimentUncheckedUpdateWithoutBaselineScanInput = {
 
 export type OptimizationExperimentUncheckedUpdateManyWithoutBaselineScanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  brandId?: Prisma.StringFieldUpdateOperationsInput | string
   opportunityId?: Prisma.StringFieldUpdateOperationsInput | string
   followUpScanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string

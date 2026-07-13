@@ -16,6 +16,35 @@ async function createReadyUser() {
 }
 
 describe("扫描服务", () => {
+  it("Mock 扫描显式落库为模拟数据", async () => {
+    const user = await createReadyUser();
+    const brand = await createBrandForUser(user.id, {
+      name: "模拟扫描品牌", website: "simulated.example.cn", industry: "企业服务", product: "客户管理软件", targetAudience: "中小企业",
+      aliases: [], competitors: [],
+    });
+
+    const scan = await createScanForUser(user.id, brand.id, ["mock"]);
+
+    expect(scan.dataMode).toBe("SIMULATED");
+  });
+
+  it("拒绝在同一扫描中混用真实与模拟平台", async () => {
+    const user = await createReadyUser();
+    const brand = await createBrandForUser(user.id, {
+      name: "混合扫描品牌", website: "mixed.example.cn", industry: "企业服务", product: "客户管理软件", targetAudience: "中小企业",
+      aliases: [], competitors: [],
+    });
+
+    await expect(createScanForUser(
+      user.id,
+      brand.id,
+      ["mock", "deepseek"],
+      { AI_PROVIDER: "mock", DEEPSEEK_API_KEY: "test-key" },
+    )).rejects.toThrow("一次扫描不能混合真实与模拟 AI 平台");
+    expect(await db.scan.count({ where: { brandId: brand.id } })).toBe(0);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance).toBe(30);
+  });
+
   it("预扣额度、保存原始回答并生成评分快照", async () => {
     const user = await createReadyUser();
     const brand = await createBrandForUser(user.id, {

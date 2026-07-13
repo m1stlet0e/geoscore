@@ -309,6 +309,7 @@ export type ScanOrderByWithRelationInput = {
 
 export type ScanWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  id_brandId?: Prisma.ScanIdBrandIdCompoundUniqueInput
   AND?: Prisma.ScanWhereInput | Prisma.ScanWhereInput[]
   OR?: Prisma.ScanWhereInput[]
   NOT?: Prisma.ScanWhereInput | Prisma.ScanWhereInput[]
@@ -332,7 +333,7 @@ export type ScanWhereUniqueInput = Prisma.AtLeast<{
   opportunities?: Prisma.OpportunityListRelationFilter
   riskFindings?: Prisma.RiskFindingListRelationFilter
   recommendations?: Prisma.RecommendationListRelationFilter
-}, "id">
+}, "id" | "id_brandId">
 
 export type ScanOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -511,6 +512,11 @@ export type ScanListRelationFilter = {
 
 export type ScanOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type ScanIdBrandIdCompoundUniqueInput = {
+  id: string
+  brandId: string
 }
 
 export type ScanCountOrderByAggregateInput = {
@@ -1075,7 +1081,6 @@ export type ScanCreateWithoutVerificationExperimentInput = {
 
 export type ScanUncheckedCreateWithoutVerificationExperimentInput = {
   id?: string
-  brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
@@ -1698,7 +1703,6 @@ export type ScanUncheckedUpdateManyWithoutBrandInput = {
 
 export type ScanCreateManyVerificationExperimentInput = {
   id?: string
-  brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
@@ -1733,7 +1737,6 @@ export type ScanUpdateWithoutVerificationExperimentInput = {
 
 export type ScanUncheckedUpdateWithoutVerificationExperimentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1754,7 +1757,6 @@ export type ScanUncheckedUpdateWithoutVerificationExperimentInput = {
 
 export type ScanUncheckedUpdateManyWithoutVerificationExperimentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number

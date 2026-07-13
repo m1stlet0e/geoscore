@@ -247,7 +247,7 @@ model Scan {
   completedAt              DateTime?
   createdAt                DateTime                 @default(now())
   brand                    Brand                    @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  verificationExperiment   OptimizationExperiment?  @relation("ExperimentVerificationScans", fields: [verificationExperimentId], references: [id], onDelete: SetNull)
+  verificationExperiment   OptimizationExperiment?  @relation("ExperimentVerificationScans", fields: [verificationExperimentId, brandId], references: [id, brandId], onDelete: NoAction)
   baselineExperiments      OptimizationExperiment[] @relation("ExperimentBaselineScan")
   followUpExperiment       OptimizationExperiment?  @relation("ExperimentFollowUpScan")
   observations             Observation[]
@@ -256,6 +256,7 @@ model Scan {
   riskFindings             RiskFinding[]
   recommendations          Recommendation[]
 
+  @@unique([id, brandId])
   @@index([brandId, createdAt])
   @@index([verificationExperimentId])
 }
@@ -277,11 +278,12 @@ model Opportunity {
   createdAt              DateTime                @default(now())
   updatedAt              DateTime                @updatedAt
   brand                  Brand                   @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  scan                   Scan                    @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  scan                   Scan                    @relation(fields: [scanId, brandId], references: [id, brandId], onDelete: Cascade)
   promptVersion          PromptVersion           @relation(fields: [promptVersionId], references: [id], onDelete: Cascade)
   optimizationExperiment OptimizationExperiment?
 
   @@unique([scanId, promptVersionId, platformId, type])
+  @@unique([id, brandId])
   @@index([brandId, status, priority])
   @@index([promptVersionId])
 }
@@ -307,12 +309,16 @@ model OptimizationExperiment {
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
   brand               Brand            @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  opportunity         Opportunity      @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
-  baselineScan        Scan             @relation("ExperimentBaselineScan", fields: [baselineScanId], references: [id], onDelete: Cascade)
-  followUpScan        Scan?            @relation("ExperimentFollowUpScan", fields: [followUpScanId], references: [id], onDelete: SetNull)
+  opportunity         Opportunity      @relation(fields: [opportunityId, brandId], references: [id, brandId], onDelete: Cascade)
+  baselineScan        Scan             @relation("ExperimentBaselineScan", fields: [baselineScanId, brandId], references: [id, brandId], onDelete: Cascade)
+  followUpScan        Scan?            @relation("ExperimentFollowUpScan", fields: [followUpScanId, brandId], references: [id, brandId], onDelete: NoAction)
   verificationScans   Scan[]           @relation("ExperimentVerificationScans")
 
+  @@unique([id, brandId])
+  @@unique([opportunityId, brandId])
+  @@unique([followUpScanId, brandId])
   @@index([brandId, status, createdAt])
+  @@index([baselineScanId])
 }
 
 model Observation {
@@ -395,7 +401,7 @@ model RiskFinding {
   resolvedAt  DateTime?
   createdAt   DateTime  @default(now())
   brand       Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  scan        Scan?     @relation(fields: [scanId], references: [id], onDelete: SetNull)
+  scan        Scan?     @relation(fields: [scanId, brandId], references: [id, brandId], onDelete: NoAction)
 
   @@index([brandId, resolvedAt])
   @@index([scanId])
@@ -414,7 +420,7 @@ model Recommendation {
   effort     Int
   createdAt  DateTime @default(now())
   brand      Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  scan       Scan?    @relation(fields: [scanId], references: [id], onDelete: SetNull)
+  scan       Scan?    @relation(fields: [scanId, brandId], references: [id, brandId], onDelete: NoAction)
 
   @@index([brandId, createdAt])
   @@index([scanId])

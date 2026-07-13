@@ -327,6 +327,7 @@ export type OpportunityOrderByWithRelationInput = {
 export type OpportunityWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   scanId_promptVersionId_platformId_type?: Prisma.OpportunityScanIdPromptVersionIdPlatformIdTypeCompoundUniqueInput
+  id_brandId?: Prisma.OpportunityIdBrandIdCompoundUniqueInput
   AND?: Prisma.OpportunityWhereInput | Prisma.OpportunityWhereInput[]
   OR?: Prisma.OpportunityWhereInput[]
   NOT?: Prisma.OpportunityWhereInput | Prisma.OpportunityWhereInput[]
@@ -348,7 +349,7 @@ export type OpportunityWhereUniqueInput = Prisma.AtLeast<{
   scan?: Prisma.XOR<Prisma.ScanScalarRelationFilter, Prisma.ScanWhereInput>
   promptVersion?: Prisma.XOR<Prisma.PromptVersionScalarRelationFilter, Prisma.PromptVersionWhereInput>
   optimizationExperiment?: Prisma.XOR<Prisma.OptimizationExperimentNullableScalarRelationFilter, Prisma.OptimizationExperimentWhereInput> | null
-}, "id" | "scanId_promptVersionId_platformId_type">
+}, "id" | "scanId_promptVersionId_platformId_type" | "id_brandId">
 
 export type OpportunityOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -536,6 +537,11 @@ export type OpportunityScanIdPromptVersionIdPlatformIdTypeCompoundUniqueInput = 
   promptVersionId: string
   platformId: string
   type: $Enums.OpportunityType
+}
+
+export type OpportunityIdBrandIdCompoundUniqueInput = {
+  id: string
+  brandId: string
 }
 
 export type OpportunityCountOrderByAggregateInput = {
@@ -918,7 +924,6 @@ export type OpportunityCreateWithoutScanInput = {
 
 export type OpportunityUncheckedCreateWithoutScanInput = {
   id?: string
-  brandId: string
   promptVersionId: string
   platformId: string
   type: $Enums.OpportunityType
@@ -1190,7 +1195,6 @@ export type OpportunityUncheckedUpdateManyWithoutPromptVersionInput = {
 
 export type OpportunityCreateManyScanInput = {
   id?: string
-  brandId: string
   promptVersionId: string
   platformId: string
   type: $Enums.OpportunityType
@@ -1225,7 +1229,6 @@ export type OpportunityUpdateWithoutScanInput = {
 
 export type OpportunityUncheckedUpdateWithoutScanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  brandId?: Prisma.StringFieldUpdateOperationsInput | string
   promptVersionId?: Prisma.StringFieldUpdateOperationsInput | string
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumOpportunityTypeFieldUpdateOperationsInput | $Enums.OpportunityType
@@ -1243,7 +1246,6 @@ export type OpportunityUncheckedUpdateWithoutScanInput = {
 
 export type OpportunityUncheckedUpdateManyWithoutScanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  brandId?: Prisma.StringFieldUpdateOperationsInput | string
   promptVersionId?: Prisma.StringFieldUpdateOperationsInput | string
   platformId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumOpportunityTypeFieldUpdateOperationsInput | $Enums.OpportunityType

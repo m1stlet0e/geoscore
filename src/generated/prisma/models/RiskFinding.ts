@@ -567,7 +567,6 @@ export type RiskFindingCreateWithoutScanInput = {
 
 export type RiskFindingUncheckedCreateWithoutScanInput = {
   id?: string
-  brandId: string
   level: $Enums.RiskLevel
   title: string
   description: string
@@ -648,7 +647,6 @@ export type RiskFindingUncheckedUpdateManyWithoutBrandInput = {
 
 export type RiskFindingCreateManyScanInput = {
   id?: string
-  brandId: string
   level: $Enums.RiskLevel
   title: string
   description: string
@@ -670,7 +668,6 @@ export type RiskFindingUpdateWithoutScanInput = {
 
 export type RiskFindingUncheckedUpdateWithoutScanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  brandId?: Prisma.StringFieldUpdateOperationsInput | string
   level?: Prisma.EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
@@ -681,7 +678,6 @@ export type RiskFindingUncheckedUpdateWithoutScanInput = {
 
 export type RiskFindingUncheckedUpdateManyWithoutScanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  brandId?: Prisma.StringFieldUpdateOperationsInput | string
   level?: Prisma.EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string

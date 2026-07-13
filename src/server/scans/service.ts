@@ -1,22 +1,37 @@
 import { calculateComponents, calculateConfidence, calculateGeoScore, SCORING_VERSION, type ParsedObservation } from "@/domain/scoring/calculate";
 import { db } from "@/lib/db";
-import { getAiProvider } from "@/server/ai";
+import { getAiProvider, listAiProviders, type AiProviderEnvironment } from "@/server/ai";
 
-export async function createScanForUser(userId: string, brandId: string, platformIds: string[]) {
+export async function createScanForUser(
+  userId: string,
+  brandId: string,
+  platformIds: string[],
+  env: AiProviderEnvironment = process.env,
+) {
   const brand = await db.brand.findFirst({
     where: { id: brandId, ownerId: userId },
     include: { prompts: { where: { active: true } } },
   });
   if (!brand) throw new Error("品牌不存在");
   if (!platformIds.length) throw new Error("至少选择一个 AI 平台");
-  platformIds.forEach((id) => getAiProvider(id));
+  const registrations = new Map(
+    listAiProviders(env).map((provider) => [provider.id, provider] as const),
+  );
+  const dataModes = new Set(platformIds.map((id) => {
+    getAiProvider(id, env);
+    return registrations.get(id)!.dataMode;
+  }));
+  if (dataModes.size > 1) throw new Error("一次扫描不能混合真实与模拟 AI 平台");
+  const dataMode = [...dataModes][0];
   const requestedCount = brand.prompts.length * platformIds.length;
   if (!requestedCount) throw new Error("品牌没有可扫描的问题");
 
   return db.$transaction(async (tx) => {
     const quota = await tx.quotaAccount.findUnique({ where: { userId } });
     if (!quota || quota.balance < requestedCount) throw new Error(`额度不足，本次需要 ${requestedCount} 次`);
-    const scan = await tx.scan.create({ data: { brandId, providerIds: platformIds, requestedCount } });
+    const scan = await tx.scan.create({
+      data: { brandId, providerIds: platformIds, requestedCount, dataMode },
+    });
     const debited = await tx.quotaAccount.updateMany({
       where: { userId, balance: { gte: requestedCount } },
       data: { balance: { decrement: requestedCount } },

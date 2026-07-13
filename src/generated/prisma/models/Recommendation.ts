@@ -675,7 +675,6 @@ export type RecommendationCreateWithoutScanInput = {
 
 export type RecommendationUncheckedCreateWithoutScanInput = {
   id?: string
-  brandId: string
   title: string
   finding: string
   action: string
@@ -766,7 +765,6 @@ export type RecommendationUncheckedUpdateManyWithoutBrandInput = {
 
 export type RecommendationCreateManyScanInput = {
   id?: string
-  brandId: string
   title: string
   finding: string
   action: string
@@ -792,7 +790,6 @@ export type RecommendationUpdateWithoutScanInput = {
 
 export type RecommendationUncheckedUpdateWithoutScanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  brandId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   finding?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.StringFieldUpdateOperationsInput | string
@@ -805,7 +802,6 @@ export type RecommendationUncheckedUpdateWithoutScanInput = {
 
 export type RecommendationUncheckedUpdateManyWithoutScanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  brandId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   finding?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.StringFieldUpdateOperationsInput | string
