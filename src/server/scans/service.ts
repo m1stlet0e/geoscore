@@ -6,6 +6,8 @@ import { getAiProvider, listAiProviders, type AiProviderEnvironment } from "@/se
 export type CreateScanOptions = {
   repeatCount?: number;
   env?: AiProviderEnvironment;
+  promptVersionIds?: string[];
+  verificationExperimentId?: string;
 };
 
 export type RepeatConsistencySample = {
@@ -47,7 +49,12 @@ export async function createScanForUser(
   const env = options.env ?? process.env;
   const brand = await db.brand.findFirst({
     where: { id: brandId, ownerId: userId },
-    include: { prompts: { where: { active: true } } },
+    include: {
+      prompts: {
+        where: { active: true },
+        include: { versions: { orderBy: { version: "desc" }, take: 1 } },
+      },
+    },
   });
   if (!brand) throw new Error("品牌不存在");
   if (!platformIds.length) throw new Error("至少选择一个 AI 平台");
@@ -60,14 +67,47 @@ export async function createScanForUser(
   }));
   if (dataModes.size > 1) throw new Error("一次扫描不能混合真实与模拟 AI 平台");
   const dataMode = [...dataModes][0];
-  const requestedCount = brand.prompts.length * platformIds.length * repeatCount;
+  const promptVersionIds = options.promptVersionIds === undefined
+    ? brand.prompts.flatMap((prompt) => prompt.versions[0]?.id ?? [])
+    : [...new Set(options.promptVersionIds.map((id) => id.trim()).filter(Boolean))];
+  if (!promptVersionIds.length) throw new Error("固定问题版本不能为空");
+  if (options.promptVersionIds !== undefined) {
+    const ownedVersionCount = await db.promptVersion.count({
+      where: {
+        id: { in: promptVersionIds },
+        prompt: { brandId },
+      },
+    });
+    if (ownedVersionCount !== promptVersionIds.length) {
+      throw new Error("固定问题版本不属于当前品牌");
+    }
+  }
+  if (options.verificationExperimentId) {
+    const verificationExperiment = await db.optimizationExperiment.findFirst({
+      where: { id: options.verificationExperimentId, brandId },
+      select: { id: true, status: true },
+    });
+    if (!verificationExperiment) throw new Error("验证实验不存在或不属于当前品牌");
+    if (verificationExperiment.status !== "VERIFYING") {
+      throw new Error("只有验证中的实验可以创建复扫");
+    }
+  }
+  const requestedCount = promptVersionIds.length * platformIds.length * repeatCount;
   if (!requestedCount) throw new Error("品牌没有可扫描的问题");
 
   return db.$transaction(async (tx) => {
     const quota = await tx.quotaAccount.findUnique({ where: { userId } });
     if (!quota || quota.balance < requestedCount) throw new Error(`额度不足，本次需要 ${requestedCount} 次`);
     const scan = await tx.scan.create({
-      data: { brandId, providerIds: platformIds, requestedCount, repeatCount, dataMode },
+      data: {
+        brandId,
+        providerIds: platformIds,
+        promptVersionIds,
+        requestedCount,
+        repeatCount,
+        dataMode,
+        verificationExperimentId: options.verificationExperimentId,
+      },
     });
     const debited = await tx.quotaAccount.updateMany({
       where: { userId, balance: { gte: requestedCount } },
@@ -102,10 +142,11 @@ export async function executeScanForUser(userId: string, scanId: string) {
     include: {
       brand: {
         include: {
-          aliases: true, competitors: true,
-          prompts: { where: { active: true }, include: { versions: { orderBy: { version: "desc" }, take: 1 } } },
+          aliases: true,
+          competitors: true,
         },
       },
+      verificationExperiment: { include: { opportunity: true } },
       observations: true,
       scoreSnapshot: true,
     },
@@ -125,9 +166,29 @@ export async function executeScanForUser(userId: string, scanId: string) {
   const repeatSignals: RepeatConsistencySample[] = [];
   const opportunitySamples: OpportunitySample[] = [];
   try {
-    for (const prompt of scan.brand.prompts) {
-      const version = prompt.versions[0];
-      if (!version) continue;
+    const pinnedIds = Array.isArray(scan.promptVersionIds)
+      ? scan.promptVersionIds.filter((id): id is string => typeof id === "string")
+      : [];
+    const promptVersions = pinnedIds.length
+      ? await db.promptVersion.findMany({
+        where: { id: { in: pinnedIds }, prompt: { brandId: scan.brandId } },
+        include: { prompt: { select: { category: true } } },
+      }).then((versions) => {
+        const byId = new Map(versions.map((version) => [version.id, version]));
+        return pinnedIds.flatMap((id) => byId.get(id) ?? []);
+      })
+      : await db.prompt.findMany({
+        where: { brandId: scan.brandId, active: true },
+        include: { versions: { orderBy: { version: "desc" }, take: 1 } },
+      }).then((prompts) => prompts.flatMap((prompt) => prompt.versions.map((version) => ({
+        ...version,
+        prompt: { category: prompt.category },
+      }))));
+    if (pinnedIds.length && promptVersions.length !== pinnedIds.length) {
+      throw new Error("扫描固定的问题版本已失效");
+    }
+    if (!promptVersions.length) throw new Error("品牌没有可扫描的问题");
+    for (const version of promptVersions) {
       for (const platformId of platformIds) {
         const provider = getAiProvider(platformId);
         for (let runIndex = 1; runIndex <= scan.repeatCount; runIndex += 1) {
@@ -135,6 +196,13 @@ export async function executeScanForUser(userId: string, scanId: string) {
             prompt: version.text,
             brand: { name: scan.brand.name, website: scan.brand.website, aliases: scan.brand.aliases.map((item) => item.value) },
             competitors: scan.brand.competitors.map((item) => item.name),
+            simulationContext: scan.dataMode === "SIMULATED"
+              && scan.verificationExperiment?.opportunity.promptVersionId === version.id
+              ? {
+                optimizationApplied: true,
+                targetUrl: scan.verificationExperiment.targetUrl ?? undefined,
+              }
+              : undefined,
           });
           const target = answer.mentions.find((item) => item.isTarget);
           const competitorMentions = answer.mentions.filter((item) => !item.isTarget);
@@ -163,7 +231,7 @@ export async function executeScanForUser(userId: string, scanId: string) {
             brandName: scan.brand.name,
             promptVersionId: version.id,
             promptText: version.text,
-            promptCategory: prompt.category,
+            promptCategory: version.prompt.category,
             promptWeight: version.weight,
             platformId: answer.platformId,
             rawResponse: answer.rawResponse,

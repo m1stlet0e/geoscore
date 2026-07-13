@@ -29,6 +29,10 @@ export type AiQuery = {
   prompt: string;
   brand: { name: string; website: string; aliases: string[] };
   competitors: string[];
+  simulationContext?: {
+    optimizationApplied: boolean;
+    targetUrl?: string;
+  };
 };
 
 export interface AiProvider {

@@ -1,6 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { DeepSeekProvider } from "./deepseek-provider";
+import { MockAiProvider } from "./mock-provider";
 import { getAiProvider, listAiProviders } from "./index";
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("AI 平台注册表", () => {
   it("显式启用 mock 时标记为可用的模拟数据平台", () => {
@@ -82,5 +87,97 @@ describe("AI 平台注册表", () => {
 
     expect(deepseek).toMatchObject({ dataMode: "REAL", available: true });
     expect(getAiProvider("deepseek", env)).toBeInstanceOf(DeepSeekProvider);
+  });
+
+  it("Mock 在应用优化时稳定推荐目标品牌并返回官方引用", async () => {
+    const provider = new MockAiProvider();
+
+    const answer = await provider.query({
+      prompt: "c",
+      brand: {
+        name: "实验品牌",
+        website: "https://target.example.com",
+        aliases: [],
+      },
+      competitors: ["竞品甲"],
+      simulationContext: {
+        optimizationApplied: true,
+        targetUrl: "https://target.example.com/optimized",
+      },
+    });
+
+    expect(answer.modelId).toBe("mock-deterministic-optimized-v1");
+    expect(answer.mentions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        isTarget: true,
+        recommendationStrength: expect.any(Number),
+      }),
+    ]));
+    expect(answer.mentions.find((item) => item.isTarget)?.recommendationStrength)
+      .toBeGreaterThan(0);
+    expect(answer.citations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        url: "https://target.example.com/optimized",
+        isOfficial: true,
+      }),
+    ]));
+  });
+
+  it("Mock 的优化目标在站外时仍包含品牌官网引用", async () => {
+    const provider = new MockAiProvider();
+
+    const answer = await provider.query({
+      prompt: "c",
+      brand: {
+        name: "实验品牌",
+        website: "https://official.example.com",
+        aliases: [],
+      },
+      competitors: [],
+      simulationContext: {
+        optimizationApplied: true,
+        targetUrl: "https://content.example.net/guide",
+      },
+    });
+
+    expect(answer.citations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        url: "https://official.example.com",
+        isOfficial: true,
+      }),
+    ]));
+    expect(answer.rawResponse).toContain("https://content.example.net/guide");
+  });
+
+  it("DeepSeek 请求消息完全忽略模拟实验上下文", async () => {
+    let requestBody = "";
+    vi.stubGlobal("fetch", vi.fn(async (_url: string, init?: RequestInit) => {
+      requestBody = String(init?.body ?? "");
+      return new Response(JSON.stringify({
+        id: "response-id",
+        model: "deepseek-chat",
+        choices: [{ message: { content: "普通回答" } }],
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    }));
+    const provider = new DeepSeekProvider("test-key", "https://deepseek.test");
+
+    await provider.query({
+      prompt: "用户原始问题",
+      brand: {
+        name: "实验品牌",
+        website: "https://target.example.com",
+        aliases: [],
+      },
+      competitors: ["竞品甲"],
+      simulationContext: {
+        optimizationApplied: true,
+        targetUrl: "https://target.example.com/optimized",
+      },
+    });
+
+    expect(requestBody).toContain("用户原始问题");
+    expect(requestBody).not.toContain("实验品牌");
+    expect(requestBody).not.toContain("target.example.com");
+    expect(requestBody).not.toContain("optimizationApplied");
   });
 });

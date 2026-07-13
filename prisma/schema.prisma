@@ -238,6 +238,7 @@ model Scan {
   brandId                  String
   status                   ScanStatus               @default(PENDING)
   providerIds              Json
+  promptVersionIds         Json?
   requestedCount           Int
   repeatCount              Int                      @default(1)
   dataMode                 ScanDataMode             @default(REAL)

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
+import { randomUUID } from "node:crypto";
 import { db } from "@/lib/db";
-import { createBrandForUser } from "@/server/brands/service";
+import { createBrandForUser, updatePromptForUser } from "@/server/brands/service";
 import {
   calculateRepeatConsistency,
   createScanForUser,
@@ -12,7 +13,7 @@ afterEach(async () => { await db.user.deleteMany({ where: { id: { in: userIds.sp
 
 async function createReadyUser(balance = 30) {
   const free = await db.plan.findUniqueOrThrow({ where: { code: "FREE" } });
-  const user = await db.user.create({ data: { name: "扫描测试", email: `scan-${Date.now()}@test.local` } });
+  const user = await db.user.create({ data: { name: "扫描测试", email: `scan-${randomUUID()}@test.local` } });
   userIds.push(user.id);
   await db.quotaAccount.create({ data: { userId: user.id, balance } });
   await db.subscription.create({ data: { userId: user.id, planId: free.id, startsAt: new Date(), endsAt: new Date(Date.now() + 86_400_000) } });
@@ -51,6 +52,144 @@ describe("扫描服务", () => {
     const scan = await createScanForUser(user.id, brand.id, ["mock"]);
 
     expect(scan.dataMode).toBe("SIMULATED");
+  });
+
+  it("创建普通扫描时快照所有启用问题的最新版本", async () => {
+    const user = await createReadyUser();
+    const brand = await createBrandForUser(user.id, {
+      name: "版本快照品牌", website: "pin.example.cn", industry: "企业服务", product: "监测软件", targetAudience: "品牌团队",
+      aliases: [], competitors: [],
+    });
+    const expectedVersionIds = brand.prompts
+      .map((prompt) => prompt.versions[0]?.id)
+      .filter((id): id is string => Boolean(id));
+
+    const scan = await createScanForUser(user.id, brand.id, ["mock"]);
+
+    expect(scan.promptVersionIds).toEqual(expectedVersionIds);
+    expect(scan.requestedCount).toBe(expectedVersionIds.length);
+  });
+
+  it("创建后编辑并停用问题仍按扫描固定的旧版本执行", async () => {
+    const user = await createReadyUser();
+    const brand = await createBrandForUser(user.id, {
+      name: "旧版本执行品牌", website: "old-version.example.cn", industry: "企业服务", product: "监测软件", targetAudience: "品牌团队",
+      aliases: [], competitors: [],
+    });
+    const prompt = brand.prompts[0];
+    const oldVersion = prompt.versions[0];
+    const scan = await createScanForUser(user.id, brand.id, ["mock"]);
+    const updated = await updatePromptForUser(user.id, prompt.id, {
+      text: "这是扫描创建之后才出现的新问题版本",
+      active: false,
+    });
+    const newVersion = updated.versions[0];
+
+    const completed = await executeScanForUser(user.id, scan.id);
+
+    expect(completed.observations.some((item) => item.promptVersionId === oldVersion.id))
+      .toBe(true);
+    expect(completed.observations.some((item) => item.promptVersionId === newVersion.id))
+      .toBe(false);
+    expect(completed.observations.find((item) => item.promptVersionId === oldVersion.id)?.rawResponse)
+      .toContain(oldVersion.text);
+  });
+
+  it("显式固定其他品牌的问题版本时拒绝且不扣费", async () => {
+    const [user, otherUser] = await Promise.all([
+      createReadyUser(50),
+      createReadyUser(50),
+    ]);
+    const [brand, otherBrand] = await Promise.all([
+      createBrandForUser(user.id, {
+        name: "当前品牌", website: "current-brand.example.cn", industry: "企业服务", product: "监测软件", targetAudience: "品牌团队",
+        aliases: [], competitors: [],
+      }),
+      createBrandForUser(otherUser.id, {
+        name: "其他品牌", website: "other-brand.example.cn", industry: "企业服务", product: "监测软件", targetAudience: "品牌团队",
+        aliases: [], competitors: [],
+      }),
+    ]);
+    const foreignVersionId = otherBrand.prompts[0].versions[0].id;
+
+    await expect(createScanForUser(user.id, brand.id, ["mock"], {
+      promptVersionIds: [foreignVersionId],
+    })).rejects.toThrow("固定问题版本不属于当前品牌");
+
+    expect(await db.scan.count({ where: { brandId: brand.id } })).toBe(0);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(50);
+  });
+
+  it("显式固定版本去重并按实际版本数计算额度", async () => {
+    const user = await createReadyUser(50);
+    const brand = await createBrandForUser(user.id, {
+      name: "指定版本品牌", website: "selected-versions.example.cn", industry: "企业服务", product: "监测软件", targetAudience: "品牌团队",
+      aliases: [], competitors: [],
+    });
+    const versionIds = brand.prompts.slice(0, 2).map((prompt) => prompt.versions[0].id);
+
+    const scan = await createScanForUser(user.id, brand.id, ["mock"], {
+      repeatCount: 2,
+      promptVersionIds: [versionIds[0], versionIds[0], versionIds[1]],
+    });
+
+    expect(scan.promptVersionIds).toEqual(versionIds);
+    expect(scan.requestedCount).toBe(4);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(46);
+  });
+
+  it("拒绝为非 VERIFYING 状态的实验创建验证扫描且不扣费", async () => {
+    const user = await createReadyUser(50);
+    const brand = await createBrandForUser(user.id, {
+      name: "验证状态品牌", website: "verification-state.example.cn", industry: "企业服务", product: "监测软件", targetAudience: "品牌团队",
+      aliases: [], competitors: [],
+    });
+    const promptVersionId = brand.prompts[0].versions[0].id;
+    const baselineScan = await db.scan.create({
+      data: {
+        brandId: brand.id,
+        providerIds: ["mock"],
+        promptVersionIds: [promptVersionId],
+        requestedCount: 1,
+        dataMode: "SIMULATED",
+      },
+    });
+    const opportunity = await db.opportunity.create({
+      data: {
+        brandId: brand.id,
+        scanId: baselineScan.id,
+        promptVersionId,
+        platformId: "mock",
+        type: "MENTION_GAP",
+        priority: 80,
+        title: "验证状态机会",
+        summary: "验证状态摘要",
+        evidence: "验证状态证据",
+        recommendedAction: "发布一篇完整的官网验证内容",
+        targetContentType: "官网指南",
+      },
+    });
+    const draft = await db.optimizationExperiment.create({
+      data: {
+        brandId: brand.id,
+        opportunityId: opportunity.id,
+        baselineScanId: baselineScan.id,
+        title: "验证状态实验",
+        hypothesis: "验证状态假设",
+        actionPlan: "发布一篇完整的官网验证内容",
+      },
+    });
+
+    await expect(createScanForUser(user.id, brand.id, ["mock"], {
+      promptVersionIds: [promptVersionId],
+      verificationExperimentId: draft.id,
+    })).rejects.toThrow("只有验证中的实验可以创建复扫");
+
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(50);
+    expect(await db.scan.count({ where: { brandId: brand.id } })).toBe(1);
   });
 
   it("重复选择同一 AI 平台时在创建扫描和扣额度前拒绝", async () => {

@@ -12,16 +12,23 @@ export class MockAiProvider implements AiProvider {
     const startedAt = Date.now();
     const value = hash(input.prompt);
     const competitor = input.competitors[value % Math.max(1, input.competitors.length)];
-    const includeTarget = value % 4 !== 0;
-    const recommendation = value % 3 !== 0;
+    const optimizationApplied = input.simulationContext?.optimizationApplied === true;
+    const includeTarget = optimizationApplied || value % 4 !== 0;
+    const recommendation = optimizationApplied || value % 3 !== 0;
+    const targetUrl = input.simulationContext?.targetUrl;
+    const optimizedContent = optimizationApplied && targetUrl
+      ? `，本次优化内容位于 ${targetUrl}`
+      : "";
     const target = includeTarget
-      ? `${input.brand.name}${recommendation ? "是值得优先考虑的选择" : "也在相关候选名单中"}，其官网 ${input.brand.website} 提供了完整资料。`
+      ? `${input.brand.name}${recommendation ? "是值得优先考虑的选择" : "也在相关候选名单中"}，其官网 ${input.brand.website} 提供了完整资料${optimizedContent}。`
       : "目标品牌暂未进入这次回答。";
     const rival = competitor ? `${competitor}也经常被用户比较和提及。` : "当前没有明确的同类品牌对比。";
     const rawResponse = `针对“${input.prompt}”，需要综合产品能力、公开资料与实际需求判断。${target}${rival}`;
     return withAnalysis({
       platformId: this.id,
-      modelId: "mock-deterministic-v1",
+      modelId: optimizationApplied
+        ? "mock-deterministic-optimized-v1"
+        : "mock-deterministic-v1",
       requestId: `mock-${value}`,
       rawResponse,
       latencyMs: Date.now() - startedAt,

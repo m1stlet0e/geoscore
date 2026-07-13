@@ -69,6 +69,7 @@ export type ScanCountAggregateOutputType = {
   brandId: number
   status: number
   providerIds: number
+  promptVersionIds: number
   requestedCount: number
   repeatCount: number
   dataMode: number
@@ -124,6 +125,7 @@ export type ScanCountAggregateInputType = {
   brandId?: true
   status?: true
   providerIds?: true
+  promptVersionIds?: true
   requestedCount?: true
   repeatCount?: true
   dataMode?: true
@@ -226,6 +228,7 @@ export type ScanGroupByOutputType = {
   brandId: string
   status: $Enums.ScanStatus
   providerIds: runtime.JsonValue
+  promptVersionIds: runtime.JsonValue | null
   requestedCount: number
   repeatCount: number
   dataMode: $Enums.ScanDataMode
@@ -264,6 +267,7 @@ export type ScanWhereInput = {
   brandId?: Prisma.StringFilter<"Scan"> | string
   status?: Prisma.EnumScanStatusFilter<"Scan"> | $Enums.ScanStatus
   providerIds?: Prisma.JsonFilter<"Scan">
+  promptVersionIds?: Prisma.JsonNullableFilter<"Scan">
   requestedCount?: Prisma.IntFilter<"Scan"> | number
   repeatCount?: Prisma.IntFilter<"Scan"> | number
   dataMode?: Prisma.EnumScanDataModeFilter<"Scan"> | $Enums.ScanDataMode
@@ -288,6 +292,7 @@ export type ScanOrderByWithRelationInput = {
   brandId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerIds?: Prisma.SortOrder
+  promptVersionIds?: Prisma.SortOrderInput | Prisma.SortOrder
   requestedCount?: Prisma.SortOrder
   repeatCount?: Prisma.SortOrder
   dataMode?: Prisma.SortOrder
@@ -316,6 +321,7 @@ export type ScanWhereUniqueInput = Prisma.AtLeast<{
   brandId?: Prisma.StringFilter<"Scan"> | string
   status?: Prisma.EnumScanStatusFilter<"Scan"> | $Enums.ScanStatus
   providerIds?: Prisma.JsonFilter<"Scan">
+  promptVersionIds?: Prisma.JsonNullableFilter<"Scan">
   requestedCount?: Prisma.IntFilter<"Scan"> | number
   repeatCount?: Prisma.IntFilter<"Scan"> | number
   dataMode?: Prisma.EnumScanDataModeFilter<"Scan"> | $Enums.ScanDataMode
@@ -340,6 +346,7 @@ export type ScanOrderByWithAggregationInput = {
   brandId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerIds?: Prisma.SortOrder
+  promptVersionIds?: Prisma.SortOrderInput | Prisma.SortOrder
   requestedCount?: Prisma.SortOrder
   repeatCount?: Prisma.SortOrder
   dataMode?: Prisma.SortOrder
@@ -363,6 +370,7 @@ export type ScanScalarWhereWithAggregatesInput = {
   brandId?: Prisma.StringWithAggregatesFilter<"Scan"> | string
   status?: Prisma.EnumScanStatusWithAggregatesFilter<"Scan"> | $Enums.ScanStatus
   providerIds?: Prisma.JsonWithAggregatesFilter<"Scan">
+  promptVersionIds?: Prisma.JsonNullableWithAggregatesFilter<"Scan">
   requestedCount?: Prisma.IntWithAggregatesFilter<"Scan"> | number
   repeatCount?: Prisma.IntWithAggregatesFilter<"Scan"> | number
   dataMode?: Prisma.EnumScanDataModeWithAggregatesFilter<"Scan"> | $Enums.ScanDataMode
@@ -377,6 +385,7 @@ export type ScanCreateInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -400,6 +409,7 @@ export type ScanUncheckedCreateInput = {
   brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -421,6 +431,7 @@ export type ScanUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -444,6 +455,7 @@ export type ScanUncheckedUpdateInput = {
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -466,6 +478,7 @@ export type ScanCreateManyInput = {
   brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -480,6 +493,7 @@ export type ScanUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -494,6 +508,7 @@ export type ScanUncheckedUpdateManyInput = {
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -524,6 +539,7 @@ export type ScanCountOrderByAggregateInput = {
   brandId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerIds?: Prisma.SortOrder
+  promptVersionIds?: Prisma.SortOrder
   requestedCount?: Prisma.SortOrder
   repeatCount?: Prisma.SortOrder
   dataMode?: Prisma.SortOrder
@@ -782,6 +798,7 @@ export type ScanCreateWithoutBrandInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -803,6 +820,7 @@ export type ScanUncheckedCreateWithoutBrandInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -854,6 +872,7 @@ export type ScanScalarWhereInput = {
   brandId?: Prisma.StringFilter<"Scan"> | string
   status?: Prisma.EnumScanStatusFilter<"Scan"> | $Enums.ScanStatus
   providerIds?: Prisma.JsonFilter<"Scan">
+  promptVersionIds?: Prisma.JsonNullableFilter<"Scan">
   requestedCount?: Prisma.IntFilter<"Scan"> | number
   repeatCount?: Prisma.IntFilter<"Scan"> | number
   dataMode?: Prisma.EnumScanDataModeFilter<"Scan"> | $Enums.ScanDataMode
@@ -868,6 +887,7 @@ export type ScanCreateWithoutOpportunitiesInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -890,6 +910,7 @@ export type ScanUncheckedCreateWithoutOpportunitiesInput = {
   brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -926,6 +947,7 @@ export type ScanUpdateWithoutOpportunitiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -948,6 +970,7 @@ export type ScanUncheckedUpdateWithoutOpportunitiesInput = {
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -968,6 +991,7 @@ export type ScanCreateWithoutBaselineExperimentsInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -990,6 +1014,7 @@ export type ScanUncheckedCreateWithoutBaselineExperimentsInput = {
   brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1015,6 +1040,7 @@ export type ScanCreateWithoutFollowUpExperimentInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1037,6 +1063,7 @@ export type ScanUncheckedCreateWithoutFollowUpExperimentInput = {
   brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1062,6 +1089,7 @@ export type ScanCreateWithoutVerificationExperimentInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1083,6 +1111,7 @@ export type ScanUncheckedCreateWithoutVerificationExperimentInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1124,6 +1153,7 @@ export type ScanUpdateWithoutBaselineExperimentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1146,6 +1176,7 @@ export type ScanUncheckedUpdateWithoutBaselineExperimentsInput = {
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1177,6 +1208,7 @@ export type ScanUpdateWithoutFollowUpExperimentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1199,6 +1231,7 @@ export type ScanUncheckedUpdateWithoutFollowUpExperimentInput = {
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1235,6 +1268,7 @@ export type ScanCreateWithoutObservationsInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1257,6 +1291,7 @@ export type ScanUncheckedCreateWithoutObservationsInput = {
   brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1293,6 +1328,7 @@ export type ScanUpdateWithoutObservationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1315,6 +1351,7 @@ export type ScanUncheckedUpdateWithoutObservationsInput = {
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1335,6 +1372,7 @@ export type ScanCreateWithoutScoreSnapshotInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1357,6 +1395,7 @@ export type ScanUncheckedCreateWithoutScoreSnapshotInput = {
   brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1393,6 +1432,7 @@ export type ScanUpdateWithoutScoreSnapshotInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1415,6 +1455,7 @@ export type ScanUncheckedUpdateWithoutScoreSnapshotInput = {
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1435,6 +1476,7 @@ export type ScanCreateWithoutRiskFindingsInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1457,6 +1499,7 @@ export type ScanUncheckedCreateWithoutRiskFindingsInput = {
   brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1493,6 +1536,7 @@ export type ScanUpdateWithoutRiskFindingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1515,6 +1559,7 @@ export type ScanUncheckedUpdateWithoutRiskFindingsInput = {
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1535,6 +1580,7 @@ export type ScanCreateWithoutRecommendationsInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1557,6 +1603,7 @@ export type ScanUncheckedCreateWithoutRecommendationsInput = {
   brandId: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1593,6 +1640,7 @@ export type ScanUpdateWithoutRecommendationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1615,6 +1663,7 @@ export type ScanUncheckedUpdateWithoutRecommendationsInput = {
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1635,6 +1684,7 @@ export type ScanCreateManyBrandInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1649,6 +1699,7 @@ export type ScanUpdateWithoutBrandInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1670,6 +1721,7 @@ export type ScanUncheckedUpdateWithoutBrandInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1691,6 +1743,7 @@ export type ScanUncheckedUpdateManyWithoutBrandInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1705,6 +1758,7 @@ export type ScanCreateManyVerificationExperimentInput = {
   id?: string
   status?: $Enums.ScanStatus
   providerIds: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
@@ -1718,6 +1772,7 @@ export type ScanUpdateWithoutVerificationExperimentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1739,6 +1794,7 @@ export type ScanUncheckedUpdateWithoutVerificationExperimentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1759,6 +1815,7 @@ export type ScanUncheckedUpdateManyWithoutVerificationExperimentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumScanStatusFieldUpdateOperationsInput | $Enums.ScanStatus
   providerIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  promptVersionIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
@@ -1840,6 +1897,7 @@ export type ScanSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   brandId?: boolean
   status?: boolean
   providerIds?: boolean
+  promptVersionIds?: boolean
   requestedCount?: boolean
   repeatCount?: boolean
   dataMode?: boolean
@@ -1865,6 +1923,7 @@ export type ScanSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   brandId?: boolean
   status?: boolean
   providerIds?: boolean
+  promptVersionIds?: boolean
   requestedCount?: boolean
   repeatCount?: boolean
   dataMode?: boolean
@@ -1882,6 +1941,7 @@ export type ScanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   brandId?: boolean
   status?: boolean
   providerIds?: boolean
+  promptVersionIds?: boolean
   requestedCount?: boolean
   repeatCount?: boolean
   dataMode?: boolean
@@ -1899,6 +1959,7 @@ export type ScanSelectScalar = {
   brandId?: boolean
   status?: boolean
   providerIds?: boolean
+  promptVersionIds?: boolean
   requestedCount?: boolean
   repeatCount?: boolean
   dataMode?: boolean
@@ -1909,7 +1970,7 @@ export type ScanSelectScalar = {
   createdAt?: boolean
 }
 
-export type ScanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brandId" | "status" | "providerIds" | "requestedCount" | "repeatCount" | "dataMode" | "verificationExperimentId" | "errorMessage" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["scan"]>
+export type ScanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brandId" | "status" | "providerIds" | "promptVersionIds" | "requestedCount" | "repeatCount" | "dataMode" | "verificationExperimentId" | "errorMessage" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["scan"]>
 export type ScanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
   verificationExperiment?: boolean | Prisma.Scan$verificationExperimentArgs<ExtArgs>
@@ -1949,6 +2010,7 @@ export type $ScanPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     brandId: string
     status: $Enums.ScanStatus
     providerIds: runtime.JsonValue
+    promptVersionIds: runtime.JsonValue | null
     requestedCount: number
     repeatCount: number
     dataMode: $Enums.ScanDataMode
@@ -2393,6 +2455,7 @@ export interface ScanFieldRefs {
   readonly brandId: Prisma.FieldRef<"Scan", 'String'>
   readonly status: Prisma.FieldRef<"Scan", 'ScanStatus'>
   readonly providerIds: Prisma.FieldRef<"Scan", 'Json'>
+  readonly promptVersionIds: Prisma.FieldRef<"Scan", 'Json'>
   readonly requestedCount: Prisma.FieldRef<"Scan", 'Int'>
   readonly repeatCount: Prisma.FieldRef<"Scan", 'Int'>
   readonly dataMode: Prisma.FieldRef<"Scan", 'ScanDataMode'>

@@ -231,6 +231,7 @@ export const ScanScalarFieldEnum = {
   brandId: 'brandId',
   status: 'status',
   providerIds: 'providerIds',
+  promptVersionIds: 'promptVersionIds',
   requestedCount: 'requestedCount',
   repeatCount: 'repeatCount',
   dataMode: 'dataMode',
