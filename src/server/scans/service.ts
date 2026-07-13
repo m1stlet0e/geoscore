@@ -24,10 +24,11 @@ export function calculateRepeatConsistency(samples: RepeatConsistencySample[]) {
     groups.set(key, outcomes);
   }
   const consistencyTotal = [...groups.values()].reduce((sum, outcomes) => {
+    if (outcomes.length < 2) return sum;
     const mentionedCount = outcomes.filter(Boolean).length;
     return sum + Math.max(mentionedCount, outcomes.length - mentionedCount) / outcomes.length;
   }, 0);
-  return consistencyTotal / groups.size;
+  return Math.min(1, Math.max(0, consistencyTotal / groups.size));
 }
 
 export async function createScanForUser(
@@ -39,6 +40,9 @@ export async function createScanForUser(
   const repeatCount = options.repeatCount ?? 1;
   if (!Number.isInteger(repeatCount) || repeatCount < 1 || repeatCount > 3) {
     throw new Error("重复采样次数必须是 1 到 3 之间的整数");
+  }
+  if (new Set(platformIds).size !== platformIds.length) {
+    throw new Error("AI 平台不能重复选择");
   }
   const env = options.env ?? process.env;
   const brand = await db.brand.findFirst({
@@ -108,9 +112,14 @@ export async function executeScanForUser(userId: string, scanId: string) {
   });
   if (!scan) throw new Error("扫描任务不存在");
   if (scan.status === "COMPLETED") return scan;
+  if (scan.status === "FAILED") throw new Error("扫描已失败，请重新创建");
   if (scan.status === "RUNNING") throw new Error("扫描正在执行");
   const platformIds = scan.providerIds as string[];
-  await db.scan.update({ where: { id: scan.id }, data: { status: "RUNNING", startedAt: new Date(), errorMessage: null } });
+  const claimed = await db.scan.updateMany({
+    where: { id: scan.id, status: "PENDING" },
+    data: { status: "RUNNING", startedAt: new Date(), errorMessage: null },
+  });
+  if (claimed.count !== 1) throw new Error("扫描正在执行");
 
   const scoring: ParsedObservation[] = [];
   const repeatSignals: RepeatConsistencySample[] = [];
@@ -186,30 +195,6 @@ export async function executeScanForUser(userId: string, scanId: string) {
       confidenceScore: confidence.score,
       hasCriticalRisk: riskOpportunities.length > 0,
     });
-    await db.scoreSnapshot.create({
-      data: {
-        scanId: scan.id, brandId: scan.brandId, algorithmVersion: SCORING_VERSION, score: total.score,
-        ...components, confidenceScore: confidence.score, isProvisional: confidence.isProvisional, riskLevel: total.riskLevel,
-      },
-    });
-    if (riskOpportunities.length) {
-      await db.riskFinding.create({
-        data: {
-          brandId: scan.brandId, scanId: scan.id, level: "CRITICAL", title: "AI 回答包含高风险品牌描述",
-          description: "监测回答中出现倒闭、违法或诈骗等可能严重影响品牌信任的描述，请尽快核查事实并处理信息源。",
-          evidence: riskOpportunities.slice(0, 3).map((opportunity) => opportunity.evidence).join("\n\n"),
-        },
-      });
-    }
-    if (opportunities.length) {
-      await db.opportunity.createMany({
-        data: opportunities.map((opportunity) => ({
-          brandId: scan.brandId,
-          scanId: scan.id,
-          ...opportunity,
-        })),
-      });
-    }
     const recommendations = [
       {
         score: components.mentionScore, title: "补齐未覆盖的高价值问题",
@@ -230,11 +215,41 @@ export async function executeScanForUser(userId: string, scanId: string) {
         evidence: `本次扫描的品牌推荐度为 ${components.recommendationScore.toFixed(0)} 分。`, impact: 88, confidence: 82, effort: 65,
       },
     ].sort((left, right) => left.score - right.score).slice(0, 3);
-    await db.recommendation.createMany({ data: recommendations.map((item) => ({
-      brandId: scan.brandId, scanId: scan.id, title: item.title, finding: item.finding, action: item.action,
-      evidence: item.evidence, impact: item.impact, confidence: item.confidence, effort: item.effort,
-    })) });
-    await db.scan.update({ where: { id: scan.id }, data: { status: "COMPLETED", completedAt: new Date() } });
+    await db.$transaction(async (tx) => {
+      await tx.scoreSnapshot.create({
+        data: {
+          scanId: scan.id, brandId: scan.brandId, algorithmVersion: SCORING_VERSION, score: total.score,
+          ...components, confidenceScore: confidence.score, isProvisional: confidence.isProvisional, riskLevel: total.riskLevel,
+        },
+      });
+      if (riskOpportunities.length) {
+        await tx.riskFinding.create({
+          data: {
+            brandId: scan.brandId, scanId: scan.id, level: "CRITICAL", title: "AI 回答包含高风险品牌描述",
+            description: "监测回答中出现倒闭、违法或诈骗等可能严重影响品牌信任的描述，请尽快核查事实并处理信息源。",
+            evidence: riskOpportunities.slice(0, 3).map((opportunity) => opportunity.evidence).join("\n\n"),
+          },
+        });
+      }
+      if (opportunities.length) {
+        await tx.opportunity.createMany({
+          data: opportunities.map((opportunity) => ({
+            brandId: scan.brandId,
+            scanId: scan.id,
+            ...opportunity,
+          })),
+        });
+      }
+      await tx.recommendation.createMany({ data: recommendations.map((item) => ({
+        brandId: scan.brandId, scanId: scan.id, title: item.title, finding: item.finding, action: item.action,
+        evidence: item.evidence, impact: item.impact, confidence: item.confidence, effort: item.effort,
+      })) });
+      const completed = await tx.scan.updateMany({
+        where: { id: scan.id, status: "RUNNING" },
+        data: { status: "COMPLETED", completedAt: new Date() },
+      });
+      if (completed.count !== 1) throw new Error("扫描状态已变化，无法提交结果");
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "扫描执行失败";
     await db.scan.update({ where: { id: scan.id }, data: { status: "FAILED", errorMessage: message, completedAt: new Date() } });

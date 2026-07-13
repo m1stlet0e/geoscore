@@ -36,6 +36,7 @@ export type BuiltOpportunity = {
 
 const BRAND_RISK_SOURCE = "已倒闭|停止运营|诈骗|违法|被查处";
 const CLAUSE_SEPARATOR = /(?<=[。！？!?；;，,\n])/u;
+const RISK_NEGATION_PATTERN = /(?:并未|并没有|未曾|从未|没有|不是|并非|无|未)\s*$/u;
 
 function mentionIndexes(text: string, name: string) {
   const indexes: number[] = [];
@@ -56,6 +57,10 @@ function nearestDistance(index: number, indexes: number[]) {
     : Number.POSITIVE_INFINITY;
 }
 
+function isNegatedRisk(clause: string, riskIndex: number) {
+  return RISK_NEGATION_PATTERN.test(clause.slice(Math.max(0, riskIndex - 8), riskIndex));
+}
+
 function findTargetBrandRiskEvidence(sample: OpportunitySample) {
   const evidence: string[] = [];
   for (const rawClause of sample.rawResponse.split(CLAUSE_SEPARATOR)) {
@@ -66,6 +71,7 @@ function findTargetBrandRiskEvidence(sample: OpportunitySample) {
     const matches = [...clause.matchAll(new RegExp(BRAND_RISK_SOURCE, "g"))];
     if (matches.some((match) => {
       const riskIndex = match.index;
+      if (isNegatedRisk(clause, riskIndex)) return false;
       return nearestDistance(riskIndex, targetIndexes) <= nearestDistance(riskIndex, competitorIndexes);
     })) {
       evidence.push(clause);

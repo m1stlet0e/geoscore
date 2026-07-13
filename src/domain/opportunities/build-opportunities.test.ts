@@ -175,6 +175,27 @@ describe("问题级竞品抢位机会", () => {
     expect(opportunities.some((item) => item.type === "BRAND_RISK")).toBe(false);
   });
 
+  it.each([
+    "GeoScore 并未违法。",
+    "GeoScore 不是诈骗公司。",
+    "GeoScore 没有被查处。",
+  ])("目标品牌风险词处于否定语境时不生成品牌风险：%s", (rawResponse) => {
+    const opportunities = buildOpportunities([
+      sample({
+        rawResponse,
+        targetMentioned: true,
+        targetPosition: 1,
+        targetRecommendationStrength: 0.8,
+        competitorNames: [],
+        competitorPositions: [],
+        competitorRecommendationStrengths: [],
+        hasOfficialCitation: true,
+      }),
+    ]);
+
+    expect(opportunities.some((item) => item.type === "BRAND_RISK")).toBe(false);
+  });
+
   it("购买和比较问题的机会优先级高于普通发现问题", () => {
     const shared = {
       promptWeight: 1,

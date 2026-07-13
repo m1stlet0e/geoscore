@@ -28,6 +28,17 @@ describe("扫描服务", () => {
       { promptVersionId: "prompt-2", platformId: "mock", targetMentioned: false },
     ])).toBe(0.75);
     expect(calculateRepeatConsistency([])).toBe(0);
+    expect(calculateRepeatConsistency([
+      { promptVersionId: "single", platformId: "mock", targetMentioned: true },
+    ])).toBe(0);
+    expect(calculateRepeatConsistency([
+      { promptVersionId: "consistent", platformId: "mock", targetMentioned: true },
+      { promptVersionId: "consistent", platformId: "mock", targetMentioned: true },
+    ])).toBe(1);
+    expect(calculateRepeatConsistency([
+      { promptVersionId: "inconsistent", platformId: "mock", targetMentioned: true },
+      { promptVersionId: "inconsistent", platformId: "mock", targetMentioned: false },
+    ])).toBe(0.5);
   });
 
   it("Mock 扫描显式落库为模拟数据", async () => {
@@ -40,6 +51,19 @@ describe("扫描服务", () => {
     const scan = await createScanForUser(user.id, brand.id, ["mock"]);
 
     expect(scan.dataMode).toBe("SIMULATED");
+  });
+
+  it("重复选择同一 AI 平台时在创建扫描和扣额度前拒绝", async () => {
+    const user = await createReadyUser(50);
+    const brand = await createBrandForUser(user.id, {
+      name: "重复平台品牌", website: "duplicate-platform.example.cn", industry: "企业服务", product: "监测软件", targetAudience: "品牌团队", aliases: [], competitors: [],
+    });
+
+    await expect(createScanForUser(user.id, brand.id, ["mock", "mock"]))
+      .rejects.toThrow("AI 平台不能重复选择");
+
+    expect(await db.scan.count({ where: { brandId: brand.id } })).toBe(0);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance).toBe(50);
   });
 
   it("repeatCount=2 时预扣 40 次并真实保存两轮回答", async () => {
@@ -127,6 +151,11 @@ describe("扫描服务", () => {
     }
     const quota = await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } });
     expect(quota.balance).toBe(10);
+
+    const completedAgain = await executeScanForUser(user.id, scan.id);
+    expect(completedAgain.status).toBe("COMPLETED");
+    expect(await db.observation.count({ where: { scanId: scan.id } })).toBe(20);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance).toBe(10);
   });
 
   it("额度不足时拒绝创建扫描", async () => {
@@ -138,7 +167,7 @@ describe("扫描服务", () => {
     await expect(createScanForUser(user.id, brand.id, ["mock"])).rejects.toThrow("额度不足");
   });
 
-  it("扫描执行失败时只退款一次", async () => {
+  it("扫描失败退款后拒绝免费重试且不改变额度和回答", async () => {
     const user = await createReadyUser();
     const brand = await createBrandForUser(user.id, {
       name: "失败退款品牌", website: "refund.example.cn", industry: "企业服务", product: "监测软件", targetAudience: "品牌团队", aliases: [], competitors: [],
@@ -147,13 +176,53 @@ describe("扫描服务", () => {
     await db.scan.update({ where: { id: scan.id }, data: { providerIds: ["unknown"] } });
 
     await expect(executeScanForUser(user.id, scan.id)).rejects.toThrow("未知 AI 平台");
-    await expect(executeScanForUser(user.id, scan.id)).rejects.toThrow("未知 AI 平台");
+    const balanceAfterFailure = (await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance;
+    const observationCountAfterFailure = await db.observation.count({ where: { scanId: scan.id } });
 
-    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance).toBe(30);
+    await expect(executeScanForUser(user.id, scan.id))
+      .rejects.toThrow("扫描已失败，请重新创建");
+
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance).toBe(balanceAfterFailure);
+    expect(await db.observation.count({ where: { scanId: scan.id } })).toBe(observationCountAfterFailure);
+    expect(balanceAfterFailure).toBe(30);
     expect(await db.quotaLedger.count({
       where: { referenceId: scan.id, type: "REFUND" },
     })).toBe(1);
     expect((await db.scan.findUniqueOrThrow({ where: { id: scan.id } })).status).toBe("FAILED");
+  });
+
+  it("最终产物任一写入失败时回滚同批业务产物", async () => {
+    const user = await createReadyUser();
+    const brand = await createBrandForUser(user.id, {
+      name: "原子产物品牌", website: "atomic-products.example.cn", industry: "企业服务", product: "客户管理软件", targetAudience: "中小企业", aliases: [], competitors: ["竞品甲"],
+    });
+    const scan = await createScanForUser(user.id, brand.id, ["mock"]);
+    await db.opportunity.createMany({
+      data: brand.prompts.map((prompt) => ({
+        brandId: brand.id,
+        scanId: scan.id,
+        promptVersionId: prompt.versions[0].id,
+        platformId: "mock",
+        type: "MENTION_GAP" as const,
+        priority: 50,
+        title: "预置冲突机会",
+        summary: "用于验证最终业务产物事务回滚",
+        evidence: "预置证据",
+        recommendedAction: "预置动作",
+        targetContentType: "测试页面",
+      })),
+    });
+    const opportunityCountBeforeExecution = await db.opportunity.count({ where: { scanId: scan.id } });
+
+    await expect(executeScanForUser(user.id, scan.id)).rejects.toThrow();
+
+    expect(await db.observation.count({ where: { scanId: scan.id } })).toBe(20);
+    expect(await db.scoreSnapshot.count({ where: { scanId: scan.id } })).toBe(0);
+    expect(await db.riskFinding.count({ where: { scanId: scan.id } })).toBe(0);
+    expect(await db.recommendation.count({ where: { scanId: scan.id } })).toBe(0);
+    expect(await db.opportunity.count({ where: { scanId: scan.id } })).toBe(opportunityCountBeforeExecution);
+    expect((await db.scan.findUniqueOrThrow({ where: { id: scan.id } })).status).toBe("FAILED");
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance).toBe(30);
   });
 
   it("同一品牌连续扫描的建议按 scanId 严格隔离", async () => {
@@ -177,6 +246,28 @@ describe("扫描服务", () => {
     expect(secondRecommendations.every((item) => item.scanId === secondScan.id)).toBe(true);
     const firstIds = new Set(firstRecommendations.map((item) => item.id));
     expect(secondRecommendations.some((item) => firstIds.has(item.id))).toBe(false);
+  });
+
+  it("同一扫描并发执行时只有一个调用取得执行权", async () => {
+    const user = await createReadyUser();
+    const brand = await createBrandForUser(user.id, {
+      name: "并发执行品牌", website: "concurrent-execute.example.cn", industry: "企业服务", product: "监测软件", targetAudience: "品牌团队", aliases: [], competitors: [],
+    });
+    const scan = await createScanForUser(user.id, brand.id, ["mock"]);
+
+    const results = await Promise.allSettled([
+      executeScanForUser(user.id, scan.id),
+      executeScanForUser(user.id, scan.id),
+    ]);
+
+    expect(results.filter((item) => item.status === "fulfilled")).toHaveLength(1);
+    const rejected = results.find((item) => item.status === "rejected");
+    expect(rejected).toMatchObject({ status: "rejected" });
+    expect((rejected as PromiseRejectedResult).reason).toMatchObject({ message: "扫描正在执行" });
+    expect(await db.observation.count({ where: { scanId: scan.id } })).toBe(20);
+    expect((await db.scan.findUniqueOrThrow({ where: { id: scan.id } })).status).toBe("COMPLETED");
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance).toBe(10);
+    expect(await db.quotaLedger.count({ where: { referenceId: scan.id, type: "REFUND" } })).toBe(0);
   });
 
   it("并发创建扫描时额度不会被超扣", async () => {
