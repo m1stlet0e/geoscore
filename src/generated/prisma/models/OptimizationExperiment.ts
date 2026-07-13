@@ -27,6 +27,7 @@ export type AggregateOptimizationExperiment = {
 }
 
 export type OptimizationExperimentAvgAggregateOutputType = {
+  actionRevision: number | null
   scoreDelta: number | null
   mentionDelta: number | null
   recommendationDelta: number | null
@@ -34,6 +35,7 @@ export type OptimizationExperimentAvgAggregateOutputType = {
 }
 
 export type OptimizationExperimentSumAggregateOutputType = {
+  actionRevision: number | null
   scoreDelta: number | null
   mentionDelta: number | null
   recommendationDelta: number | null
@@ -53,6 +55,9 @@ export type OptimizationExperimentMinAggregateOutputType = {
   publishedAt: Date | null
   nextCheckAt: Date | null
   status: $Enums.ExperimentStatus | null
+  actionRevision: number | null
+  verificationLeaseToken: string | null
+  verificationLeaseExpiresAt: Date | null
   resultSummary: string | null
   scoreDelta: number | null
   mentionDelta: number | null
@@ -75,6 +80,9 @@ export type OptimizationExperimentMaxAggregateOutputType = {
   publishedAt: Date | null
   nextCheckAt: Date | null
   status: $Enums.ExperimentStatus | null
+  actionRevision: number | null
+  verificationLeaseToken: string | null
+  verificationLeaseExpiresAt: Date | null
   resultSummary: string | null
   scoreDelta: number | null
   mentionDelta: number | null
@@ -97,6 +105,9 @@ export type OptimizationExperimentCountAggregateOutputType = {
   publishedAt: number
   nextCheckAt: number
   status: number
+  actionRevision: number
+  verificationLeaseToken: number
+  verificationLeaseExpiresAt: number
   resultSummary: number
   scoreDelta: number
   mentionDelta: number
@@ -109,6 +120,7 @@ export type OptimizationExperimentCountAggregateOutputType = {
 
 
 export type OptimizationExperimentAvgAggregateInputType = {
+  actionRevision?: true
   scoreDelta?: true
   mentionDelta?: true
   recommendationDelta?: true
@@ -116,6 +128,7 @@ export type OptimizationExperimentAvgAggregateInputType = {
 }
 
 export type OptimizationExperimentSumAggregateInputType = {
+  actionRevision?: true
   scoreDelta?: true
   mentionDelta?: true
   recommendationDelta?: true
@@ -135,6 +148,9 @@ export type OptimizationExperimentMinAggregateInputType = {
   publishedAt?: true
   nextCheckAt?: true
   status?: true
+  actionRevision?: true
+  verificationLeaseToken?: true
+  verificationLeaseExpiresAt?: true
   resultSummary?: true
   scoreDelta?: true
   mentionDelta?: true
@@ -157,6 +173,9 @@ export type OptimizationExperimentMaxAggregateInputType = {
   publishedAt?: true
   nextCheckAt?: true
   status?: true
+  actionRevision?: true
+  verificationLeaseToken?: true
+  verificationLeaseExpiresAt?: true
   resultSummary?: true
   scoreDelta?: true
   mentionDelta?: true
@@ -179,6 +198,9 @@ export type OptimizationExperimentCountAggregateInputType = {
   publishedAt?: true
   nextCheckAt?: true
   status?: true
+  actionRevision?: true
+  verificationLeaseToken?: true
+  verificationLeaseExpiresAt?: true
   resultSummary?: true
   scoreDelta?: true
   mentionDelta?: true
@@ -288,6 +310,9 @@ export type OptimizationExperimentGroupByOutputType = {
   publishedAt: Date | null
   nextCheckAt: Date | null
   status: $Enums.ExperimentStatus
+  actionRevision: number
+  verificationLeaseToken: string | null
+  verificationLeaseExpiresAt: Date | null
   resultSummary: string | null
   scoreDelta: number | null
   mentionDelta: number | null
@@ -333,6 +358,9 @@ export type OptimizationExperimentWhereInput = {
   publishedAt?: Prisma.DateTimeNullableFilter<"OptimizationExperiment"> | Date | string | null
   nextCheckAt?: Prisma.DateTimeNullableFilter<"OptimizationExperiment"> | Date | string | null
   status?: Prisma.EnumExperimentStatusFilter<"OptimizationExperiment"> | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFilter<"OptimizationExperiment"> | number
+  verificationLeaseToken?: Prisma.StringNullableFilter<"OptimizationExperiment"> | string | null
+  verificationLeaseExpiresAt?: Prisma.DateTimeNullableFilter<"OptimizationExperiment"> | Date | string | null
   resultSummary?: Prisma.StringNullableFilter<"OptimizationExperiment"> | string | null
   scoreDelta?: Prisma.FloatNullableFilter<"OptimizationExperiment"> | number | null
   mentionDelta?: Prisma.FloatNullableFilter<"OptimizationExperiment"> | number | null
@@ -360,6 +388,9 @@ export type OptimizationExperimentOrderByWithRelationInput = {
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   nextCheckAt?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  actionRevision?: Prisma.SortOrder
+  verificationLeaseToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationLeaseExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   resultSummary?: Prisma.SortOrderInput | Prisma.SortOrder
   scoreDelta?: Prisma.SortOrderInput | Prisma.SortOrder
   mentionDelta?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -393,6 +424,9 @@ export type OptimizationExperimentWhereUniqueInput = Prisma.AtLeast<{
   publishedAt?: Prisma.DateTimeNullableFilter<"OptimizationExperiment"> | Date | string | null
   nextCheckAt?: Prisma.DateTimeNullableFilter<"OptimizationExperiment"> | Date | string | null
   status?: Prisma.EnumExperimentStatusFilter<"OptimizationExperiment"> | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFilter<"OptimizationExperiment"> | number
+  verificationLeaseToken?: Prisma.StringNullableFilter<"OptimizationExperiment"> | string | null
+  verificationLeaseExpiresAt?: Prisma.DateTimeNullableFilter<"OptimizationExperiment"> | Date | string | null
   resultSummary?: Prisma.StringNullableFilter<"OptimizationExperiment"> | string | null
   scoreDelta?: Prisma.FloatNullableFilter<"OptimizationExperiment"> | number | null
   mentionDelta?: Prisma.FloatNullableFilter<"OptimizationExperiment"> | number | null
@@ -420,6 +454,9 @@ export type OptimizationExperimentOrderByWithAggregationInput = {
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   nextCheckAt?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  actionRevision?: Prisma.SortOrder
+  verificationLeaseToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationLeaseExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   resultSummary?: Prisma.SortOrderInput | Prisma.SortOrder
   scoreDelta?: Prisma.SortOrderInput | Prisma.SortOrder
   mentionDelta?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -450,6 +487,9 @@ export type OptimizationExperimentScalarWhereWithAggregatesInput = {
   publishedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"OptimizationExperiment"> | Date | string | null
   nextCheckAt?: Prisma.DateTimeNullableWithAggregatesFilter<"OptimizationExperiment"> | Date | string | null
   status?: Prisma.EnumExperimentStatusWithAggregatesFilter<"OptimizationExperiment"> | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntWithAggregatesFilter<"OptimizationExperiment"> | number
+  verificationLeaseToken?: Prisma.StringNullableWithAggregatesFilter<"OptimizationExperiment"> | string | null
+  verificationLeaseExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"OptimizationExperiment"> | Date | string | null
   resultSummary?: Prisma.StringNullableWithAggregatesFilter<"OptimizationExperiment"> | string | null
   scoreDelta?: Prisma.FloatNullableWithAggregatesFilter<"OptimizationExperiment"> | number | null
   mentionDelta?: Prisma.FloatNullableWithAggregatesFilter<"OptimizationExperiment"> | number | null
@@ -468,6 +508,9 @@ export type OptimizationExperimentCreateInput = {
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -495,6 +538,9 @@ export type OptimizationExperimentUncheckedCreateInput = {
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -514,6 +560,9 @@ export type OptimizationExperimentUpdateInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -541,6 +590,9 @@ export type OptimizationExperimentUncheckedUpdateInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -564,6 +616,9 @@ export type OptimizationExperimentCreateManyInput = {
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -582,6 +637,9 @@ export type OptimizationExperimentUpdateManyMutationInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -604,6 +662,9 @@ export type OptimizationExperimentUncheckedUpdateManyInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -656,6 +717,9 @@ export type OptimizationExperimentCountOrderByAggregateInput = {
   publishedAt?: Prisma.SortOrder
   nextCheckAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  actionRevision?: Prisma.SortOrder
+  verificationLeaseToken?: Prisma.SortOrder
+  verificationLeaseExpiresAt?: Prisma.SortOrder
   resultSummary?: Prisma.SortOrder
   scoreDelta?: Prisma.SortOrder
   mentionDelta?: Prisma.SortOrder
@@ -666,6 +730,7 @@ export type OptimizationExperimentCountOrderByAggregateInput = {
 }
 
 export type OptimizationExperimentAvgOrderByAggregateInput = {
+  actionRevision?: Prisma.SortOrder
   scoreDelta?: Prisma.SortOrder
   mentionDelta?: Prisma.SortOrder
   recommendationDelta?: Prisma.SortOrder
@@ -685,6 +750,9 @@ export type OptimizationExperimentMaxOrderByAggregateInput = {
   publishedAt?: Prisma.SortOrder
   nextCheckAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  actionRevision?: Prisma.SortOrder
+  verificationLeaseToken?: Prisma.SortOrder
+  verificationLeaseExpiresAt?: Prisma.SortOrder
   resultSummary?: Prisma.SortOrder
   scoreDelta?: Prisma.SortOrder
   mentionDelta?: Prisma.SortOrder
@@ -707,6 +775,9 @@ export type OptimizationExperimentMinOrderByAggregateInput = {
   publishedAt?: Prisma.SortOrder
   nextCheckAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  actionRevision?: Prisma.SortOrder
+  verificationLeaseToken?: Prisma.SortOrder
+  verificationLeaseExpiresAt?: Prisma.SortOrder
   resultSummary?: Prisma.SortOrder
   scoreDelta?: Prisma.SortOrder
   mentionDelta?: Prisma.SortOrder
@@ -717,6 +788,7 @@ export type OptimizationExperimentMinOrderByAggregateInput = {
 }
 
 export type OptimizationExperimentSumOrderByAggregateInput = {
+  actionRevision?: Prisma.SortOrder
   scoreDelta?: Prisma.SortOrder
   mentionDelta?: Prisma.SortOrder
   recommendationDelta?: Prisma.SortOrder
@@ -908,6 +980,9 @@ export type OptimizationExperimentCreateWithoutBrandInput = {
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -933,6 +1008,9 @@ export type OptimizationExperimentUncheckedCreateWithoutBrandInput = {
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -985,6 +1063,9 @@ export type OptimizationExperimentScalarWhereInput = {
   publishedAt?: Prisma.DateTimeNullableFilter<"OptimizationExperiment"> | Date | string | null
   nextCheckAt?: Prisma.DateTimeNullableFilter<"OptimizationExperiment"> | Date | string | null
   status?: Prisma.EnumExperimentStatusFilter<"OptimizationExperiment"> | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFilter<"OptimizationExperiment"> | number
+  verificationLeaseToken?: Prisma.StringNullableFilter<"OptimizationExperiment"> | string | null
+  verificationLeaseExpiresAt?: Prisma.DateTimeNullableFilter<"OptimizationExperiment"> | Date | string | null
   resultSummary?: Prisma.StringNullableFilter<"OptimizationExperiment"> | string | null
   scoreDelta?: Prisma.FloatNullableFilter<"OptimizationExperiment"> | number | null
   mentionDelta?: Prisma.FloatNullableFilter<"OptimizationExperiment"> | number | null
@@ -1003,6 +1084,9 @@ export type OptimizationExperimentCreateWithoutVerificationScansInput = {
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -1029,6 +1113,9 @@ export type OptimizationExperimentUncheckedCreateWithoutVerificationScansInput =
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -1052,6 +1139,9 @@ export type OptimizationExperimentCreateWithoutBaselineScanInput = {
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -1076,6 +1166,9 @@ export type OptimizationExperimentUncheckedCreateWithoutBaselineScanInput = {
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -1105,6 +1198,9 @@ export type OptimizationExperimentCreateWithoutFollowUpScanInput = {
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -1129,6 +1225,9 @@ export type OptimizationExperimentUncheckedCreateWithoutFollowUpScanInput = {
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -1164,6 +1263,9 @@ export type OptimizationExperimentUpdateWithoutVerificationScansInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1190,6 +1292,9 @@ export type OptimizationExperimentUncheckedUpdateWithoutVerificationScansInput =
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1235,6 +1340,9 @@ export type OptimizationExperimentUpdateWithoutFollowUpScanInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1259,6 +1367,9 @@ export type OptimizationExperimentUncheckedUpdateWithoutFollowUpScanInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1278,6 +1389,9 @@ export type OptimizationExperimentCreateWithoutOpportunityInput = {
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -1302,6 +1416,9 @@ export type OptimizationExperimentUncheckedCreateWithoutOpportunityInput = {
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -1337,6 +1454,9 @@ export type OptimizationExperimentUpdateWithoutOpportunityInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1361,6 +1481,9 @@ export type OptimizationExperimentUncheckedUpdateWithoutOpportunityInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1383,6 +1506,9 @@ export type OptimizationExperimentCreateManyBrandInput = {
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -1401,6 +1527,9 @@ export type OptimizationExperimentUpdateWithoutBrandInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1426,6 +1555,9 @@ export type OptimizationExperimentUncheckedUpdateWithoutBrandInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1448,6 +1580,9 @@ export type OptimizationExperimentUncheckedUpdateManyWithoutBrandInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1468,6 +1603,9 @@ export type OptimizationExperimentCreateManyBaselineScanInput = {
   publishedAt?: Date | string | null
   nextCheckAt?: Date | string | null
   status?: $Enums.ExperimentStatus
+  actionRevision?: number
+  verificationLeaseToken?: string | null
+  verificationLeaseExpiresAt?: Date | string | null
   resultSummary?: string | null
   scoreDelta?: number | null
   mentionDelta?: number | null
@@ -1486,6 +1624,9 @@ export type OptimizationExperimentUpdateWithoutBaselineScanInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1510,6 +1651,9 @@ export type OptimizationExperimentUncheckedUpdateWithoutBaselineScanInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1531,6 +1675,9 @@ export type OptimizationExperimentUncheckedUpdateManyWithoutBaselineScanInput = 
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   nextCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumExperimentStatusFieldUpdateOperationsInput | $Enums.ExperimentStatus
+  actionRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resultSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scoreDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   mentionDelta?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1584,6 +1731,9 @@ export type OptimizationExperimentSelect<ExtArgs extends runtime.Types.Extension
   publishedAt?: boolean
   nextCheckAt?: boolean
   status?: boolean
+  actionRevision?: boolean
+  verificationLeaseToken?: boolean
+  verificationLeaseExpiresAt?: boolean
   resultSummary?: boolean
   scoreDelta?: boolean
   mentionDelta?: boolean
@@ -1612,6 +1762,9 @@ export type OptimizationExperimentSelectCreateManyAndReturn<ExtArgs extends runt
   publishedAt?: boolean
   nextCheckAt?: boolean
   status?: boolean
+  actionRevision?: boolean
+  verificationLeaseToken?: boolean
+  verificationLeaseExpiresAt?: boolean
   resultSummary?: boolean
   scoreDelta?: boolean
   mentionDelta?: boolean
@@ -1638,6 +1791,9 @@ export type OptimizationExperimentSelectUpdateManyAndReturn<ExtArgs extends runt
   publishedAt?: boolean
   nextCheckAt?: boolean
   status?: boolean
+  actionRevision?: boolean
+  verificationLeaseToken?: boolean
+  verificationLeaseExpiresAt?: boolean
   resultSummary?: boolean
   scoreDelta?: boolean
   mentionDelta?: boolean
@@ -1664,6 +1820,9 @@ export type OptimizationExperimentSelectScalar = {
   publishedAt?: boolean
   nextCheckAt?: boolean
   status?: boolean
+  actionRevision?: boolean
+  verificationLeaseToken?: boolean
+  verificationLeaseExpiresAt?: boolean
   resultSummary?: boolean
   scoreDelta?: boolean
   mentionDelta?: boolean
@@ -1673,7 +1832,7 @@ export type OptimizationExperimentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type OptimizationExperimentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brandId" | "opportunityId" | "baselineScanId" | "followUpScanId" | "title" | "hypothesis" | "actionPlan" | "targetUrl" | "publishedAt" | "nextCheckAt" | "status" | "resultSummary" | "scoreDelta" | "mentionDelta" | "recommendationDelta" | "citationDelta" | "createdAt" | "updatedAt", ExtArgs["result"]["optimizationExperiment"]>
+export type OptimizationExperimentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brandId" | "opportunityId" | "baselineScanId" | "followUpScanId" | "title" | "hypothesis" | "actionPlan" | "targetUrl" | "publishedAt" | "nextCheckAt" | "status" | "actionRevision" | "verificationLeaseToken" | "verificationLeaseExpiresAt" | "resultSummary" | "scoreDelta" | "mentionDelta" | "recommendationDelta" | "citationDelta" | "createdAt" | "updatedAt", ExtArgs["result"]["optimizationExperiment"]>
 export type OptimizationExperimentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
   opportunity?: boolean | Prisma.OpportunityDefaultArgs<ExtArgs>
@@ -1717,6 +1876,9 @@ export type $OptimizationExperimentPayload<ExtArgs extends runtime.Types.Extensi
     publishedAt: Date | null
     nextCheckAt: Date | null
     status: $Enums.ExperimentStatus
+    actionRevision: number
+    verificationLeaseToken: string | null
+    verificationLeaseExpiresAt: Date | null
     resultSummary: string | null
     scoreDelta: number | null
     mentionDelta: number | null
@@ -2164,6 +2326,9 @@ export interface OptimizationExperimentFieldRefs {
   readonly publishedAt: Prisma.FieldRef<"OptimizationExperiment", 'DateTime'>
   readonly nextCheckAt: Prisma.FieldRef<"OptimizationExperiment", 'DateTime'>
   readonly status: Prisma.FieldRef<"OptimizationExperiment", 'ExperimentStatus'>
+  readonly actionRevision: Prisma.FieldRef<"OptimizationExperiment", 'Int'>
+  readonly verificationLeaseToken: Prisma.FieldRef<"OptimizationExperiment", 'String'>
+  readonly verificationLeaseExpiresAt: Prisma.FieldRef<"OptimizationExperiment", 'DateTime'>
   readonly resultSummary: Prisma.FieldRef<"OptimizationExperiment", 'String'>
   readonly scoreDelta: Prisma.FieldRef<"OptimizationExperiment", 'Float'>
   readonly mentionDelta: Prisma.FieldRef<"OptimizationExperiment", 'Float'>

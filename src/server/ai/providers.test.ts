@@ -4,6 +4,7 @@ import { MockAiProvider } from "./mock-provider";
 import { getAiProvider, listAiProviders } from "./index";
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 
@@ -179,5 +180,40 @@ describe("AI 平台注册表", () => {
     expect(requestBody).not.toContain("实验品牌");
     expect(requestBody).not.toContain("target.example.com");
     expect(requestBody).not.toContain("optimizationApplied");
+  });
+
+  it("DeepSeek 请求超时时主动中止 fetch 并返回中文错误", async () => {
+    vi.useFakeTimers();
+    let fetchSignal: AbortSignal | null = null;
+    vi.stubGlobal("fetch", vi.fn((_url: string, init?: RequestInit) => (
+      new Promise<Response>((_resolve, reject) => {
+        fetchSignal = init?.signal instanceof AbortSignal ? init.signal : null;
+        if (!fetchSignal) {
+          reject(new Error("fetch 缺少 AbortSignal"));
+          return;
+        }
+        fetchSignal.addEventListener("abort", () => {
+          reject(new DOMException("The operation was aborted", "AbortError"));
+        }, { once: true });
+      })
+    )));
+    const provider = new DeepSeekProvider("test-key", "https://deepseek.test", 10);
+
+    const rejection = provider.query({
+      prompt: "需要在超时后终止的问题",
+      brand: {
+        name: "实验品牌",
+        website: "https://target.example.com",
+        aliases: [],
+      },
+      competitors: [],
+    }).then(() => null, (error: unknown) => error);
+    await vi.advanceTimersByTimeAsync(11);
+
+    const error = await rejection;
+    expect(error).toBeInstanceOf(Error);
+    expect((error as Error).message).toBe("DeepSeek 请求超时，请稍后重试");
+    expect(fetchSignal).toBeInstanceOf(AbortSignal);
+    expect((fetchSignal as AbortSignal | null)?.aborted).toBe(true);
   });
 });

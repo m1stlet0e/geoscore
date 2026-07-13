@@ -73,7 +73,7 @@ describe("实验结果计算", () => {
     });
   });
 
-  it("风险从有到无时即使指标不变也验证成功", () => {
+  it("品牌风险实验从有到无时即使指标不变也验证成功", () => {
     const result = calculateExperimentResult({
       baseline: {
         overallScore: 40,
@@ -89,13 +89,14 @@ describe("实验结果计算", () => {
         citationRate: 10,
         followUpRisk: false,
       },
+      riskResolutionEligible: true,
     });
 
     expect(result.verified).toBe(true);
     expect(result.summary).toContain("风险已解除");
   });
 
-  it("支持在输入顶层传递前后风险状态", () => {
+  it("非品牌风险实验不能仅凭风险消失验证成功", () => {
     const unchanged = {
       overallScore: 40,
       mentionRate: 20,
@@ -108,10 +109,57 @@ describe("实验结果计算", () => {
       followUp: unchanged,
       baselineRisk: true,
       followUpRisk: false,
+      riskResolutionEligible: false,
     });
 
-    expect(result.verified).toBe(true);
-    expect(result.summary).toContain("风险已解除");
+    expect(result.verified).toBe(false);
+    expect(result.summary).toContain("尚未验证");
+  });
+
+  it("复扫新增目标品牌风险时即使指标提升也拒绝验证", () => {
+    const result = calculateExperimentResult({
+      baseline: {
+        overallScore: 40,
+        mentionRate: 20,
+        recommendationScore: 30,
+        citationRate: 10,
+      },
+      followUp: {
+        overallScore: 60,
+        mentionRate: 80,
+        recommendationScore: 70,
+        citationRate: 50,
+      },
+      baselineRisk: false,
+      followUpRisk: true,
+      riskResolutionEligible: false,
+    });
+
+    expect(result.verified).toBe(false);
+    expect(result.summary).toContain("新的目标品牌风险");
+  });
+
+  it("目标品牌风险仍存在时即使指标提升也拒绝验证", () => {
+    const result = calculateExperimentResult({
+      baseline: {
+        overallScore: 40,
+        mentionRate: 20,
+        recommendationScore: 30,
+        citationRate: 10,
+      },
+      followUp: {
+        overallScore: 60,
+        mentionRate: 80,
+        recommendationScore: 70,
+        citationRate: 50,
+      },
+      baselineRisk: true,
+      followUpRisk: true,
+      riskResolutionEligible: true,
+    });
+
+    expect(result.verified).toBe(false);
+    expect(result.summary).toContain("目标品牌风险仍然存在");
   });
 
   it("拒绝超出 0 到 100 的指标", () => {

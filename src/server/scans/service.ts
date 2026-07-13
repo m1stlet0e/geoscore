@@ -1,7 +1,20 @@
+import { randomUUID } from "node:crypto";
 import { calculateComponents, calculateConfidence, calculateGeoScore, SCORING_VERSION, type ParsedObservation } from "@/domain/scoring/calculate";
 import { buildOpportunities, type OpportunitySample } from "@/domain/opportunities/build-opportunities";
+import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
 import { getAiProvider, listAiProviders, type AiProviderEnvironment } from "@/server/ai";
+import type { AiAnswer } from "@/server/ai/types";
+
+const SCAN_EXECUTION_LEASE_MS = 60_000;
+const EXPERIMENT_VERIFICATION_LEASE_HEARTBEAT_MS = 120_000;
+
+class ScanLeaseLostError extends Error {
+  constructor() {
+    super("扫描执行权已转移");
+    this.name = "ScanLeaseLostError";
+  }
+}
 
 export type CreateScanOptions = {
   repeatCount?: number;
@@ -20,6 +33,18 @@ export type ScanExecutionConfig = {
   promptVersionIds: string[];
   providerIds: string[];
   repeatCount: number;
+};
+
+type VerificationBaselineConfig = ScanExecutionConfig & {
+  actionRevision: number;
+  verificationAttemptToken: string;
+};
+
+type ScanLeaseContext = {
+  scanId: string;
+  executionLeaseToken: string;
+  verificationExperimentId: string | null;
+  verificationAttemptToken: string | null;
 };
 
 function asUniqueStringArray(value: unknown) {
@@ -46,11 +71,14 @@ export function scanExecutionConfigMatches(
 async function loadVerificationBaselineConfig(
   verificationExperimentId: string,
   brandId: string,
-): Promise<ScanExecutionConfig> {
+): Promise<VerificationBaselineConfig> {
   const verificationExperiment = await db.optimizationExperiment.findFirst({
     where: { id: verificationExperimentId, brandId },
     select: {
       status: true,
+      actionRevision: true,
+      verificationLeaseToken: true,
+      verificationLeaseExpiresAt: true,
       baselineScan: {
         select: {
           id: true,
@@ -66,6 +94,13 @@ async function loadVerificationBaselineConfig(
   if (!verificationExperiment) throw new Error("验证实验不存在或不属于当前品牌");
   if (verificationExperiment.status !== "VERIFYING") {
     throw new Error("只有验证中的实验可以创建复扫");
+  }
+  if (
+    !verificationExperiment.verificationLeaseToken
+    || !verificationExperiment.verificationLeaseExpiresAt
+    || verificationExperiment.verificationLeaseExpiresAt <= new Date()
+  ) {
+    throw new Error("验证实验没有有效执行权，请重新发起验证");
   }
   if (
     verificationExperiment.baselineScan.brandId !== brandId
@@ -95,6 +130,8 @@ async function loadVerificationBaselineConfig(
     promptVersionIds,
     providerIds,
     repeatCount: verificationExperiment.baselineScan.repeatCount,
+    actionRevision: verificationExperiment.actionRevision,
+    verificationAttemptToken: verificationExperiment.verificationLeaseToken,
   };
 }
 
@@ -191,6 +228,8 @@ export async function createScanForUser(
         repeatCount,
         dataMode,
         verificationExperimentId: options.verificationExperimentId,
+        verificationActionRevision: verificationBaselineConfig?.actionRevision,
+        verificationAttemptToken: verificationBaselineConfig?.verificationAttemptToken,
       },
     });
     const debited = await tx.quotaAccount.updateMany({
@@ -220,8 +259,93 @@ async function refundFailedScan(userId: string, scanId: string, amount: number) 
   });
 }
 
+function nextScanLeaseExpiry() {
+  return new Date(Date.now() + SCAN_EXECUTION_LEASE_MS);
+}
+
+async function assertAndExtendScanLease(
+  tx: Prisma.TransactionClient,
+  lease: ScanLeaseContext,
+) {
+  const expiresAt = nextScanLeaseExpiry();
+  const scanHeartbeat = await tx.scan.updateMany({
+    where: {
+      id: lease.scanId,
+      status: "RUNNING",
+      executionLeaseToken: lease.executionLeaseToken,
+    },
+    data: { executionLeaseExpiresAt: expiresAt },
+  });
+  if (scanHeartbeat.count !== 1) throw new ScanLeaseLostError();
+
+  if (lease.verificationExperimentId && lease.verificationAttemptToken) {
+    const verificationLeaseExpiresAt = new Date(
+      Date.now() + EXPERIMENT_VERIFICATION_LEASE_HEARTBEAT_MS,
+    );
+    const experimentHeartbeat = await tx.optimizationExperiment.updateMany({
+      where: {
+        id: lease.verificationExperimentId,
+        status: "VERIFYING",
+        verificationLeaseToken: lease.verificationAttemptToken,
+      },
+      data: { verificationLeaseExpiresAt },
+    });
+    if (experimentHeartbeat.count !== 1) throw new ScanLeaseLostError();
+  }
+}
+
+async function heartbeatScanLease(lease: ScanLeaseContext) {
+  await db.$transaction((tx) => assertAndExtendScanLease(tx, lease));
+}
+
+function logicalObservationKey(
+  promptVersionId: string,
+  platformId: string,
+  runIndex: number,
+) {
+  return `${promptVersionId}\u0000${platformId}\u0000${runIndex}`;
+}
+
+async function persistObservationWithLease(
+  lease: ScanLeaseContext,
+  input: {
+    promptVersionId: string;
+    platformId: string;
+    runIndex: number;
+    answer: AiAnswer;
+  },
+) {
+  await db.$transaction(async (tx) => {
+    await assertAndExtendScanLease(tx, lease);
+    const existing = await tx.observation.findFirst({
+      where: {
+        scanId: lease.scanId,
+        promptVersionId: input.promptVersionId,
+        platformId: input.platformId,
+        runIndex: input.runIndex,
+      },
+      select: { id: true },
+    });
+    if (existing) return;
+    await tx.observation.create({
+      data: {
+        scanId: lease.scanId,
+        promptVersionId: input.promptVersionId,
+        platformId: input.platformId,
+        modelId: input.answer.modelId,
+        requestId: input.answer.requestId,
+        rawResponse: input.answer.rawResponse,
+        latencyMs: input.answer.latencyMs,
+        runIndex: input.runIndex,
+        mentions: { create: input.answer.mentions },
+        citations: { create: input.answer.citations },
+      },
+    });
+  });
+}
+
 export async function executeScanForUser(userId: string, scanId: string) {
-  const scan = await db.scan.findFirst({
+  const initialScan = await db.scan.findFirst({
     where: { id: scanId, brand: { ownerId: userId } },
     include: {
       brand: {
@@ -235,20 +359,57 @@ export async function executeScanForUser(userId: string, scanId: string) {
       scoreSnapshot: true,
     },
   });
-  if (!scan) throw new Error("扫描任务不存在");
-  if (scan.status === "COMPLETED") return scan;
-  if (scan.status === "FAILED") throw new Error("扫描已失败，请重新创建");
-  if (scan.status === "RUNNING") throw new Error("扫描正在执行");
-  const platformIds = scan.providerIds as string[];
+  if (!initialScan) throw new Error("扫描任务不存在");
+  if (initialScan.status === "COMPLETED") return initialScan;
+  if (initialScan.status === "FAILED") throw new Error("扫描已失败，请重新创建");
+
+  const executionLeaseToken = randomUUID();
+  const claimTime = new Date();
   const claimed = await db.scan.updateMany({
-    where: { id: scan.id, status: "PENDING" },
-    data: { status: "RUNNING", startedAt: new Date(), errorMessage: null },
+    where: {
+      id: initialScan.id,
+      OR: [
+        { status: "PENDING" },
+        {
+          status: "RUNNING",
+          OR: [
+            { executionLeaseExpiresAt: null },
+            { executionLeaseExpiresAt: { lte: claimTime } },
+          ],
+        },
+      ],
+    },
+    data: {
+      status: "RUNNING",
+      executionLeaseToken,
+      executionLeaseExpiresAt: nextScanLeaseExpiry(),
+      startedAt: initialScan.startedAt ?? claimTime,
+      errorMessage: null,
+      completedAt: null,
+    },
   });
   if (claimed.count !== 1) throw new Error("扫描正在执行");
 
-  const scoring: ParsedObservation[] = [];
-  const repeatSignals: RepeatConsistencySample[] = [];
-  const opportunitySamples: OpportunitySample[] = [];
+  const scan = await db.scan.findUniqueOrThrow({
+    where: { id: initialScan.id },
+    include: {
+      brand: {
+        include: {
+          aliases: true,
+          competitors: true,
+        },
+      },
+      verificationExperiment: { include: { opportunity: true } },
+    },
+  });
+  const lease: ScanLeaseContext = {
+    scanId: scan.id,
+    executionLeaseToken,
+    verificationExperimentId: scan.verificationExperimentId,
+    verificationAttemptToken: scan.verificationAttemptToken,
+  };
+  const platformIds = asUniqueStringArray(scan.providerIds);
+
   try {
     const pinnedIds = Array.isArray(scan.promptVersionIds)
       ? scan.promptVersionIds.filter((id): id is string => typeof id === "string")
@@ -272,10 +433,31 @@ export async function executeScanForUser(userId: string, scanId: string) {
       throw new Error("扫描固定的问题版本已失效");
     }
     if (!promptVersions.length) throw new Error("品牌没有可扫描的问题");
+
+    const persistedObservations = await db.observation.findMany({
+      where: { scanId: scan.id },
+      select: {
+        promptVersionId: true,
+        platformId: true,
+        runIndex: true,
+      },
+      orderBy: { createdAt: "asc" },
+    });
+    const persistedLogicalSlots = new Set(persistedObservations.map((observation) => (
+      logicalObservationKey(
+        observation.promptVersionId,
+        observation.platformId,
+        observation.runIndex,
+      )
+    )));
+
     for (const version of promptVersions) {
       for (const platformId of platformIds) {
         const provider = getAiProvider(platformId);
         for (let runIndex = 1; runIndex <= scan.repeatCount; runIndex += 1) {
+          const logicalSlot = logicalObservationKey(version.id, platformId, runIndex);
+          if (persistedLogicalSlots.has(logicalSlot)) continue;
+          await heartbeatScanLease(lease);
           const answer = await provider.query({
             prompt: version.text,
             brand: { name: scan.brand.name, website: scan.brand.website, aliases: scan.brand.aliases.map((item) => item.value) },
@@ -288,49 +470,89 @@ export async function executeScanForUser(userId: string, scanId: string) {
               }
               : undefined,
           });
-          const target = answer.mentions.find((item) => item.isTarget);
-          const competitorMentions = answer.mentions.filter((item) => !item.isTarget);
-          const officialCitation = answer.citations.find((item) => item.isOfficial);
-          await db.observation.create({
-            data: {
-              scanId: scan.id, promptVersionId: version.id, platformId: answer.platformId, modelId: answer.modelId,
-              requestId: answer.requestId, rawResponse: answer.rawResponse, latencyMs: answer.latencyMs, runIndex,
-              mentions: { create: answer.mentions }, citations: { create: answer.citations },
-            },
-          });
-          scoring.push({
-            weight: version.weight, platformId, targetMentioned: Boolean(target),
-            recommendationStrength: target?.recommendationStrength ?? 0, position: target?.position,
-            competitorMentions: answer.mentions.filter((item) => !item.isTarget).length,
-            trackedCompetitorCount: scan.brand.competitors.length,
-            targetCitationQuality: officialCitation?.sourceQuality ?? null,
-            sentiment: target?.sentiment ?? null,
-          });
-          repeatSignals.push({
+          await heartbeatScanLease(lease);
+          if (answer.platformId !== platformId) {
+            throw new Error(`AI 平台返回标识不一致：预期 ${platformId}，实际 ${answer.platformId}`);
+          }
+          await persistObservationWithLease(lease, {
             promptVersionId: version.id,
             platformId,
-            targetMentioned: Boolean(target),
+            runIndex,
+            answer,
           });
-          opportunitySamples.push({
-            brandName: scan.brand.name,
-            promptVersionId: version.id,
-            promptText: version.text,
-            promptCategory: version.prompt.category,
-            promptWeight: version.weight,
-            platformId: answer.platformId,
-            rawResponse: answer.rawResponse,
-            targetMentioned: Boolean(target),
-            targetPosition: target?.position ?? null,
-            targetRecommendationStrength: target?.recommendationStrength ?? 0,
-            competitorNames: competitorMentions.map((item) => item.brandName),
-            competitorPositions: competitorMentions.map((item) => item.position),
-            competitorRecommendationStrengths: competitorMentions.map(
-              (item) => item.recommendationStrength,
-            ),
-            hasOfficialCitation: Boolean(officialCitation),
-          });
+          persistedLogicalSlots.add(logicalSlot);
         }
       }
+    }
+
+    await heartbeatScanLease(lease);
+    const allPersistedObservations = await db.observation.findMany({
+      where: { scanId: scan.id },
+      include: { mentions: true, citations: true },
+      orderBy: { createdAt: "asc" },
+    });
+    const observationByLogicalSlot = new Map<string, typeof allPersistedObservations[number]>();
+    for (const observation of allPersistedObservations) {
+      const key = logicalObservationKey(
+        observation.promptVersionId,
+        observation.platformId,
+        observation.runIndex,
+      );
+      if (!observationByLogicalSlot.has(key)) observationByLogicalSlot.set(key, observation);
+    }
+    const expectedObservations = promptVersions.flatMap((version) => (
+      platformIds.flatMap((platformId) => (
+        Array.from({ length: scan.repeatCount }, (_, index) => {
+          const runIndex = index + 1;
+          const observation = observationByLogicalSlot.get(
+            logicalObservationKey(version.id, platformId, runIndex),
+          );
+          if (!observation) throw new Error("扫描仍有未完成的采样槽位");
+          return { observation, version, platformId };
+        })
+      ))
+    ));
+    const scoring: ParsedObservation[] = [];
+    const repeatSignals: RepeatConsistencySample[] = [];
+    const opportunitySamples: OpportunitySample[] = [];
+    for (const { observation, version, platformId } of expectedObservations) {
+      const target = observation.mentions.find((item) => item.isTarget);
+      const competitorMentions = observation.mentions.filter((item) => !item.isTarget);
+      const officialCitation = observation.citations.find((item) => item.isOfficial);
+      scoring.push({
+        weight: version.weight,
+        platformId,
+        targetMentioned: Boolean(target),
+        recommendationStrength: target?.recommendationStrength ?? 0,
+        position: target?.position,
+        competitorMentions: competitorMentions.length,
+        trackedCompetitorCount: scan.brand.competitors.length,
+        targetCitationQuality: officialCitation?.sourceQuality ?? null,
+        sentiment: target?.sentiment ?? null,
+      });
+      repeatSignals.push({
+        promptVersionId: version.id,
+        platformId,
+        targetMentioned: Boolean(target),
+      });
+      opportunitySamples.push({
+        brandName: scan.brand.name,
+        promptVersionId: version.id,
+        promptText: version.text,
+        promptCategory: version.prompt.category,
+        promptWeight: version.weight,
+        platformId,
+        rawResponse: observation.rawResponse,
+        targetMentioned: Boolean(target),
+        targetPosition: target?.position ?? null,
+        targetRecommendationStrength: target?.recommendationStrength ?? 0,
+        competitorNames: competitorMentions.map((item) => item.brandName),
+        competitorPositions: competitorMentions.map((item) => item.position),
+        competitorRecommendationStrengths: competitorMentions.map(
+          (item) => item.recommendationStrength,
+        ),
+        hasOfficialCitation: Boolean(officialCitation),
+      });
     }
     const opportunities = buildOpportunities(opportunitySamples);
     const riskOpportunities = opportunities.filter(
@@ -368,6 +590,7 @@ export async function executeScanForUser(userId: string, scanId: string) {
       },
     ].sort((left, right) => left.score - right.score).slice(0, 3);
     await db.$transaction(async (tx) => {
+      await assertAndExtendScanLease(tx, lease);
       await tx.scoreSnapshot.create({
         data: {
           scanId: scan.id, brandId: scan.brandId, algorithmVersion: SCORING_VERSION, score: total.score,
@@ -397,15 +620,41 @@ export async function executeScanForUser(userId: string, scanId: string) {
         evidence: item.evidence, impact: item.impact, confidence: item.confidence, effort: item.effort,
       })) });
       const completed = await tx.scan.updateMany({
-        where: { id: scan.id, status: "RUNNING" },
-        data: { status: "COMPLETED", completedAt: new Date() },
+        where: {
+          id: scan.id,
+          status: "RUNNING",
+          executionLeaseToken,
+        },
+        data: {
+          status: "COMPLETED",
+          completedAt: new Date(),
+          executionLeaseToken: null,
+          executionLeaseExpiresAt: null,
+          errorMessage: null,
+        },
       });
-      if (completed.count !== 1) throw new Error("扫描状态已变化，无法提交结果");
+      if (completed.count !== 1) throw new ScanLeaseLostError();
     });
   } catch (error) {
+    if (error instanceof ScanLeaseLostError) throw error;
     const message = error instanceof Error ? error.message : "扫描执行失败";
-    await db.scan.update({ where: { id: scan.id }, data: { status: "FAILED", errorMessage: message, completedAt: new Date() } });
-    await refundFailedScan(userId, scan.id, scan.requestedCount);
+    const failed = await db.scan.updateMany({
+      where: {
+        id: scan.id,
+        status: "RUNNING",
+        executionLeaseToken,
+      },
+      data: {
+        status: "FAILED",
+        errorMessage: message,
+        completedAt: new Date(),
+        executionLeaseToken: null,
+        executionLeaseExpiresAt: null,
+      },
+    });
+    if (failed.count === 1) {
+      await refundFailedScan(userId, scan.id, scan.requestedCount);
+    }
     throw error;
   }
 

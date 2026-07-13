@@ -61,6 +61,138 @@ async function createBaselineFixture(balance = 100) {
   return { user, brand, baselineScan, opportunity };
 }
 
+async function createVerificationCandidate(
+  userId: string,
+  brandId: string,
+  experimentId: string,
+  baselineScan: {
+    providerIds: unknown;
+    promptVersionIds: unknown;
+    repeatCount: number;
+  },
+  verificationLeaseToken: string,
+) {
+  await db.optimizationExperiment.update({
+    where: { id: experimentId },
+    data: {
+      status: "VERIFYING",
+      verificationLeaseToken,
+      verificationLeaseExpiresAt: new Date(Date.now() + 60_000),
+    },
+  });
+  return createScanForUser(
+    userId,
+    brandId,
+    baselineScan.providerIds as string[],
+    {
+      repeatCount: baselineScan.repeatCount,
+      promptVersionIds: baselineScan.promptVersionIds as string[],
+      verificationExperimentId: experimentId,
+    },
+  );
+}
+
+async function createCompletedVerificationCandidate(
+  input: {
+    userId: string;
+    brandId: string;
+    experimentId: string;
+    baselineScan: {
+      id: string;
+      providerIds: unknown;
+      promptVersionIds: unknown;
+      repeatCount: number;
+    };
+    promptVersionId: string;
+    platformId: string;
+    verificationLeaseToken: string;
+    scoreDelta?: number;
+  },
+) {
+  const candidate = await createVerificationCandidate(
+    input.userId,
+    input.brandId,
+    input.experimentId,
+    input.baselineScan,
+    input.verificationLeaseToken,
+  );
+  const [baselineSnapshot, baselineObservations] = await Promise.all([
+    db.scoreSnapshot.findUniqueOrThrow({ where: { scanId: input.baselineScan.id } }),
+    db.observation.findMany({
+      where: {
+        scanId: input.baselineScan.id,
+        promptVersionId: input.promptVersionId,
+        platformId: input.platformId,
+      },
+      include: { mentions: true, citations: true },
+    }),
+  ]);
+  for (const observation of baselineObservations) {
+    await db.observation.create({
+      data: {
+        scanId: candidate.id,
+        promptVersionId: observation.promptVersionId,
+        platformId: observation.platformId,
+        modelId: observation.modelId,
+        requestId: observation.requestId,
+        runIndex: observation.runIndex,
+        rawResponse: observation.rawResponse,
+        latencyMs: observation.latencyMs,
+        mentions: {
+          create: observation.mentions.map((mention) => ({
+            brandName: mention.brandName,
+            isTarget: mention.isTarget,
+            position: mention.position,
+            recommendationStrength: mention.recommendationStrength,
+            sentiment: mention.sentiment,
+            evidence: mention.evidence,
+          })),
+        },
+        citations: {
+          create: observation.citations.map((citation) => ({
+            url: citation.url,
+            domain: citation.domain,
+            title: citation.title,
+            sourceQuality: citation.sourceQuality,
+            isOfficial: citation.isOfficial,
+          })),
+        },
+      },
+    });
+  }
+  await db.$transaction([
+    db.scoreSnapshot.create({
+      data: {
+        scanId: candidate.id,
+        brandId: input.brandId,
+        algorithmVersion: baselineSnapshot.algorithmVersion,
+        score: baselineSnapshot.score + (input.scoreDelta ?? 0),
+        mentionScore: baselineSnapshot.mentionScore,
+        recommendationScore: baselineSnapshot.recommendationScore,
+        shareOfVoiceScore: baselineSnapshot.shareOfVoiceScore,
+        citationScore: baselineSnapshot.citationScore,
+        sentimentScore: baselineSnapshot.sentimentScore,
+        confidenceScore: baselineSnapshot.confidenceScore,
+        isProvisional: baselineSnapshot.isProvisional,
+        riskLevel: baselineSnapshot.riskLevel,
+      },
+    }),
+    db.scan.update({
+      where: { id: candidate.id },
+      data: { status: "COMPLETED", completedAt: new Date() },
+    }),
+    db.optimizationExperiment.update({
+      where: { id: input.experimentId },
+      data: {
+        status: "ACTIVE",
+        verificationLeaseToken: null,
+        verificationLeaseExpiresAt: null,
+      },
+    }),
+  ]);
+  return candidate;
+}
+
 describe("实验服务", () => {
   it("从机会的已完成扫描创建草稿并推进机会状态", async () => {
     const { user, baselineScan, opportunity } = await createBaselineFixture();
@@ -73,6 +205,7 @@ describe("实验服务", () => {
       baselineScanId: baselineScan.id,
       status: "DRAFT",
       actionPlan: opportunity.recommendedAction,
+      actionRevision: 0,
     });
     expect(experiment.title).toContain(opportunity.title);
     expect(experiment.hypothesis).toContain(opportunity.summary);
@@ -133,6 +266,7 @@ describe("实验服务", () => {
       status: "ACTIVE",
       actionPlan: "新增一篇包含真实案例和量化数据的官网指南",
       targetUrl: "https://content.example.com/guide?from=test",
+      actionRevision: 1,
     });
     expect(active.publishedAt).not.toBeNull();
     expect(active.nextCheckAt).not.toBeNull();
@@ -141,13 +275,18 @@ describe("实验服务", () => {
       .toBe(7 * 86_400_000);
   });
 
-  it("ACTIVE 重复发布可更新行动但不重置发布时间", async () => {
+  it("ACTIVE 实质变更动作时保留首次发布时间并从变更时重置七天复查窗口", async () => {
     const { user, opportunity } = await createBaselineFixture();
     const draft = await createExperimentForUser(user.id, opportunity.id);
     const first = await publishExperimentForUser(user.id, draft.id, {
       actionPlan: "发布第一版包含足够细节的行动计划",
       targetUrl: "https://experiment.example.cn/first",
     });
+    await db.optimizationExperiment.update({
+      where: { id: first.id },
+      data: { nextCheckAt: new Date(Date.now() + 60_000) },
+    });
+    const beforeChange = Date.now();
 
     const second = await publishExperimentForUser(user.id, draft.id, {
       actionPlan: "发布第二版包含更多证据的行动计划",
@@ -157,8 +296,53 @@ describe("实验服务", () => {
     expect(second.status).toBe("ACTIVE");
     expect(second.actionPlan).toBe("发布第二版包含更多证据的行动计划");
     expect(second.targetUrl).toBe("https://experiment.example.cn/second");
+    expect(first.actionRevision).toBe(1);
+    expect(second.actionRevision).toBe(2);
     expect(second.publishedAt?.getTime()).toBe(first.publishedAt?.getTime());
-    expect(second.nextCheckAt?.getTime()).toBe(first.nextCheckAt?.getTime());
+    expect(second.nextCheckAt!.getTime()).toBeGreaterThanOrEqual(
+      beforeChange + 7 * 86_400_000,
+    );
+    expect(second.nextCheckAt!.getTime()).toBeLessThanOrEqual(
+      Date.now() + 7 * 86_400_000,
+    );
+  });
+
+  it("ACTIVE 发布规范化后内容相同时不递增动作版本也不重置时间", async () => {
+    const { user, opportunity } = await createBaselineFixture();
+    const draft = await createExperimentForUser(user.id, opportunity.id);
+    const first = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "  发布一版包含充分证据的完整行动计划  ",
+      targetUrl: "https://experiment.example.cn/same/",
+    });
+
+    const repeated = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "发布一版包含充分证据的完整行动计划",
+      targetUrl: " https://experiment.example.cn/same ",
+    });
+
+    expect(repeated.actionRevision).toBe(1);
+    expect(repeated.publishedAt?.getTime()).toBe(first.publishedAt?.getTime());
+    expect(repeated.nextCheckAt?.getTime()).toBe(first.nextCheckAt?.getTime());
+  });
+
+  it("并发发布相同草稿时只产生第一版动作且两个请求都返回成功", async () => {
+    const { user, opportunity } = await createBaselineFixture();
+    const draft = await createExperimentForUser(user.id, opportunity.id);
+    const input = {
+      actionPlan: "发布一版可供并发幂等验证的完整行动计划",
+      targetUrl: "https://experiment.example.cn/concurrent-publish",
+    };
+
+    const results = await Promise.all([
+      publishExperimentForUser(user.id, draft.id, input),
+      publishExperimentForUser(user.id, draft.id, input),
+    ]);
+
+    expect(results.every((item) => item.status === "ACTIVE")).toBe(true);
+    expect(results.every((item) => item.actionRevision === 1)).toBe(true);
+    expect(results.every((item) => item.actionPlan === input.actionPlan)).toBe(true);
+    expect((await db.optimizationExperiment.findUniqueOrThrow({ where: { id: draft.id } }))
+      .actionRevision).toBe(1);
   });
 
   it.each([
@@ -269,6 +453,55 @@ describe("实验服务", () => {
       .toBe("COMPLETED");
   });
 
+  it("基线评分算法版本过期时保持 ACTIVE 且不创建扫描、不扣额度", async () => {
+    const { user, baselineScan, opportunity } = await createBaselineFixture();
+    const draft = await createExperimentForUser(user.id, opportunity.id);
+    const active = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "发布用于验证算法版本门禁的完整行动计划",
+    });
+    await db.scoreSnapshot.update({
+      where: { scanId: baselineScan.id },
+      data: { algorithmVersion: "legacy-scoring-v0" },
+    });
+    const balanceBefore = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: user.id },
+    })).balance;
+    const scanCountBefore = await db.scan.count({ where: { brandId: opportunity.brandId } });
+
+    await expect(verifyExperimentForUser(user.id, active.id))
+      .rejects.toThrow("基线评分算法版本已过期，请重新扫描后再创建实验");
+
+    expect((await db.optimizationExperiment.findUniqueOrThrow({ where: { id: active.id } })).status)
+      .toBe("ACTIVE");
+    expect(await db.scan.count({ where: { brandId: opportunity.brandId } })).toBe(scanCountBefore);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(balanceBefore);
+  });
+
+  it("真实数据实验在 nextCheckAt 前拒绝验证且不发起网络请求、不扣额度", async () => {
+    const { user, baselineScan, opportunity } = await createBaselineFixture();
+    const draft = await createExperimentForUser(user.id, opportunity.id);
+    const active = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "发布需要等待真实数据观察窗口的完整行动计划",
+    });
+    await db.scan.update({
+      where: { id: baselineScan.id },
+      data: { dataMode: "REAL" },
+    });
+    const balanceBefore = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: user.id },
+    })).balance;
+
+    await expect(verifyExperimentForUser(user.id, active.id))
+      .rejects.toThrow("真实数据实验尚未到复查时间");
+
+    expect((await db.optimizationExperiment.findUniqueOrThrow({ where: { id: active.id } })).status)
+      .toBe("ACTIVE");
+    expect(await db.scan.count({ where: { verificationExperimentId: active.id } })).toBe(0);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(balanceBefore);
+  });
+
   it("已完成实验重复复扫直接返回现有结果且不再次扣费", async () => {
     const { user, opportunity } = await createBaselineFixture();
     const draft = await createExperimentForUser(user.id, opportunity.id);
@@ -319,7 +552,11 @@ describe("实验服务", () => {
     });
     await db.optimizationExperiment.update({
       where: { id: active.id },
-      data: { status: "VERIFYING" },
+      data: {
+        status: "VERIFYING",
+        verificationLeaseToken: "completed-candidate-owner",
+        verificationLeaseExpiresAt: new Date(Date.now() + 60_000),
+      },
     });
     const completedVerification = await createScanForUser(
       user.id,
@@ -334,7 +571,7 @@ describe("实验服务", () => {
     await executeScanForUser(user.id, completedVerification.id);
     await db.optimizationExperiment.update({
       where: { id: active.id },
-      data: { status: "ACTIVE" },
+      data: { verificationLeaseExpiresAt: new Date(Date.now() - 60_000) },
     });
     const balanceBeforeRecovery = (await db.quotaAccount.findUniqueOrThrow({
       where: { userId: user.id },
@@ -352,6 +589,265 @@ describe("实验服务", () => {
       .toBe(balanceBeforeRecovery);
   });
 
+  it("VERIFYING 在创建扫描前崩溃后可由过期 lease 接管并仅扣一次", async () => {
+    const { user, baselineScan, opportunity } = await createBaselineFixture();
+    const draft = await createExperimentForUser(user.id, opportunity.id);
+    const active = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "发布用于验证无扫描崩溃恢复的完整行动计划",
+    });
+    await db.optimizationExperiment.update({
+      where: { id: active.id },
+      data: {
+        status: "VERIFYING",
+        verificationLeaseToken: "crashed-before-scan",
+        verificationLeaseExpiresAt: new Date(Date.now() - 60_000),
+      },
+    });
+    const balanceBeforeRecovery = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: user.id },
+    })).balance;
+
+    const result = await verifyExperimentForUser(user.id, active.id);
+
+    expect(result.followUpScanId).toBeTruthy();
+    expect(await db.scan.count({ where: { verificationExperimentId: active.id } })).toBe(1);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(balanceBeforeRecovery - baselineScan.requestedCount);
+  });
+
+  it("VERIFYING 在 PENDING 扫描创建后崩溃可复用同一扫描且不二次扣费", async () => {
+    const { user, baselineScan, opportunity } = await createBaselineFixture();
+    const draft = await createExperimentForUser(user.id, opportunity.id);
+    const active = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "发布用于验证待执行扫描恢复的完整行动计划",
+    });
+    const pendingScan = await createVerificationCandidate(
+      user.id,
+      opportunity.brandId,
+      active.id,
+      baselineScan,
+      "crashed-pending-owner",
+    );
+    await db.optimizationExperiment.update({
+      where: { id: active.id },
+      data: { verificationLeaseExpiresAt: new Date(Date.now() - 60_000) },
+    });
+    const balanceBeforeRecovery = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: user.id },
+    })).balance;
+
+    const result = await verifyExperimentForUser(user.id, active.id);
+
+    expect(result.followUpScanId).toBe(pendingScan.id);
+    expect(await db.scan.count({ where: { verificationExperimentId: active.id } })).toBe(1);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(balanceBeforeRecovery);
+  });
+
+  it("VERIFYING 在部分 RUNNING 扫描后崩溃可断点补齐且不二次扣费", async () => {
+    const { user, baselineScan, opportunity } = await createBaselineFixture();
+    const draft = await createExperimentForUser(user.id, opportunity.id);
+    const active = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "发布用于验证部分扫描恢复的完整行动计划",
+    });
+    const partialScan = await createVerificationCandidate(
+      user.id,
+      opportunity.brandId,
+      active.id,
+      baselineScan,
+      "crashed-running-owner",
+    );
+    const firstPromptVersionId = (baselineScan.promptVersionIds as string[])[0];
+    const firstPlatformId = (baselineScan.providerIds as string[])[0];
+    const persisted = await db.observation.create({
+      data: {
+        scanId: partialScan.id,
+        promptVersionId: firstPromptVersionId,
+        platformId: firstPlatformId,
+        modelId: "partial-verification-model",
+        runIndex: 1,
+        rawResponse: "验证 worker 崩溃前已持久化的回答",
+      },
+    });
+    await db.scan.update({
+      where: { id: partialScan.id },
+      data: {
+        status: "RUNNING",
+        executionLeaseToken: "crashed-scan-owner",
+        executionLeaseExpiresAt: new Date(Date.now() - 60_000),
+      },
+    });
+    await db.optimizationExperiment.update({
+      where: { id: active.id },
+      data: { verificationLeaseExpiresAt: new Date(Date.now() - 60_000) },
+    });
+    const balanceBeforeRecovery = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: user.id },
+    })).balance;
+
+    const result = await verifyExperimentForUser(user.id, active.id);
+    const recoveredObservations = await db.observation.findMany({
+      where: { scanId: partialScan.id },
+    });
+
+    expect(result.followUpScanId).toBe(partialScan.id);
+    expect(recoveredObservations).toHaveLength(partialScan.requestedCount);
+    expect(recoveredObservations.some((item) => item.id === persisted.id)).toBe(true);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(balanceBeforeRecovery);
+  });
+
+  it("动作版本变化后忽略旧版已完成候选并创建当前版本验证扫描", async () => {
+    const { user, baselineScan, opportunity } = await createBaselineFixture(150);
+    const draft = await createExperimentForUser(user.id, opportunity.id);
+    const firstAction = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "发布第一版用于候选隔离的完整行动计划",
+    });
+    const oldCandidate = await createVerificationCandidate(
+      user.id,
+      opportunity.brandId,
+      firstAction.id,
+      baselineScan,
+      "first-action-owner",
+    );
+    await executeScanForUser(user.id, oldCandidate.id);
+    await db.optimizationExperiment.update({
+      where: { id: firstAction.id },
+      data: {
+        status: "ACTIVE",
+        verificationLeaseToken: null,
+        verificationLeaseExpiresAt: null,
+      },
+    });
+    const secondAction = await publishExperimentForUser(user.id, firstAction.id, {
+      actionPlan: "发布第二版加入更多证据的完整行动计划",
+    });
+    const balanceBeforeVerification = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: user.id },
+    })).balance;
+
+    const result = await verifyExperimentForUser(user.id, secondAction.id);
+    const followUp = await db.scan.findUniqueOrThrow({ where: { id: result.followUpScanId! } });
+
+    expect(secondAction.actionRevision).toBe(2);
+    expect(oldCandidate.verificationActionRevision).toBe(1);
+    expect(result.followUpScanId).not.toBe(oldCandidate.id);
+    expect(followUp.verificationActionRevision).toBe(2);
+    expect(await db.scan.count({ where: { verificationExperimentId: secondAction.id } })).toBe(2);
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(balanceBeforeVerification - baselineScan.requestedCount);
+  });
+
+  it("品牌风险机会可仅凭同目标风险解除验证成功", async () => {
+    const { user, brand, baselineScan, opportunity } = await createBaselineFixture();
+    await db.opportunity.deleteMany({
+      where: {
+        scanId: baselineScan.id,
+        type: "BRAND_RISK",
+        id: { not: opportunity.id },
+      },
+    });
+    const riskOpportunity = await db.opportunity.update({
+      where: { id: opportunity.id },
+      data: { type: "BRAND_RISK" },
+    });
+    const draft = await createExperimentForUser(user.id, riskOpportunity.id);
+    const active = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "发布用于澄清目标品牌风险的完整事实说明",
+    });
+    await createCompletedVerificationCandidate({
+      userId: user.id,
+      brandId: brand.id,
+      experimentId: active.id,
+      baselineScan,
+      promptVersionId: riskOpportunity.promptVersionId,
+      platformId: riskOpportunity.platformId,
+      verificationLeaseToken: "risk-resolution-candidate",
+    });
+
+    const result = await verifyExperimentForUser(user.id, active.id);
+
+    expect(result.status).toBe("VERIFIED");
+    expect(result.scoreDelta).toBe(0);
+    expect(result.mentionDelta).toBe(0);
+    expect(result.recommendationDelta).toBe(0);
+    expect(result.citationDelta).toBe(0);
+    expect(result.resultSummary).toContain("品牌风险已解除");
+  });
+
+  it("复扫新增同目标品牌风险时即使总分提升也拒绝验证", async () => {
+    const { user, brand, baselineScan, opportunity } = await createBaselineFixture();
+    const draft = await createExperimentForUser(user.id, opportunity.id);
+    const active = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "发布用于验证新增目标风险拦截的完整行动计划",
+    });
+    const candidate = await createCompletedVerificationCandidate({
+      userId: user.id,
+      brandId: brand.id,
+      experimentId: active.id,
+      baselineScan,
+      promptVersionId: opportunity.promptVersionId,
+      platformId: opportunity.platformId,
+      verificationLeaseToken: "new-target-risk-candidate",
+      scoreDelta: 1,
+    });
+    await db.opportunity.create({
+      data: {
+        brandId: brand.id,
+        scanId: candidate.id,
+        promptVersionId: opportunity.promptVersionId,
+        platformId: opportunity.platformId,
+        type: "BRAND_RISK",
+        priority: 100,
+        title: "复扫新增目标风险",
+        summary: "目标问题与平台出现新的品牌风险",
+        evidence: "新的目标品牌风险证据",
+        recommendedAction: "立即核查并澄清",
+        targetContentType: "风险澄清页",
+      },
+    });
+
+    const result = await verifyExperimentForUser(user.id, active.id);
+
+    expect(result.status).toBe("INCONCLUSIVE");
+    expect(result.scoreDelta).toBe(1);
+    expect(result.resultSummary).toContain("新的目标品牌风险");
+  });
+
+  it("无关的全局 RiskFinding 不会阻断同目标的正向归因", async () => {
+    const { user, brand, baselineScan, opportunity } = await createBaselineFixture();
+    const draft = await createExperimentForUser(user.id, opportunity.id);
+    const active = await publishExperimentForUser(user.id, draft.id, {
+      actionPlan: "发布用于验证风险归因隔离的完整行动计划",
+    });
+    const candidate = await createCompletedVerificationCandidate({
+      userId: user.id,
+      brandId: brand.id,
+      experimentId: active.id,
+      baselineScan,
+      promptVersionId: opportunity.promptVersionId,
+      platformId: opportunity.platformId,
+      verificationLeaseToken: "unrelated-risk-candidate",
+      scoreDelta: 1,
+    });
+    await db.riskFinding.create({
+      data: {
+        brandId: brand.id,
+        scanId: candidate.id,
+        level: "CRITICAL",
+        title: "其他问题产生的风险",
+        description: "该风险不属于实验目标问题与平台",
+        evidence: "无关风险证据",
+      },
+    });
+
+    const result = await verifyExperimentForUser(user.id, active.id);
+
+    expect(result.status).toBe("VERIFIED");
+    expect(result.scoreDelta).toBe(1);
+    expect(result.resultSummary).not.toContain("新的目标品牌风险");
+  });
+
   it.each([
     "问题版本",
     "AI 平台",
@@ -364,7 +860,11 @@ describe("实验服务", () => {
     });
     await db.optimizationExperiment.update({
       where: { id: active.id },
-      data: { status: "VERIFYING" },
+      data: {
+        status: "VERIFYING",
+        verificationLeaseToken: `mismatched-candidate-${mismatch}`,
+        verificationLeaseExpiresAt: new Date(Date.now() + 60_000),
+      },
     });
     const mismatchedScan = await createScanForUser(
       user.id,
@@ -417,7 +917,7 @@ describe("实验服务", () => {
     })).toBe(2);
   });
 
-  it("DRAFT 与 VERIFYING 状态拒绝复扫", async () => {
+  it("DRAFT 与持有活动 lease 的 VERIFYING 状态拒绝复扫且不恢复 ACTIVE", async () => {
     const { user, opportunity } = await createBaselineFixture();
     const draft = await createExperimentForUser(user.id, opportunity.id);
 
@@ -425,10 +925,16 @@ describe("实验服务", () => {
       .rejects.toThrow("实验尚未发布，不能复扫");
     await db.optimizationExperiment.update({
       where: { id: draft.id },
-      data: { status: "VERIFYING" },
+      data: {
+        status: "VERIFYING",
+        verificationLeaseToken: "active-verification-owner",
+        verificationLeaseExpiresAt: new Date(Date.now() + 60_000),
+      },
     });
     await expect(verifyExperimentForUser(user.id, draft.id))
       .rejects.toThrow("实验正在复扫验证");
+    expect((await db.optimizationExperiment.findUniqueOrThrow({ where: { id: draft.id } })).status)
+      .toBe("VERIFYING");
   });
 
   it("额度不足时复扫失败并恢复 ACTIVE", async () => {

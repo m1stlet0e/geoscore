@@ -29,11 +29,13 @@ export type AggregateScan = {
 export type ScanAvgAggregateOutputType = {
   requestedCount: number | null
   repeatCount: number | null
+  verificationActionRevision: number | null
 }
 
 export type ScanSumAggregateOutputType = {
   requestedCount: number | null
   repeatCount: number | null
+  verificationActionRevision: number | null
 }
 
 export type ScanMinAggregateOutputType = {
@@ -44,6 +46,10 @@ export type ScanMinAggregateOutputType = {
   repeatCount: number | null
   dataMode: $Enums.ScanDataMode | null
   verificationExperimentId: string | null
+  executionLeaseToken: string | null
+  executionLeaseExpiresAt: Date | null
+  verificationAttemptToken: string | null
+  verificationActionRevision: number | null
   errorMessage: string | null
   startedAt: Date | null
   completedAt: Date | null
@@ -58,6 +64,10 @@ export type ScanMaxAggregateOutputType = {
   repeatCount: number | null
   dataMode: $Enums.ScanDataMode | null
   verificationExperimentId: string | null
+  executionLeaseToken: string | null
+  executionLeaseExpiresAt: Date | null
+  verificationAttemptToken: string | null
+  verificationActionRevision: number | null
   errorMessage: string | null
   startedAt: Date | null
   completedAt: Date | null
@@ -74,6 +84,10 @@ export type ScanCountAggregateOutputType = {
   repeatCount: number
   dataMode: number
   verificationExperimentId: number
+  executionLeaseToken: number
+  executionLeaseExpiresAt: number
+  verificationAttemptToken: number
+  verificationActionRevision: number
   errorMessage: number
   startedAt: number
   completedAt: number
@@ -85,11 +99,13 @@ export type ScanCountAggregateOutputType = {
 export type ScanAvgAggregateInputType = {
   requestedCount?: true
   repeatCount?: true
+  verificationActionRevision?: true
 }
 
 export type ScanSumAggregateInputType = {
   requestedCount?: true
   repeatCount?: true
+  verificationActionRevision?: true
 }
 
 export type ScanMinAggregateInputType = {
@@ -100,6 +116,10 @@ export type ScanMinAggregateInputType = {
   repeatCount?: true
   dataMode?: true
   verificationExperimentId?: true
+  executionLeaseToken?: true
+  executionLeaseExpiresAt?: true
+  verificationAttemptToken?: true
+  verificationActionRevision?: true
   errorMessage?: true
   startedAt?: true
   completedAt?: true
@@ -114,6 +134,10 @@ export type ScanMaxAggregateInputType = {
   repeatCount?: true
   dataMode?: true
   verificationExperimentId?: true
+  executionLeaseToken?: true
+  executionLeaseExpiresAt?: true
+  verificationAttemptToken?: true
+  verificationActionRevision?: true
   errorMessage?: true
   startedAt?: true
   completedAt?: true
@@ -130,6 +154,10 @@ export type ScanCountAggregateInputType = {
   repeatCount?: true
   dataMode?: true
   verificationExperimentId?: true
+  executionLeaseToken?: true
+  executionLeaseExpiresAt?: true
+  verificationAttemptToken?: true
+  verificationActionRevision?: true
   errorMessage?: true
   startedAt?: true
   completedAt?: true
@@ -233,6 +261,10 @@ export type ScanGroupByOutputType = {
   repeatCount: number
   dataMode: $Enums.ScanDataMode
   verificationExperimentId: string | null
+  executionLeaseToken: string | null
+  executionLeaseExpiresAt: Date | null
+  verificationAttemptToken: string | null
+  verificationActionRevision: number | null
   errorMessage: string | null
   startedAt: Date | null
   completedAt: Date | null
@@ -272,6 +304,10 @@ export type ScanWhereInput = {
   repeatCount?: Prisma.IntFilter<"Scan"> | number
   dataMode?: Prisma.EnumScanDataModeFilter<"Scan"> | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.StringNullableFilter<"Scan"> | string | null
+  executionLeaseToken?: Prisma.StringNullableFilter<"Scan"> | string | null
+  executionLeaseExpiresAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
+  verificationAttemptToken?: Prisma.StringNullableFilter<"Scan"> | string | null
+  verificationActionRevision?: Prisma.IntNullableFilter<"Scan"> | number | null
   errorMessage?: Prisma.StringNullableFilter<"Scan"> | string | null
   startedAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
@@ -297,6 +333,10 @@ export type ScanOrderByWithRelationInput = {
   repeatCount?: Prisma.SortOrder
   dataMode?: Prisma.SortOrder
   verificationExperimentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  executionLeaseToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  executionLeaseExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationAttemptToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationActionRevision?: Prisma.SortOrderInput | Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -326,6 +366,10 @@ export type ScanWhereUniqueInput = Prisma.AtLeast<{
   repeatCount?: Prisma.IntFilter<"Scan"> | number
   dataMode?: Prisma.EnumScanDataModeFilter<"Scan"> | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.StringNullableFilter<"Scan"> | string | null
+  executionLeaseToken?: Prisma.StringNullableFilter<"Scan"> | string | null
+  executionLeaseExpiresAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
+  verificationAttemptToken?: Prisma.StringNullableFilter<"Scan"> | string | null
+  verificationActionRevision?: Prisma.IntNullableFilter<"Scan"> | number | null
   errorMessage?: Prisma.StringNullableFilter<"Scan"> | string | null
   startedAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
@@ -351,6 +395,10 @@ export type ScanOrderByWithAggregationInput = {
   repeatCount?: Prisma.SortOrder
   dataMode?: Prisma.SortOrder
   verificationExperimentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  executionLeaseToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  executionLeaseExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationAttemptToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationActionRevision?: Prisma.SortOrderInput | Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -375,6 +423,10 @@ export type ScanScalarWhereWithAggregatesInput = {
   repeatCount?: Prisma.IntWithAggregatesFilter<"Scan"> | number
   dataMode?: Prisma.EnumScanDataModeWithAggregatesFilter<"Scan"> | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.StringNullableWithAggregatesFilter<"Scan"> | string | null
+  executionLeaseToken?: Prisma.StringNullableWithAggregatesFilter<"Scan"> | string | null
+  executionLeaseExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Scan"> | Date | string | null
+  verificationAttemptToken?: Prisma.StringNullableWithAggregatesFilter<"Scan"> | string | null
+  verificationActionRevision?: Prisma.IntNullableWithAggregatesFilter<"Scan"> | number | null
   errorMessage?: Prisma.StringNullableWithAggregatesFilter<"Scan"> | string | null
   startedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Scan"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Scan"> | Date | string | null
@@ -389,6 +441,10 @@ export type ScanCreateInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -414,6 +470,10 @@ export type ScanUncheckedCreateInput = {
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
   verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -435,6 +495,10 @@ export type ScanUpdateInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -460,6 +524,10 @@ export type ScanUncheckedUpdateInput = {
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -483,6 +551,10 @@ export type ScanCreateManyInput = {
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
   verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -497,6 +569,10 @@ export type ScanUpdateManyMutationInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -513,6 +589,10 @@ export type ScanUncheckedUpdateManyInput = {
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -544,6 +624,10 @@ export type ScanCountOrderByAggregateInput = {
   repeatCount?: Prisma.SortOrder
   dataMode?: Prisma.SortOrder
   verificationExperimentId?: Prisma.SortOrder
+  executionLeaseToken?: Prisma.SortOrder
+  executionLeaseExpiresAt?: Prisma.SortOrder
+  verificationAttemptToken?: Prisma.SortOrder
+  verificationActionRevision?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
@@ -553,6 +637,7 @@ export type ScanCountOrderByAggregateInput = {
 export type ScanAvgOrderByAggregateInput = {
   requestedCount?: Prisma.SortOrder
   repeatCount?: Prisma.SortOrder
+  verificationActionRevision?: Prisma.SortOrder
 }
 
 export type ScanMaxOrderByAggregateInput = {
@@ -563,6 +648,10 @@ export type ScanMaxOrderByAggregateInput = {
   repeatCount?: Prisma.SortOrder
   dataMode?: Prisma.SortOrder
   verificationExperimentId?: Prisma.SortOrder
+  executionLeaseToken?: Prisma.SortOrder
+  executionLeaseExpiresAt?: Prisma.SortOrder
+  verificationAttemptToken?: Prisma.SortOrder
+  verificationActionRevision?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
@@ -577,6 +666,10 @@ export type ScanMinOrderByAggregateInput = {
   repeatCount?: Prisma.SortOrder
   dataMode?: Prisma.SortOrder
   verificationExperimentId?: Prisma.SortOrder
+  executionLeaseToken?: Prisma.SortOrder
+  executionLeaseExpiresAt?: Prisma.SortOrder
+  verificationAttemptToken?: Prisma.SortOrder
+  verificationActionRevision?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
@@ -586,6 +679,7 @@ export type ScanMinOrderByAggregateInput = {
 export type ScanSumOrderByAggregateInput = {
   requestedCount?: Prisma.SortOrder
   repeatCount?: Prisma.SortOrder
+  verificationActionRevision?: Prisma.SortOrder
 }
 
 export type ScanScalarRelationFilter = {
@@ -646,6 +740,14 @@ export type EnumScanStatusFieldUpdateOperationsInput = {
 
 export type EnumScanDataModeFieldUpdateOperationsInput = {
   set?: $Enums.ScanDataMode
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type ScanCreateNestedOneWithoutOpportunitiesInput = {
@@ -802,6 +904,10 @@ export type ScanCreateWithoutBrandInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -825,6 +931,10 @@ export type ScanUncheckedCreateWithoutBrandInput = {
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
   verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -877,6 +987,10 @@ export type ScanScalarWhereInput = {
   repeatCount?: Prisma.IntFilter<"Scan"> | number
   dataMode?: Prisma.EnumScanDataModeFilter<"Scan"> | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.StringNullableFilter<"Scan"> | string | null
+  executionLeaseToken?: Prisma.StringNullableFilter<"Scan"> | string | null
+  executionLeaseExpiresAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
+  verificationAttemptToken?: Prisma.StringNullableFilter<"Scan"> | string | null
+  verificationActionRevision?: Prisma.IntNullableFilter<"Scan"> | number | null
   errorMessage?: Prisma.StringNullableFilter<"Scan"> | string | null
   startedAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Scan"> | Date | string | null
@@ -891,6 +1005,10 @@ export type ScanCreateWithoutOpportunitiesInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -915,6 +1033,10 @@ export type ScanUncheckedCreateWithoutOpportunitiesInput = {
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
   verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -951,6 +1073,10 @@ export type ScanUpdateWithoutOpportunitiesInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -975,6 +1101,10 @@ export type ScanUncheckedUpdateWithoutOpportunitiesInput = {
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -995,6 +1125,10 @@ export type ScanCreateWithoutBaselineExperimentsInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1019,6 +1153,10 @@ export type ScanUncheckedCreateWithoutBaselineExperimentsInput = {
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
   verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1044,6 +1182,10 @@ export type ScanCreateWithoutFollowUpExperimentInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1068,6 +1210,10 @@ export type ScanUncheckedCreateWithoutFollowUpExperimentInput = {
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
   verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1093,6 +1239,10 @@ export type ScanCreateWithoutVerificationExperimentInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1115,6 +1265,10 @@ export type ScanUncheckedCreateWithoutVerificationExperimentInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1157,6 +1311,10 @@ export type ScanUpdateWithoutBaselineExperimentsInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1181,6 +1339,10 @@ export type ScanUncheckedUpdateWithoutBaselineExperimentsInput = {
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1212,6 +1374,10 @@ export type ScanUpdateWithoutFollowUpExperimentInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1236,6 +1402,10 @@ export type ScanUncheckedUpdateWithoutFollowUpExperimentInput = {
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1272,6 +1442,10 @@ export type ScanCreateWithoutObservationsInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1296,6 +1470,10 @@ export type ScanUncheckedCreateWithoutObservationsInput = {
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
   verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1332,6 +1510,10 @@ export type ScanUpdateWithoutObservationsInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1356,6 +1538,10 @@ export type ScanUncheckedUpdateWithoutObservationsInput = {
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1376,6 +1562,10 @@ export type ScanCreateWithoutScoreSnapshotInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1400,6 +1590,10 @@ export type ScanUncheckedCreateWithoutScoreSnapshotInput = {
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
   verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1436,6 +1630,10 @@ export type ScanUpdateWithoutScoreSnapshotInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1460,6 +1658,10 @@ export type ScanUncheckedUpdateWithoutScoreSnapshotInput = {
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1480,6 +1682,10 @@ export type ScanCreateWithoutRiskFindingsInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1504,6 +1710,10 @@ export type ScanUncheckedCreateWithoutRiskFindingsInput = {
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
   verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1540,6 +1750,10 @@ export type ScanUpdateWithoutRiskFindingsInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1564,6 +1778,10 @@ export type ScanUncheckedUpdateWithoutRiskFindingsInput = {
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1584,6 +1802,10 @@ export type ScanCreateWithoutRecommendationsInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1608,6 +1830,10 @@ export type ScanUncheckedCreateWithoutRecommendationsInput = {
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
   verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1644,6 +1870,10 @@ export type ScanUpdateWithoutRecommendationsInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1668,6 +1898,10 @@ export type ScanUncheckedUpdateWithoutRecommendationsInput = {
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1689,6 +1923,10 @@ export type ScanCreateManyBrandInput = {
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
   verificationExperimentId?: string | null
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1703,6 +1941,10 @@ export type ScanUpdateWithoutBrandInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1726,6 +1968,10 @@ export type ScanUncheckedUpdateWithoutBrandInput = {
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1748,6 +1994,10 @@ export type ScanUncheckedUpdateManyWithoutBrandInput = {
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
   verificationExperimentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1762,6 +2012,10 @@ export type ScanCreateManyVerificationExperimentInput = {
   requestedCount: number
   repeatCount?: number
   dataMode?: $Enums.ScanDataMode
+  executionLeaseToken?: string | null
+  executionLeaseExpiresAt?: Date | string | null
+  verificationAttemptToken?: string | null
+  verificationActionRevision?: number | null
   errorMessage?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -1776,6 +2030,10 @@ export type ScanUpdateWithoutVerificationExperimentInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1798,6 +2056,10 @@ export type ScanUncheckedUpdateWithoutVerificationExperimentInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1819,6 +2081,10 @@ export type ScanUncheckedUpdateManyWithoutVerificationExperimentInput = {
   requestedCount?: Prisma.IntFieldUpdateOperationsInput | number
   repeatCount?: Prisma.IntFieldUpdateOperationsInput | number
   dataMode?: Prisma.EnumScanDataModeFieldUpdateOperationsInput | $Enums.ScanDataMode
+  executionLeaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  executionLeaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationAttemptToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationActionRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1902,6 +2168,10 @@ export type ScanSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   repeatCount?: boolean
   dataMode?: boolean
   verificationExperimentId?: boolean
+  executionLeaseToken?: boolean
+  executionLeaseExpiresAt?: boolean
+  verificationAttemptToken?: boolean
+  verificationActionRevision?: boolean
   errorMessage?: boolean
   startedAt?: boolean
   completedAt?: boolean
@@ -1928,6 +2198,10 @@ export type ScanSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   repeatCount?: boolean
   dataMode?: boolean
   verificationExperimentId?: boolean
+  executionLeaseToken?: boolean
+  executionLeaseExpiresAt?: boolean
+  verificationAttemptToken?: boolean
+  verificationActionRevision?: boolean
   errorMessage?: boolean
   startedAt?: boolean
   completedAt?: boolean
@@ -1946,6 +2220,10 @@ export type ScanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   repeatCount?: boolean
   dataMode?: boolean
   verificationExperimentId?: boolean
+  executionLeaseToken?: boolean
+  executionLeaseExpiresAt?: boolean
+  verificationAttemptToken?: boolean
+  verificationActionRevision?: boolean
   errorMessage?: boolean
   startedAt?: boolean
   completedAt?: boolean
@@ -1964,13 +2242,17 @@ export type ScanSelectScalar = {
   repeatCount?: boolean
   dataMode?: boolean
   verificationExperimentId?: boolean
+  executionLeaseToken?: boolean
+  executionLeaseExpiresAt?: boolean
+  verificationAttemptToken?: boolean
+  verificationActionRevision?: boolean
   errorMessage?: boolean
   startedAt?: boolean
   completedAt?: boolean
   createdAt?: boolean
 }
 
-export type ScanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brandId" | "status" | "providerIds" | "promptVersionIds" | "requestedCount" | "repeatCount" | "dataMode" | "verificationExperimentId" | "errorMessage" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["scan"]>
+export type ScanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brandId" | "status" | "providerIds" | "promptVersionIds" | "requestedCount" | "repeatCount" | "dataMode" | "verificationExperimentId" | "executionLeaseToken" | "executionLeaseExpiresAt" | "verificationAttemptToken" | "verificationActionRevision" | "errorMessage" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["scan"]>
 export type ScanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
   verificationExperiment?: boolean | Prisma.Scan$verificationExperimentArgs<ExtArgs>
@@ -2015,6 +2297,10 @@ export type $ScanPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     repeatCount: number
     dataMode: $Enums.ScanDataMode
     verificationExperimentId: string | null
+    executionLeaseToken: string | null
+    executionLeaseExpiresAt: Date | null
+    verificationAttemptToken: string | null
+    verificationActionRevision: number | null
     errorMessage: string | null
     startedAt: Date | null
     completedAt: Date | null
@@ -2460,6 +2746,10 @@ export interface ScanFieldRefs {
   readonly repeatCount: Prisma.FieldRef<"Scan", 'Int'>
   readonly dataMode: Prisma.FieldRef<"Scan", 'ScanDataMode'>
   readonly verificationExperimentId: Prisma.FieldRef<"Scan", 'String'>
+  readonly executionLeaseToken: Prisma.FieldRef<"Scan", 'String'>
+  readonly executionLeaseExpiresAt: Prisma.FieldRef<"Scan", 'DateTime'>
+  readonly verificationAttemptToken: Prisma.FieldRef<"Scan", 'String'>
+  readonly verificationActionRevision: Prisma.FieldRef<"Scan", 'Int'>
   readonly errorMessage: Prisma.FieldRef<"Scan", 'String'>
   readonly startedAt: Prisma.FieldRef<"Scan", 'DateTime'>
   readonly completedAt: Prisma.FieldRef<"Scan", 'DateTime'>

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { randomUUID } from "node:crypto";
 import { db } from "@/lib/db";
 import { createBrandForUser, updatePromptForUser } from "@/server/brands/service";
@@ -9,7 +9,11 @@ import {
 } from "./service";
 
 const userIds: string[] = [];
-afterEach(async () => { await db.user.deleteMany({ where: { id: { in: userIds.splice(0) } } }); });
+afterEach(async () => {
+  vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+  await db.user.deleteMany({ where: { id: { in: userIds.splice(0) } } });
+});
 
 async function createReadyUser(balance = 30) {
   const free = await db.plan.findUniqueOrThrow({ where: { code: "FREE" } });
@@ -75,6 +79,9 @@ async function createVerifyingExperimentFixture() {
       hypothesis: "验证扫描必须严格复用基线配置",
       actionPlan: "发布一篇完整的官网验证内容",
       status: "VERIFYING",
+      actionRevision: 1,
+      verificationLeaseToken: "verification-fixture-owner",
+      verificationLeaseExpiresAt: new Date(Date.now() + 60_000),
     },
   });
   return {
@@ -260,6 +267,44 @@ describe("扫描服务", () => {
   });
 
   it.each([
+    { label: "缺失", token: null, expiresAt: null },
+    {
+      label: "过期",
+      token: "expired-verification-owner",
+      expiresAt: new Date(Date.now() - 60_000),
+    },
+  ])("实验 $label lease 时拒绝创建验证扫描且不扣费", async ({ token, expiresAt }) => {
+    const fixture = await createVerifyingExperimentFixture();
+    await db.optimizationExperiment.update({
+      where: { id: fixture.experiment.id },
+      data: {
+        verificationLeaseToken: token,
+        verificationLeaseExpiresAt: expiresAt,
+      },
+    });
+    const balanceBefore = (await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: fixture.user.id },
+    })).balance;
+
+    await expect(createScanForUser(
+      fixture.user.id,
+      fixture.brand.id,
+      fixture.baselineScan.providerIds as string[],
+      {
+        repeatCount: fixture.baselineScan.repeatCount,
+        promptVersionIds: fixture.promptVersionIds,
+        verificationExperimentId: fixture.experiment.id,
+        env: { AI_PROVIDER: "mock" },
+      },
+    )).rejects.toThrow("验证实验没有有效执行权，请重新发起验证");
+
+    expect(await db.scan.count({ where: { brandId: fixture.brand.id } })).toBe(1);
+    expect((await db.quotaAccount.findUniqueOrThrow({
+      where: { userId: fixture.user.id },
+    })).balance).toBe(balanceBefore);
+  });
+
+  it.each([
     "省略问题版本",
     "缺少基线版本",
     "增加同品牌版本",
@@ -363,10 +408,36 @@ describe("扫描服务", () => {
     expect(verificationScan.providerIds).toEqual(fixture.baselineScan.providerIds);
     expect(verificationScan.repeatCount).toBe(fixture.baselineScan.repeatCount);
     expect(verificationScan.verificationExperimentId).toBe(fixture.experiment.id);
+    expect(verificationScan.verificationActionRevision).toBe(1);
+    expect(verificationScan.verificationAttemptToken).toBe("verification-fixture-owner");
     expect(verificationScan.requestedCount).toBe(fixture.baselineScan.requestedCount);
     expect((await db.quotaAccount.findUniqueOrThrow({
       where: { userId: fixture.user.id },
     })).balance).toBe(balanceBefore - fixture.baselineScan.requestedCount);
+  });
+
+  it("验证扫描心跳至少续期两分钟且不会缩短实验恢复窗口", async () => {
+    const fixture = await createVerifyingExperimentFixture();
+    const verificationScan = await createScanForUser(
+      fixture.user.id,
+      fixture.brand.id,
+      fixture.baselineScan.providerIds as string[],
+      {
+        repeatCount: fixture.baselineScan.repeatCount,
+        promptVersionIds: fixture.promptVersionIds,
+        verificationExperimentId: fixture.experiment.id,
+        env: { AI_PROVIDER: "mock" },
+      },
+    );
+    const beforeExecution = Date.now();
+
+    await executeScanForUser(fixture.user.id, verificationScan.id);
+
+    const experiment = await db.optimizationExperiment.findUniqueOrThrow({
+      where: { id: fixture.experiment.id },
+    });
+    expect(experiment.verificationLeaseExpiresAt!.getTime())
+      .toBeGreaterThanOrEqual(beforeExecution + 119_000);
   });
 
   it("重复选择同一 AI 平台时在创建扫描和扣额度前拒绝", async () => {
@@ -584,6 +655,174 @@ describe("扫描服务", () => {
     expect((await db.scan.findUniqueOrThrow({ where: { id: scan.id } })).status).toBe("COMPLETED");
     expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance).toBe(10);
     expect(await db.quotaLedger.count({ where: { referenceId: scan.id, type: "REFUND" } })).toBe(0);
+  });
+
+  it.each([
+    { label: "历史空 lease", token: null, expiresAt: null },
+    {
+      label: "过期 lease",
+      token: "stale-scan-worker",
+      expiresAt: new Date(Date.now() - 60_000),
+    },
+  ])("恢复 $label 的部分扫描且只补齐缺失逻辑槽位", async ({ token, expiresAt }) => {
+    const user = await createReadyUser(50);
+    const brand = await createBrandForUser(user.id, {
+      name: `部分恢复品牌-${randomUUID()}`,
+      website: "partial-resume.example.cn",
+      industry: "企业服务",
+      product: "监测软件",
+      targetAudience: "品牌团队",
+      aliases: [],
+      competitors: [],
+    });
+    const promptVersionIds = brand.prompts.slice(0, 2).map((prompt) => prompt.versions[0].id);
+    const scan = await createScanForUser(user.id, brand.id, ["mock"], {
+      promptVersionIds,
+      env: { AI_PROVIDER: "mock" },
+    });
+    const persisted = await db.observation.create({
+      data: {
+        scanId: scan.id,
+        promptVersionId: promptVersionIds[0],
+        platformId: "mock",
+        modelId: "crashed-worker-model",
+        runIndex: 1,
+        rawResponse: "崩溃前已经持久化的回答",
+      },
+    });
+    await db.scan.update({
+      where: { id: scan.id },
+      data: {
+        status: "RUNNING",
+        startedAt: new Date(Date.now() - 120_000),
+        executionLeaseToken: token,
+        executionLeaseExpiresAt: expiresAt,
+      },
+    });
+    const balanceBeforeResume = (
+      await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })
+    ).balance;
+
+    const completed = await executeScanForUser(user.id, scan.id);
+
+    expect(completed.status).toBe("COMPLETED");
+    expect(completed.observations).toHaveLength(2);
+    expect(completed.observations.some((item) => item.id === persisted.id)).toBe(true);
+    expect(new Set(completed.observations.map((item) => (
+      `${item.promptVersionId}:${item.platformId}:${item.runIndex}`
+    ))).size).toBe(2);
+    expect(completed.scoreSnapshot).not.toBeNull();
+    const stored = await db.scan.findUniqueOrThrow({ where: { id: scan.id } });
+    expect(stored.executionLeaseToken).toBeNull();
+    expect(stored.executionLeaseExpiresAt).toBeNull();
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(balanceBeforeResume);
+    expect(await db.quotaLedger.count({ where: { referenceId: scan.id, type: "REFUND" } }))
+      .toBe(0);
+  });
+
+  it("活动中的扫描 lease 拒绝抢占且不改写任务", async () => {
+    const user = await createReadyUser();
+    const brand = await createBrandForUser(user.id, {
+      name: `活动租约品牌-${randomUUID()}`,
+      website: "active-lease.example.cn",
+      industry: "企业服务",
+      product: "监测软件",
+      targetAudience: "品牌团队",
+      aliases: [],
+      competitors: [],
+    });
+    const promptVersionId = brand.prompts[0].versions[0].id;
+    const scan = await createScanForUser(user.id, brand.id, ["mock"], {
+      promptVersionIds: [promptVersionId],
+      env: { AI_PROVIDER: "mock" },
+    });
+    const activeUntil = new Date(Date.now() + 60_000);
+    await db.scan.update({
+      where: { id: scan.id },
+      data: {
+        status: "RUNNING",
+        executionLeaseToken: "active-worker",
+        executionLeaseExpiresAt: activeUntil,
+      },
+    });
+
+    await expect(executeScanForUser(user.id, scan.id)).rejects.toThrow("扫描正在执行");
+
+    const unchanged = await db.scan.findUniqueOrThrow({ where: { id: scan.id } });
+    expect(unchanged.status).toBe("RUNNING");
+    expect(unchanged.executionLeaseToken).toBe("active-worker");
+    expect(unchanged.executionLeaseExpiresAt).toEqual(activeUntil);
+    expect(await db.observation.count({ where: { scanId: scan.id } })).toBe(0);
+  });
+
+  it("旧 worker 丢失 lease 后不能写回答、完结或退款", async () => {
+    vi.stubEnv("DEEPSEEK_API_KEY", "lease-test-key");
+    vi.stubEnv("DEEPSEEK_BASE_URL", "https://lease-test.deepseek.invalid");
+    const user = await createReadyUser();
+    const brand = await createBrandForUser(user.id, {
+      name: `旧 Worker 品牌-${randomUUID()}`,
+      website: "old-worker.example.cn",
+      industry: "企业服务",
+      product: "监测软件",
+      targetAudience: "品牌团队",
+      aliases: [],
+      competitors: [],
+    });
+    const promptVersionId = brand.prompts[0].versions[0].id;
+    const scan = await createScanForUser(user.id, brand.id, ["deepseek"], {
+      promptVersionIds: [promptVersionId],
+      env: process.env,
+    });
+    const balanceAfterDebit = (
+      await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })
+    ).balance;
+    let callCount = 0;
+    let releaseFirst!: (response: Response) => void;
+    let notifyFirstStarted!: () => void;
+    const firstStarted = new Promise<void>((resolve) => { notifyFirstStarted = resolve; });
+    const deepSeekResponse = () => new Response(JSON.stringify({
+      id: `request-${randomUUID()}`,
+      model: "deepseek-chat",
+      choices: [{ message: { content: "这是一条普通的真实平台测试回答。" } }],
+    }), { status: 200, headers: { "content-type": "application/json" } });
+    vi.stubGlobal("fetch", vi.fn(async () => {
+      callCount += 1;
+      if (callCount === 1) {
+        notifyFirstStarted();
+        return new Promise<Response>((resolve) => { releaseFirst = resolve; });
+      }
+      return deepSeekResponse();
+    }));
+
+    const oldWorkerOutcome = executeScanForUser(user.id, scan.id)
+      .then((value) => ({ value, error: null }))
+      .catch((error: unknown) => ({ value: null, error }));
+    await firstStarted;
+    const firstClaim = await db.scan.findUniqueOrThrow({ where: { id: scan.id } });
+    expect(firstClaim.executionLeaseToken).not.toBeNull();
+    await db.scan.update({
+      where: { id: scan.id },
+      data: { executionLeaseExpiresAt: new Date(Date.now() - 1_000) },
+    });
+
+    const newWorkerOutcome = await executeScanForUser(user.id, scan.id)
+      .then((value) => ({ value, error: null }))
+      .catch((error: unknown) => ({ value: null, error }));
+    releaseFirst(deepSeekResponse());
+    const oldWorkerResult = await oldWorkerOutcome;
+
+    expect(newWorkerOutcome.error).toBeNull();
+    expect(newWorkerOutcome.value?.status).toBe("COMPLETED");
+    expect(oldWorkerResult.value).toBeNull();
+    expect(oldWorkerResult.error).toMatchObject({ message: "扫描执行权已转移" });
+    expect(await db.observation.count({ where: { scanId: scan.id } })).toBe(1);
+    expect((await db.scan.findUniqueOrThrow({ where: { id: scan.id } })).status)
+      .toBe("COMPLETED");
+    expect((await db.quotaAccount.findUniqueOrThrow({ where: { userId: user.id } })).balance)
+      .toBe(balanceAfterDebit);
+    expect(await db.quotaLedger.count({ where: { referenceId: scan.id, type: "REFUND" } }))
+      .toBe(0);
   });
 
   it("并发创建扫描时额度不会被超扣", async () => {

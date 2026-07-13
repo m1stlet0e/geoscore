@@ -234,32 +234,37 @@ model PromptVersion {
 }
 
 model Scan {
-  id                       String                   @id @default(cuid())
-  brandId                  String
-  status                   ScanStatus               @default(PENDING)
-  providerIds              Json
-  promptVersionIds         Json?
-  requestedCount           Int
-  repeatCount              Int                      @default(1)
-  dataMode                 ScanDataMode             @default(REAL)
-  verificationExperimentId String?
-  errorMessage             String?
-  startedAt                DateTime?
-  completedAt              DateTime?
-  createdAt                DateTime                 @default(now())
-  brand                    Brand                    @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  verificationExperiment   OptimizationExperiment?  @relation("ExperimentVerificationScans", fields: [verificationExperimentId, brandId], references: [id, brandId], onDelete: NoAction)
-  baselineExperiments      OptimizationExperiment[] @relation("ExperimentBaselineScan")
-  followUpExperiment       OptimizationExperiment?  @relation("ExperimentFollowUpScan")
-  observations             Observation[]
-  scoreSnapshot            ScoreSnapshot?
-  opportunities            Opportunity[]
-  riskFindings             RiskFinding[]
-  recommendations          Recommendation[]
+  id                         String                   @id @default(cuid())
+  brandId                    String
+  status                     ScanStatus               @default(PENDING)
+  providerIds                Json
+  promptVersionIds           Json?
+  requestedCount             Int
+  repeatCount                Int                      @default(1)
+  dataMode                   ScanDataMode             @default(REAL)
+  verificationExperimentId   String?
+  executionLeaseToken        String?
+  executionLeaseExpiresAt    DateTime?
+  verificationAttemptToken   String?
+  verificationActionRevision Int?
+  errorMessage               String?
+  startedAt                  DateTime?
+  completedAt                DateTime?
+  createdAt                  DateTime                 @default(now())
+  brand                      Brand                    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  verificationExperiment     OptimizationExperiment?  @relation("ExperimentVerificationScans", fields: [verificationExperimentId, brandId], references: [id, brandId], onDelete: NoAction)
+  baselineExperiments        OptimizationExperiment[] @relation("ExperimentBaselineScan")
+  followUpExperiment         OptimizationExperiment?  @relation("ExperimentFollowUpScan")
+  observations               Observation[]
+  scoreSnapshot              ScoreSnapshot?
+  opportunities              Opportunity[]
+  riskFindings               RiskFinding[]
+  recommendations            Recommendation[]
 
   @@unique([id, brandId])
   @@index([brandId, createdAt])
   @@index([verificationExperimentId])
+  @@index([status, executionLeaseExpiresAt])
 }
 
 model Opportunity {
@@ -290,36 +295,40 @@ model Opportunity {
 }
 
 model OptimizationExperiment {
-  id                  String           @id @default(cuid())
-  brandId             String
-  opportunityId       String           @unique
-  baselineScanId      String
-  followUpScanId      String?          @unique
-  title               String
-  hypothesis          String
-  actionPlan          String
-  targetUrl           String?
-  publishedAt         DateTime?
-  nextCheckAt         DateTime?
-  status              ExperimentStatus @default(DRAFT)
-  resultSummary       String?
-  scoreDelta          Float?
-  mentionDelta        Float?
-  recommendationDelta Float?
-  citationDelta       Float?
-  createdAt           DateTime         @default(now())
-  updatedAt           DateTime         @updatedAt
-  brand               Brand            @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  opportunity         Opportunity      @relation(fields: [opportunityId, brandId], references: [id, brandId], onDelete: Cascade)
-  baselineScan        Scan             @relation("ExperimentBaselineScan", fields: [baselineScanId, brandId], references: [id, brandId], onDelete: Cascade)
-  followUpScan        Scan?            @relation("ExperimentFollowUpScan", fields: [followUpScanId, brandId], references: [id, brandId], onDelete: NoAction)
-  verificationScans   Scan[]           @relation("ExperimentVerificationScans")
+  id                         String           @id @default(cuid())
+  brandId                    String
+  opportunityId              String           @unique
+  baselineScanId             String
+  followUpScanId             String?          @unique
+  title                      String
+  hypothesis                 String
+  actionPlan                 String
+  targetUrl                  String?
+  publishedAt                DateTime?
+  nextCheckAt                DateTime?
+  status                     ExperimentStatus @default(DRAFT)
+  actionRevision             Int              @default(0)
+  verificationLeaseToken     String?
+  verificationLeaseExpiresAt DateTime?
+  resultSummary              String?
+  scoreDelta                 Float?
+  mentionDelta               Float?
+  recommendationDelta        Float?
+  citationDelta              Float?
+  createdAt                  DateTime         @default(now())
+  updatedAt                  DateTime         @updatedAt
+  brand                      Brand            @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  opportunity                Opportunity      @relation(fields: [opportunityId, brandId], references: [id, brandId], onDelete: Cascade)
+  baselineScan               Scan             @relation("ExperimentBaselineScan", fields: [baselineScanId, brandId], references: [id, brandId], onDelete: Cascade)
+  followUpScan               Scan?            @relation("ExperimentFollowUpScan", fields: [followUpScanId, brandId], references: [id, brandId], onDelete: NoAction)
+  verificationScans          Scan[]           @relation("ExperimentVerificationScans")
 
   @@unique([id, brandId])
   @@unique([opportunityId, brandId])
   @@unique([followUpScanId, brandId])
   @@index([brandId, status, createdAt])
   @@index([baselineScanId])
+  @@index([status, verificationLeaseExpiresAt])
 }
 
 model Observation {
