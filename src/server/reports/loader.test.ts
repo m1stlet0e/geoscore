@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { loadScanReportForUser } from "./loader";
+import { loadScanReportForUser, loadScanSnapshotForUser } from "./loader";
 
 describe("扫描报告 owner-filtered loader", () => {
   it("同时绑定 scanId 与 ownerId，其他租户读取同 scanId 返回空", async () => {
@@ -40,5 +40,22 @@ describe("扫描报告 owner-filtered loader", () => {
     expect(query.include).toHaveProperty("opportunities");
     expect(query.include.brand).toEqual({ select: { id: true, name: true } });
     expect(JSON.stringify(query.include.brand)).not.toMatch(/riskFindings|recommendations|opportunities/);
+  });
+});
+
+describe("原始证据快照 loader", () => {
+  it("快照同样必须使用用户归属过滤，并且只导出原始证据字段", async () => {
+    const findFirst = vi.fn<(args: unknown) => Promise<null>>(async () => null);
+    await loadScanSnapshotForUser("user-a", "scan-private", { scan: { findFirst } } as never);
+
+    const query = findFirst.mock.calls[0][0] as unknown as { where: unknown; select: Record<string, unknown> };
+    expect(query.where).toEqual({ id: "scan-private", brand: { ownerId: "user-a" } });
+    expect(query.select).toMatchObject({
+      dataMode: true,
+      brand: { select: { id: true, name: true } },
+      observations: expect.objectContaining({
+        select: expect.objectContaining({ rawResponse: true, rawMetadata: true, mentions: expect.any(Object), citations: expect.any(Object) }),
+      }),
+    });
   });
 });

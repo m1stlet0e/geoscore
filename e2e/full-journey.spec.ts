@@ -13,6 +13,7 @@ test("用户完成模拟扫描、付费补额和增长实验验证闭环", async
   const email = `browser-${testInfo.project.name}-${runId}@geoscore.local`;
   const brandName = `端到端品牌-${runId.slice(0, 8)}`;
   const brandWebsite = `e2e-${runId.slice(0, 8)}.geoscore.local`;
+  let baselineReportUrl = "";
 
   await test.step("首页准确说明增长闭环和四档价格", async () => {
     await page.goto("/");
@@ -68,6 +69,22 @@ test("用户完成模拟扫描、付费补额和增长实验验证闭环", async
     await expect(page.locator(".report-disclaimer")).toHaveText("仅用于体验闭环，不代表真实 AI 表现");
     await expect(page.getByRole("heading", { name: "从报告进入增长实验" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "每一个结论，都能回到原始回答" })).toBeVisible();
+    baselineReportUrl = page.url();
+  });
+
+  await test.step("GEO 情报页保留排名、口碑、来源与原始证据入口", async () => {
+    const intelligenceNav = page.locator(".sidebar nav");
+    await intelligenceNav.getByRole("link", { name: "情报总览", exact: true }).click();
+    await expect(page.getByRole("heading", { name: /今天，先处理/ })).toBeVisible();
+    await intelligenceNav.getByRole("link", { name: "排名矩阵", exact: true }).click();
+    await expect(page.getByRole("heading", { name: /哪个问题、哪个模型/ })).toBeVisible();
+    await intelligenceNav.getByRole("link", { name: "口碑预警", exact: true }).click();
+    await expect(page.getByRole("heading", { name: /AI 是怎样向客户/ })).toBeVisible();
+    await intelligenceNav.getByRole("link", { name: "引用溯源", exact: true }).click();
+    await expect(page.getByRole("heading", { name: /让 AI 采信的内容/ })).toBeVisible();
+    await intelligenceNav.getByRole("link", { name: "证据快照", exact: true }).click();
+    await expect(page.getByRole("heading", { name: /每一个结论/ })).toBeVisible();
+    await page.goto(baselineReportUrl);
   });
 
   let experimentUrl = "";

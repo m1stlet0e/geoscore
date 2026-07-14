@@ -224,6 +224,7 @@ export type BrandWhereInput = {
   recommendations?: Prisma.RecommendationListRelationFilter
   opportunities?: Prisma.OpportunityListRelationFilter
   experiments?: Prisma.OptimizationExperimentListRelationFilter
+  ownedSources?: Prisma.OwnedSourceListRelationFilter
 }
 
 export type BrandOrderByWithRelationInput = {
@@ -246,6 +247,7 @@ export type BrandOrderByWithRelationInput = {
   recommendations?: Prisma.RecommendationOrderByRelationAggregateInput
   opportunities?: Prisma.OpportunityOrderByRelationAggregateInput
   experiments?: Prisma.OptimizationExperimentOrderByRelationAggregateInput
+  ownedSources?: Prisma.OwnedSourceOrderByRelationAggregateInput
 }
 
 export type BrandWhereUniqueInput = Prisma.AtLeast<{
@@ -272,6 +274,7 @@ export type BrandWhereUniqueInput = Prisma.AtLeast<{
   recommendations?: Prisma.RecommendationListRelationFilter
   opportunities?: Prisma.OpportunityListRelationFilter
   experiments?: Prisma.OptimizationExperimentListRelationFilter
+  ownedSources?: Prisma.OwnedSourceListRelationFilter
 }, "id" | "ownerId_name">
 
 export type BrandOrderByWithAggregationInput = {
@@ -323,6 +326,7 @@ export type BrandCreateInput = {
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateInput = {
@@ -344,6 +348,7 @@ export type BrandUncheckedCreateInput = {
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUpdateInput = {
@@ -365,6 +370,7 @@ export type BrandUpdateInput = {
   recommendations?: Prisma.RecommendationUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateInput = {
@@ -386,6 +392,7 @@ export type BrandUncheckedUpdateInput = {
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandCreateManyInput = {
@@ -605,6 +612,20 @@ export type BrandUpdateOneRequiredWithoutExperimentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BrandUpdateToOneWithWhereWithoutExperimentsInput, Prisma.BrandUpdateWithoutExperimentsInput>, Prisma.BrandUncheckedUpdateWithoutExperimentsInput>
 }
 
+export type BrandCreateNestedOneWithoutOwnedSourcesInput = {
+  create?: Prisma.XOR<Prisma.BrandCreateWithoutOwnedSourcesInput, Prisma.BrandUncheckedCreateWithoutOwnedSourcesInput>
+  connectOrCreate?: Prisma.BrandCreateOrConnectWithoutOwnedSourcesInput
+  connect?: Prisma.BrandWhereUniqueInput
+}
+
+export type BrandUpdateOneRequiredWithoutOwnedSourcesNestedInput = {
+  create?: Prisma.XOR<Prisma.BrandCreateWithoutOwnedSourcesInput, Prisma.BrandUncheckedCreateWithoutOwnedSourcesInput>
+  connectOrCreate?: Prisma.BrandCreateOrConnectWithoutOwnedSourcesInput
+  upsert?: Prisma.BrandUpsertWithoutOwnedSourcesInput
+  connect?: Prisma.BrandWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BrandUpdateToOneWithWhereWithoutOwnedSourcesInput, Prisma.BrandUpdateWithoutOwnedSourcesInput>, Prisma.BrandUncheckedUpdateWithoutOwnedSourcesInput>
+}
+
 export type BrandCreateNestedOneWithoutScoreSnapshotsInput = {
   create?: Prisma.XOR<Prisma.BrandCreateWithoutScoreSnapshotsInput, Prisma.BrandUncheckedCreateWithoutScoreSnapshotsInput>
   connectOrCreate?: Prisma.BrandCreateOrConnectWithoutScoreSnapshotsInput
@@ -665,6 +686,7 @@ export type BrandCreateWithoutOwnerInput = {
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateWithoutOwnerInput = {
@@ -685,6 +707,7 @@ export type BrandUncheckedCreateWithoutOwnerInput = {
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandCreateOrConnectWithoutOwnerInput = {
@@ -746,6 +769,7 @@ export type BrandCreateWithoutAliasesInput = {
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateWithoutAliasesInput = {
@@ -766,6 +790,7 @@ export type BrandUncheckedCreateWithoutAliasesInput = {
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandCreateOrConnectWithoutAliasesInput = {
@@ -802,6 +827,7 @@ export type BrandUpdateWithoutAliasesInput = {
   recommendations?: Prisma.RecommendationUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateWithoutAliasesInput = {
@@ -822,6 +848,7 @@ export type BrandUncheckedUpdateWithoutAliasesInput = {
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandCreateWithoutCompetitorsInput = {
@@ -842,6 +869,7 @@ export type BrandCreateWithoutCompetitorsInput = {
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateWithoutCompetitorsInput = {
@@ -862,6 +890,7 @@ export type BrandUncheckedCreateWithoutCompetitorsInput = {
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandCreateOrConnectWithoutCompetitorsInput = {
@@ -898,6 +927,7 @@ export type BrandUpdateWithoutCompetitorsInput = {
   recommendations?: Prisma.RecommendationUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateWithoutCompetitorsInput = {
@@ -918,6 +948,7 @@ export type BrandUncheckedUpdateWithoutCompetitorsInput = {
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandCreateWithoutPromptsInput = {
@@ -938,6 +969,7 @@ export type BrandCreateWithoutPromptsInput = {
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateWithoutPromptsInput = {
@@ -958,6 +990,7 @@ export type BrandUncheckedCreateWithoutPromptsInput = {
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandCreateOrConnectWithoutPromptsInput = {
@@ -994,6 +1027,7 @@ export type BrandUpdateWithoutPromptsInput = {
   recommendations?: Prisma.RecommendationUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateWithoutPromptsInput = {
@@ -1014,6 +1048,7 @@ export type BrandUncheckedUpdateWithoutPromptsInput = {
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandCreateWithoutScansInput = {
@@ -1034,6 +1069,7 @@ export type BrandCreateWithoutScansInput = {
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateWithoutScansInput = {
@@ -1054,6 +1090,7 @@ export type BrandUncheckedCreateWithoutScansInput = {
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandCreateOrConnectWithoutScansInput = {
@@ -1090,6 +1127,7 @@ export type BrandUpdateWithoutScansInput = {
   recommendations?: Prisma.RecommendationUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateWithoutScansInput = {
@@ -1110,6 +1148,7 @@ export type BrandUncheckedUpdateWithoutScansInput = {
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandCreateWithoutOpportunitiesInput = {
@@ -1130,6 +1169,7 @@ export type BrandCreateWithoutOpportunitiesInput = {
   riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutBrandInput
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateWithoutOpportunitiesInput = {
@@ -1150,6 +1190,7 @@ export type BrandUncheckedCreateWithoutOpportunitiesInput = {
   riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutBrandInput
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandCreateOrConnectWithoutOpportunitiesInput = {
@@ -1186,6 +1227,7 @@ export type BrandUpdateWithoutOpportunitiesInput = {
   riskFindings?: Prisma.RiskFindingUpdateManyWithoutBrandNestedInput
   recommendations?: Prisma.RecommendationUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateWithoutOpportunitiesInput = {
@@ -1206,6 +1248,7 @@ export type BrandUncheckedUpdateWithoutOpportunitiesInput = {
   riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutBrandNestedInput
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandCreateWithoutExperimentsInput = {
@@ -1226,6 +1269,7 @@ export type BrandCreateWithoutExperimentsInput = {
   riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutBrandInput
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateWithoutExperimentsInput = {
@@ -1246,6 +1290,7 @@ export type BrandUncheckedCreateWithoutExperimentsInput = {
   riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutBrandInput
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandCreateOrConnectWithoutExperimentsInput = {
@@ -1282,6 +1327,7 @@ export type BrandUpdateWithoutExperimentsInput = {
   riskFindings?: Prisma.RiskFindingUpdateManyWithoutBrandNestedInput
   recommendations?: Prisma.RecommendationUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateWithoutExperimentsInput = {
@@ -1302,6 +1348,107 @@ export type BrandUncheckedUpdateWithoutExperimentsInput = {
   riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutBrandNestedInput
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUncheckedUpdateManyWithoutBrandNestedInput
+}
+
+export type BrandCreateWithoutOwnedSourcesInput = {
+  id?: string
+  name: string
+  website: string
+  industry: string
+  product: string
+  targetAudience: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutBrandsInput
+  aliases?: Prisma.BrandAliasCreateNestedManyWithoutBrandInput
+  competitors?: Prisma.CompetitorCreateNestedManyWithoutBrandInput
+  prompts?: Prisma.PromptCreateNestedManyWithoutBrandInput
+  scans?: Prisma.ScanCreateNestedManyWithoutBrandInput
+  scoreSnapshots?: Prisma.ScoreSnapshotCreateNestedManyWithoutBrandInput
+  riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutBrandInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutBrandInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutBrandInput
+  experiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBrandInput
+}
+
+export type BrandUncheckedCreateWithoutOwnedSourcesInput = {
+  id?: string
+  name: string
+  website: string
+  industry: string
+  product: string
+  targetAudience: string
+  ownerId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  aliases?: Prisma.BrandAliasUncheckedCreateNestedManyWithoutBrandInput
+  competitors?: Prisma.CompetitorUncheckedCreateNestedManyWithoutBrandInput
+  prompts?: Prisma.PromptUncheckedCreateNestedManyWithoutBrandInput
+  scans?: Prisma.ScanUncheckedCreateNestedManyWithoutBrandInput
+  scoreSnapshots?: Prisma.ScoreSnapshotUncheckedCreateNestedManyWithoutBrandInput
+  riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutBrandInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutBrandInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutBrandInput
+  experiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBrandInput
+}
+
+export type BrandCreateOrConnectWithoutOwnedSourcesInput = {
+  where: Prisma.BrandWhereUniqueInput
+  create: Prisma.XOR<Prisma.BrandCreateWithoutOwnedSourcesInput, Prisma.BrandUncheckedCreateWithoutOwnedSourcesInput>
+}
+
+export type BrandUpsertWithoutOwnedSourcesInput = {
+  update: Prisma.XOR<Prisma.BrandUpdateWithoutOwnedSourcesInput, Prisma.BrandUncheckedUpdateWithoutOwnedSourcesInput>
+  create: Prisma.XOR<Prisma.BrandCreateWithoutOwnedSourcesInput, Prisma.BrandUncheckedCreateWithoutOwnedSourcesInput>
+  where?: Prisma.BrandWhereInput
+}
+
+export type BrandUpdateToOneWithWhereWithoutOwnedSourcesInput = {
+  where?: Prisma.BrandWhereInput
+  data: Prisma.XOR<Prisma.BrandUpdateWithoutOwnedSourcesInput, Prisma.BrandUncheckedUpdateWithoutOwnedSourcesInput>
+}
+
+export type BrandUpdateWithoutOwnedSourcesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.StringFieldUpdateOperationsInput | string
+  industry?: Prisma.StringFieldUpdateOperationsInput | string
+  product?: Prisma.StringFieldUpdateOperationsInput | string
+  targetAudience?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutBrandsNestedInput
+  aliases?: Prisma.BrandAliasUpdateManyWithoutBrandNestedInput
+  competitors?: Prisma.CompetitorUpdateManyWithoutBrandNestedInput
+  prompts?: Prisma.PromptUpdateManyWithoutBrandNestedInput
+  scans?: Prisma.ScanUpdateManyWithoutBrandNestedInput
+  scoreSnapshots?: Prisma.ScoreSnapshotUpdateManyWithoutBrandNestedInput
+  riskFindings?: Prisma.RiskFindingUpdateManyWithoutBrandNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutBrandNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutBrandNestedInput
+  experiments?: Prisma.OptimizationExperimentUpdateManyWithoutBrandNestedInput
+}
+
+export type BrandUncheckedUpdateWithoutOwnedSourcesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.StringFieldUpdateOperationsInput | string
+  industry?: Prisma.StringFieldUpdateOperationsInput | string
+  product?: Prisma.StringFieldUpdateOperationsInput | string
+  targetAudience?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  aliases?: Prisma.BrandAliasUncheckedUpdateManyWithoutBrandNestedInput
+  competitors?: Prisma.CompetitorUncheckedUpdateManyWithoutBrandNestedInput
+  prompts?: Prisma.PromptUncheckedUpdateManyWithoutBrandNestedInput
+  scans?: Prisma.ScanUncheckedUpdateManyWithoutBrandNestedInput
+  scoreSnapshots?: Prisma.ScoreSnapshotUncheckedUpdateManyWithoutBrandNestedInput
+  riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutBrandNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutBrandNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutBrandNestedInput
+  experiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandCreateWithoutScoreSnapshotsInput = {
@@ -1322,6 +1469,7 @@ export type BrandCreateWithoutScoreSnapshotsInput = {
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateWithoutScoreSnapshotsInput = {
@@ -1342,6 +1490,7 @@ export type BrandUncheckedCreateWithoutScoreSnapshotsInput = {
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandCreateOrConnectWithoutScoreSnapshotsInput = {
@@ -1378,6 +1527,7 @@ export type BrandUpdateWithoutScoreSnapshotsInput = {
   recommendations?: Prisma.RecommendationUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateWithoutScoreSnapshotsInput = {
@@ -1398,6 +1548,7 @@ export type BrandUncheckedUpdateWithoutScoreSnapshotsInput = {
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandCreateWithoutRiskFindingsInput = {
@@ -1418,6 +1569,7 @@ export type BrandCreateWithoutRiskFindingsInput = {
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateWithoutRiskFindingsInput = {
@@ -1438,6 +1590,7 @@ export type BrandUncheckedCreateWithoutRiskFindingsInput = {
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandCreateOrConnectWithoutRiskFindingsInput = {
@@ -1474,6 +1627,7 @@ export type BrandUpdateWithoutRiskFindingsInput = {
   recommendations?: Prisma.RecommendationUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateWithoutRiskFindingsInput = {
@@ -1494,6 +1648,7 @@ export type BrandUncheckedUpdateWithoutRiskFindingsInput = {
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandCreateWithoutRecommendationsInput = {
@@ -1514,6 +1669,7 @@ export type BrandCreateWithoutRecommendationsInput = {
   riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateWithoutRecommendationsInput = {
@@ -1534,6 +1690,7 @@ export type BrandUncheckedCreateWithoutRecommendationsInput = {
   riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutBrandInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutBrandInput
   experiments?: Prisma.OptimizationExperimentUncheckedCreateNestedManyWithoutBrandInput
+  ownedSources?: Prisma.OwnedSourceUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandCreateOrConnectWithoutRecommendationsInput = {
@@ -1570,6 +1727,7 @@ export type BrandUpdateWithoutRecommendationsInput = {
   riskFindings?: Prisma.RiskFindingUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateWithoutRecommendationsInput = {
@@ -1590,6 +1748,7 @@ export type BrandUncheckedUpdateWithoutRecommendationsInput = {
   riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandCreateManyOwnerInput = {
@@ -1621,6 +1780,7 @@ export type BrandUpdateWithoutOwnerInput = {
   recommendations?: Prisma.RecommendationUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateWithoutOwnerInput = {
@@ -1641,6 +1801,7 @@ export type BrandUncheckedUpdateWithoutOwnerInput = {
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutBrandNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutBrandNestedInput
   experiments?: Prisma.OptimizationExperimentUncheckedUpdateManyWithoutBrandNestedInput
+  ownedSources?: Prisma.OwnedSourceUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateManyWithoutOwnerInput = {
@@ -1669,6 +1830,7 @@ export type BrandCountOutputType = {
   recommendations: number
   opportunities: number
   experiments: number
+  ownedSources: number
 }
 
 export type BrandCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1681,6 +1843,7 @@ export type BrandCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   recommendations?: boolean | BrandCountOutputTypeCountRecommendationsArgs
   opportunities?: boolean | BrandCountOutputTypeCountOpportunitiesArgs
   experiments?: boolean | BrandCountOutputTypeCountExperimentsArgs
+  ownedSources?: boolean | BrandCountOutputTypeCountOwnedSourcesArgs
 }
 
 /**
@@ -1756,6 +1919,13 @@ export type BrandCountOutputTypeCountExperimentsArgs<ExtArgs extends runtime.Typ
   where?: Prisma.OptimizationExperimentWhereInput
 }
 
+/**
+ * BrandCountOutputType without action
+ */
+export type BrandCountOutputTypeCountOwnedSourcesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OwnedSourceWhereInput
+}
+
 
 export type BrandSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1777,6 +1947,7 @@ export type BrandSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   recommendations?: boolean | Prisma.Brand$recommendationsArgs<ExtArgs>
   opportunities?: boolean | Prisma.Brand$opportunitiesArgs<ExtArgs>
   experiments?: boolean | Prisma.Brand$experimentsArgs<ExtArgs>
+  ownedSources?: boolean | Prisma.Brand$ownedSourcesArgs<ExtArgs>
   _count?: boolean | Prisma.BrandCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["brand"]>
 
@@ -1830,6 +2001,7 @@ export type BrandInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   recommendations?: boolean | Prisma.Brand$recommendationsArgs<ExtArgs>
   opportunities?: boolean | Prisma.Brand$opportunitiesArgs<ExtArgs>
   experiments?: boolean | Prisma.Brand$experimentsArgs<ExtArgs>
+  ownedSources?: boolean | Prisma.Brand$ownedSourcesArgs<ExtArgs>
   _count?: boolean | Prisma.BrandCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BrandIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1852,6 +2024,7 @@ export type $BrandPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     recommendations: Prisma.$RecommendationPayload<ExtArgs>[]
     opportunities: Prisma.$OpportunityPayload<ExtArgs>[]
     experiments: Prisma.$OptimizationExperimentPayload<ExtArgs>[]
+    ownedSources: Prisma.$OwnedSourcePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2267,6 +2440,7 @@ export interface Prisma__BrandClient<T, Null = never, ExtArgs extends runtime.Ty
   recommendations<T extends Prisma.Brand$recommendationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Brand$recommendationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecommendationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   opportunities<T extends Prisma.Brand$opportunitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Brand$opportunitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OpportunityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   experiments<T extends Prisma.Brand$experimentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Brand$experimentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OptimizationExperimentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ownedSources<T extends Prisma.Brand$ownedSourcesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Brand$ownedSourcesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OwnedSourcePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2919,6 +3093,30 @@ export type Brand$experimentsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.OptimizationExperimentScalarFieldEnum | Prisma.OptimizationExperimentScalarFieldEnum[]
+}
+
+/**
+ * Brand.ownedSources
+ */
+export type Brand$ownedSourcesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OwnedSource
+   */
+  select?: Prisma.OwnedSourceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OwnedSource
+   */
+  omit?: Prisma.OwnedSourceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OwnedSourceInclude<ExtArgs> | null
+  where?: Prisma.OwnedSourceWhereInput
+  orderBy?: Prisma.OwnedSourceOrderByWithRelationInput | Prisma.OwnedSourceOrderByWithRelationInput[]
+  cursor?: Prisma.OwnedSourceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OwnedSourceScalarFieldEnum | Prisma.OwnedSourceScalarFieldEnum[]
 }
 
 /**

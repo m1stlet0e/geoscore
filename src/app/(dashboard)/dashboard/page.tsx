@@ -1,148 +1,92 @@
-import { headers } from "next/headers";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { headers } from "next/headers";
+import { ArrowRight, ArrowUpRight, Radar, ShieldAlert, Sparkles } from "lucide-react";
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { buildDashboardGrowthSnapshot } from "@/lib/growth-data";
-import { OpportunityCard } from "@/components/growth/opportunity-card";
+import { loadIntelligenceOverviewForUser } from "@/server/intelligence/loader";
 
-const modeLabels = {
-  REAL: "真实 AI 数据",
-  SIMULATED: "模拟演示数据",
+const priorityCopy = {
+  P0: "立即处理",
+  P1: "本周复盘",
+  P2: "持续观察",
 } as const;
+
+const modeLabels = { REAL: "真实 AI 数据", SIMULATED: "模拟演示数据" } as const;
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return null;
-
-  const [brands, quota, activeExperimentCount, verifiedExperimentCount] = await Promise.all([
-    db.brand.findMany({
-      where: { ownerId: session.user.id },
-      orderBy: { createdAt: "desc" },
-      include: {
-        scans: {
-          where: { status: "COMPLETED" },
-          orderBy: { completedAt: "desc" },
-          take: 1,
-          include: {
-            scoreSnapshot: true,
-            opportunities: {
-              where: { status: "OPEN" },
-              orderBy: [{ priority: "desc" }, { createdAt: "desc" }],
-              include: {
-                promptVersion: true,
-                optimizationExperiment: { select: { id: true } },
-              },
-            },
-          },
-        },
-      },
-    }),
-    db.quotaAccount.findUnique({ where: { userId: session.user.id } }),
-    db.optimizationExperiment.count({
-      where: {
-        brand: { ownerId: session.user.id },
-        status: { in: ["ACTIVE", "VERIFYING"] },
-      },
-    }),
-    db.optimizationExperiment.count({
-      where: { brand: { ownerId: session.user.id }, status: "VERIFIED" },
-    }),
-  ]);
-
-  const growth = buildDashboardGrowthSnapshot(brands.map((brand) => ({
-    id: brand.id,
-    name: brand.name,
-    scans: brand.scans.map((scan) => ({
-      id: scan.id,
-      status: scan.status,
-      completedAt: scan.completedAt,
-      dataMode: scan.dataMode,
-      score: scan.scoreSnapshot?.score ?? null,
-      opportunities: scan.opportunities,
-    })),
-  })));
-  const prioritizedOpportunities = growth.opportunities.slice(0, 6);
+  const intelligence = await loadIntelligenceOverviewForUser(session.user.id);
 
   return (
-    <main className="dashboard-page growth-dashboard">
-      <header>
+    <main className="dashboard-page intelligence-page">
+      <header className="intelligence-hero">
         <div>
-          <p className="eyebrow">增长指挥台</p>
-          <h1>你好，{session.user.name}</h1>
-          <p>先处理高优先级 AI 推荐缺口，再用复扫实验验证每一次内容行动。</p>
+          <p className="eyebrow"><Radar size={15} /> GEO 情报中心 / TODAY</p>
+          <h1>今天，先处理<br />会让品牌失去推荐的信号。</h1>
+          <p>把扫描中的未提及、竞品领先、负面口碑和引用缺口，按处理优先级放到一张作战清单。</p>
         </div>
-        <Link href="/dashboard/brands/new" className="primary-button">添加品牌</Link>
+        <div className="intelligence-hero-action">
+          <span>当前账户</span>
+          <strong>{session.user.name}</strong>
+          <Link href="/dashboard/brands/new" className="primary-button">添加监测品牌 <ArrowRight size={16} /></Link>
+        </div>
       </header>
 
-      <section className="growth-kpi-grid" aria-label="账户增长指标">
-        <article><span>监测品牌</span><strong>{brands.length}</strong><small>当前账户</small></article>
-        <article><span>剩余额度</span><strong>{quota?.balance ?? 0}</strong><small>AI 回答次数</small></article>
-        <article><span>待处理机会</span><strong>{growth.opportunities.length}</strong><small>仅统计各品牌最新扫描</small></article>
-        <article><span>进行中实验</span><strong>{activeExperimentCount}</strong><small>已发布行动</small></article>
-        <article><span>已验证提升</span><strong>{verifiedExperimentCount}</strong><small>完成归因复扫</small></article>
+      <section className="intelligence-kpis" aria-label="今日情报指标">
+        <article><span>监测品牌</span><strong>{intelligence.summary.brandCount}</strong><small>当前账户</small></article>
+        <article><span>剩余额度</span><strong>{intelligence.summary.quotaBalance}</strong><small>AI 回答次数</small></article>
+        <article><span>平均 GeoScore</span><strong>{intelligence.summary.averageScore === null ? "—" : intelligence.summary.averageScore.toFixed(0)}</strong><small>仅汇总各品牌最新报告</small></article>
+        <article data-priority="P0"><span>P0 紧急信号</span><strong>{intelligence.summary.p0Count}</strong><small>未提及 / 高风险</small></article>
+        <article><span>进行中实验</span><strong>{intelligence.summary.activeExperiments}</strong><small>等待复扫归因</small></article>
       </section>
 
-      {brands.length === 0 ? (
-        <section className="empty-panel">
-          <span>01</span>
-          <h2>建立第一个品牌雷达</h2>
-          <p>填写官网和产品信息，系统会自动生成用户可能向 AI 提出的监测问题。</p>
+      {intelligence.latestScans.length === 0 ? (
+        <section className="intelligence-empty">
+          <Sparkles aria-hidden="true" size={26} />
+          <div><span>FIRST SIGNAL</span><h2>先建立一条品牌信号基线。</h2><p>创建品牌、生成 20 个真实用户问题并完成扫描后，这里会自动按 P0/P1/P2 排出今天的行动清单。</p></div>
           <Link href="/dashboard/brands/new" className="primary-button">创建第一个品牌</Link>
         </section>
       ) : (
         <>
-          <section className="dashboard-section latest-brand-scores">
-            <div className="section-heading-compact">
-              <div><span className="section-index">RADAR / 01</span><h2>每个品牌的最新基线</h2></div>
-              <Link href="/dashboard/brands">查看全部品牌<ArrowUpRight aria-hidden="true" size={15} /></Link>
+          <section className="intelligence-section">
+            <div className="intelligence-section-heading">
+              <div><span>01 / ACTION QUEUE</span><h2>优先处理的品牌信号</h2></div>
+              <p>P0 必须先处理；P1 纳入本周复盘；P2 作为内容增长线索持续观察。</p>
             </div>
-            <div className="latest-score-list">
-              {growth.latestScans.map((scan) => (
-                <Link key={scan.id} href={`/dashboard/scans/${scan.id}`}>
-                  <span>{scan.brandName}</span>
-                  <strong>{scan.score === null ? "—" : scan.score.toFixed(0)}</strong>
-                  <small>{modeLabels[scan.dataMode]} · 查看报告</small>
+            {intelligence.alerts.length ? (
+              <div className="action-alert-list">
+                {intelligence.alerts.slice(0, 12).map((alert, index) => (
+                  <Link key={alert.id} href={alert.scanId ? `/dashboard/scans/${alert.scanId}` : "/dashboard/brands"} className="action-alert-card">
+                    <div className={`priority-chip priority-${alert.priority.toLowerCase()}`}>{alert.priority}<small>{priorityCopy[alert.priority]}</small></div>
+                    <span className="alert-index">{String(index + 1).padStart(2, "0")}</span>
+                    <div><b>{alert.source === "RISK" ? "品牌风险" : "增长机会"}</b><h3>{alert.title}</h3><p>{alert.summary}</p></div>
+                    <ArrowUpRight aria-hidden="true" size={18} />
+                  </Link>
+                ))}
+              </div>
+            ) : <div className="compact-empty"><strong>当前没有待处理信号</strong><p>完成下一次扫描后，系统会根据品牌提及、竞品、引用和风险生成行动队列。</p></div>}
+          </section>
+
+          <section className="intelligence-section intelligence-watchlist">
+            <div className="intelligence-section-heading">
+              <div><span>02 / BRAND WATCHLIST</span><h2>品牌信号板</h2></div>
+              <Link href="/dashboard/rankings">查看问题级排名矩阵 <ArrowRight size={15} /></Link>
+            </div>
+            <div className="brand-signal-grid">
+              {intelligence.latestScans.map((scan) => (
+                <Link key={scan.id} href={`/dashboard/scans/${scan.id}`} className="brand-signal-card">
+                  <div><span>{scan.brand.name}</span><b className={`mode-stamp mode-${scan.dataMode.toLowerCase()}`}>{modeLabels[scan.dataMode]}</b></div>
+                  <strong>{scan.scoreSnapshot?.score.toFixed(0) ?? "—"}</strong>
+                  <p>GeoScore · {scan.completedAt?.toLocaleString("zh-CN")}</p>
+                  <small>打开报告，查看原始回答与本次机会 <ArrowUpRight aria-hidden="true" size={13} /></small>
                 </Link>
               ))}
-              {growth.latestScans.length === 0 && (
-                <p className="compact-empty">品牌已经就位，完成第一次扫描后会在这里形成基线。</p>
-              )}
             </div>
           </section>
 
-          <section className="dashboard-section">
-            <div className="section-heading-compact">
-              <div><span className="section-index">QUEUE / 02</span><h2>优先处理的推荐机会</h2></div>
-              <small>按优先级从高到低</small>
-            </div>
-            {prioritizedOpportunities.length > 0 ? (
-              <div className="opportunity-grid">
-                {prioritizedOpportunities.map((opportunity) => (
-                  <OpportunityCard
-                    key={opportunity.id}
-                    opportunity={{
-                      id: opportunity.id,
-                      type: opportunity.type,
-                      priority: opportunity.priority,
-                      platformId: opportunity.platformId,
-                      title: opportunity.title,
-                      summary: opportunity.summary,
-                      evidence: opportunity.evidence,
-                      recommendedAction: opportunity.recommendedAction,
-                      targetContentType: opportunity.targetContentType,
-                      promptText: opportunity.promptVersion.text,
-                      experimentId: opportunity.optimizationExperiment?.id ?? null,
-                    }}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="compact-empty">
-                <strong>当前没有待处理机会</strong>
-                <p>完成新扫描后，系统会把问题级缺口排成行动队列。</p>
-              </div>
-            )}
+          <section className="intelligence-footer-grid">
+            <Link href="/dashboard/reputation"><ShieldAlert aria-hidden="true" size={22} /><span>口碑预警</span><p>把负面评价和风险证据按平台、问题回溯。</p><ArrowRight aria-hidden="true" size={16} /></Link>
+            <Link href="/dashboard/sources"><Sparkles aria-hidden="true" size={22} /><span>引用溯源</span><p>找到被 AI 采信的内容源，标记你的自有资产。</p><ArrowRight aria-hidden="true" size={16} /></Link>
           </section>
         </>
       )}

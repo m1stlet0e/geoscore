@@ -400,6 +400,7 @@ export const ModelName = {
   Observation: 'Observation',
   Mention: 'Mention',
   Citation: 'Citation',
+  OwnedSource: 'OwnedSource',
   ScoreSnapshot: 'ScoreSnapshot',
   RiskFinding: 'RiskFinding',
   Recommendation: 'Recommendation',
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "smsChallenge" | "brand" | "brandAlias" | "competitor" | "prompt" | "promptVersion" | "scan" | "opportunity" | "optimizationExperiment" | "observation" | "mention" | "citation" | "scoreSnapshot" | "riskFinding" | "recommendation" | "plan" | "order" | "paymentEvent" | "subscription" | "quotaAccount" | "quotaLedger"
+    modelProps: "user" | "session" | "account" | "verification" | "smsChallenge" | "brand" | "brandAlias" | "competitor" | "prompt" | "promptVersion" | "scan" | "opportunity" | "optimizationExperiment" | "observation" | "mention" | "citation" | "ownedSource" | "scoreSnapshot" | "riskFinding" | "recommendation" | "plan" | "order" | "paymentEvent" | "subscription" | "quotaAccount" | "quotaLedger"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1612,6 +1613,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    OwnedSource: {
+      payload: Prisma.$OwnedSourcePayload<ExtArgs>
+      fields: Prisma.OwnedSourceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.OwnedSourceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OwnedSourcePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.OwnedSourceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OwnedSourcePayload>
+        }
+        findFirst: {
+          args: Prisma.OwnedSourceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OwnedSourcePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.OwnedSourceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OwnedSourcePayload>
+        }
+        findMany: {
+          args: Prisma.OwnedSourceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OwnedSourcePayload>[]
+        }
+        create: {
+          args: Prisma.OwnedSourceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OwnedSourcePayload>
+        }
+        createMany: {
+          args: Prisma.OwnedSourceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.OwnedSourceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OwnedSourcePayload>[]
+        }
+        delete: {
+          args: Prisma.OwnedSourceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OwnedSourcePayload>
+        }
+        update: {
+          args: Prisma.OwnedSourceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OwnedSourcePayload>
+        }
+        deleteMany: {
+          args: Prisma.OwnedSourceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.OwnedSourceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.OwnedSourceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OwnedSourcePayload>[]
+        }
+        upsert: {
+          args: Prisma.OwnedSourceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OwnedSourcePayload>
+        }
+        aggregate: {
+          args: Prisma.OwnedSourceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOwnedSource>
+        }
+        groupBy: {
+          args: Prisma.OwnedSourceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OwnedSourceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.OwnedSourceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OwnedSourceCountAggregateOutputType> | number
+        }
+      }
+    }
     ScoreSnapshot: {
       payload: Prisma.$ScoreSnapshotPayload<ExtArgs>
       fields: Prisma.ScoreSnapshotFieldRefs
@@ -2566,6 +2641,18 @@ export const CitationScalarFieldEnum = {
 export type CitationScalarFieldEnum = (typeof CitationScalarFieldEnum)[keyof typeof CitationScalarFieldEnum]
 
 
+export const OwnedSourceScalarFieldEnum = {
+  id: 'id',
+  brandId: 'brandId',
+  url: 'url',
+  domain: 'domain',
+  label: 'label',
+  createdAt: 'createdAt'
+} as const
+
+export type OwnedSourceScalarFieldEnum = (typeof OwnedSourceScalarFieldEnum)[keyof typeof OwnedSourceScalarFieldEnum]
+
+
 export const ScoreSnapshotScalarFieldEnum = {
   id: 'id',
   brandId: 'brandId',
@@ -3109,6 +3196,7 @@ export type GlobalOmitConfig = {
   observation?: Prisma.ObservationOmit
   mention?: Prisma.MentionOmit
   citation?: Prisma.CitationOmit
+  ownedSource?: Prisma.OwnedSourceOmit
   scoreSnapshot?: Prisma.ScoreSnapshotOmit
   riskFinding?: Prisma.RiskFindingOmit
   recommendation?: Prisma.RecommendationOmit

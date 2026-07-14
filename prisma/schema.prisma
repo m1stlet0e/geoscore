@@ -182,6 +182,7 @@ model Brand {
   recommendations Recommendation[]
   opportunities   Opportunity[]
   experiments     OptimizationExperiment[]
+  ownedSources    OwnedSource[]
 
   @@unique([ownerId, name])
   @@index([ownerId])
@@ -379,6 +380,19 @@ model Citation {
   observation   Observation @relation(fields: [observationId], references: [id], onDelete: Cascade)
 
   @@unique([observationId, url])
+}
+
+model OwnedSource {
+  id        String   @id @default(cuid())
+  brandId   String
+  url       String
+  domain    String
+  label     String?
+  createdAt DateTime @default(now())
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, url])
+  @@index([brandId, domain])
 }
 
 model ScoreSnapshot {

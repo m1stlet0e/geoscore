@@ -67,6 +67,7 @@ export const ModelName = {
   Observation: 'Observation',
   Mention: 'Mention',
   Citation: 'Citation',
+  OwnedSource: 'OwnedSource',
   ScoreSnapshot: 'ScoreSnapshot',
   RiskFinding: 'RiskFinding',
   Recommendation: 'Recommendation',
@@ -341,6 +342,18 @@ export const CitationScalarFieldEnum = {
 } as const
 
 export type CitationScalarFieldEnum = (typeof CitationScalarFieldEnum)[keyof typeof CitationScalarFieldEnum]
+
+
+export const OwnedSourceScalarFieldEnum = {
+  id: 'id',
+  brandId: 'brandId',
+  url: 'url',
+  domain: 'domain',
+  label: 'label',
+  createdAt: 'createdAt'
+} as const
+
+export type OwnedSourceScalarFieldEnum = (typeof OwnedSourceScalarFieldEnum)[keyof typeof OwnedSourceScalarFieldEnum]
 
 
 export const ScoreSnapshotScalarFieldEnum = {

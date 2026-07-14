@@ -24,7 +24,7 @@ export * as $Enums from './enums'
 export * from "./enums"
 /**
  * ## Prisma Client
- * 
+ *
  * Type-safe database client for TypeScript
  * @example
  * ```
@@ -121,6 +121,11 @@ export type Mention = Prisma.MentionModel
  * 
  */
 export type Citation = Prisma.CitationModel
+/**
+ * Model OwnedSource
+ * 
+ */
+export type OwnedSource = Prisma.OwnedSourceModel
 /**
  * Model ScoreSnapshot
  * 

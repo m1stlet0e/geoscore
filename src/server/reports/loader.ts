@@ -32,3 +32,42 @@ export function loadScanReportForUser(
     include: scanReportInclude,
   });
 }
+
+export function loadScanSnapshotForUser(
+  userId: string,
+  scanId: string,
+  database: Pick<typeof db, "scan"> = db,
+) {
+  return database.scan.findFirst({
+    where: { id: scanId, brand: { ownerId: userId } },
+    select: {
+      id: true,
+      dataMode: true,
+      providerIds: true,
+      promptVersionIds: true,
+      requestedCount: true,
+      repeatCount: true,
+      createdAt: true,
+      completedAt: true,
+      brand: { select: { id: true, name: true } },
+      observations: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          platformId: true,
+          modelId: true,
+          runIndex: true,
+          rawResponse: true,
+          rawMetadata: true,
+          latencyMs: true,
+          createdAt: true,
+          promptVersion: { select: { text: true, version: true } },
+          mentions: {
+            select: { brandName: true, isTarget: true, position: true, recommendationStrength: true, sentiment: true, evidence: true },
+          },
+          citations: { select: { url: true, domain: true, title: true, sourceQuality: true, isOfficial: true } },
+        },
+      },
+    },
+  });
+}

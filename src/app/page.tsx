@@ -93,6 +93,14 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="trust-strip" aria-label="产品能力概览">
+        <span>从发现到验证的 GEO 操作系统</span>
+        <div><b>问题级</b><small>不只看总分</small></div>
+        <div><b>多模型</b><small>明确输给谁</small></div>
+        <div><b>可回溯</b><small>保留原始证据</small></div>
+        <div><b>可验证</b><small>复扫确认变化</small></div>
+      </section>
+
       <section id="method" className="journey-section">
         <div className="section-heading journey-heading">
           <p className="eyebrow"><Sparkles size={16} /> 一条完整的增长证据链</p>
@@ -112,6 +120,21 @@ export default function Home() {
           <strong>数据边界</strong>
           <p><b>模拟扫描仅用于体验闭环，不代表真实 AI 表现</b>；真实证据来自真实 AI 数据源及其原始回答。</p>
         </aside>
+      </section>
+
+      <section className="signal-workbench">
+        <div className="signal-workbench-copy">
+          <p className="eyebrow"><Radar size={16} /> 不是另一个漂亮仪表盘</p>
+          <h2>把“看不见”的 AI 认知，变成今天可以处理的品牌信号。</h2>
+          <p>情报总览会把未提及、竞品领先、负面口碑和引用缺口按 P0/P1/P2 排队；每一个信号都能一路回到提问、模型和原始回答。</p>
+          <Link href="/register" className="text-button">用自己的品牌建立基线 <ArrowRight size={15} /></Link>
+        </div>
+        <div className="signal-workbench-board" aria-label="情报队列示例">
+          <div className="workbench-top"><span>ACTION QUEUE</span><b>今日 04 个信号</b></div>
+          <article><i>P0</i><div><strong>核心采购问题未提及</strong><p>DeepSeek · “适合成长团队的 CRM？”</p></div><span>竞品甲 #1</span></article>
+          <article><i>P1</i><div><strong>负面评价需要回应</strong><p>通义千问 · 价格透明度证据不足</p></div><span>查看证据</span></article>
+          <article><i>P2</i><div><strong>官网内容被 AI 引用</strong><p>可标记为自有资产并持续建设</p></div><span>引用溯源</span></article>
+        </div>
       </section>
 
       <section className="method-section">
